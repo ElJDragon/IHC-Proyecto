@@ -1,0 +1,15 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <ItemGroup>
+    <ProjectReference Include="..\GestionIncidentes.Application\GestionIncidentes.Application.csproj" />
+    <ProjectReference Include="..\GestionIncidentes.Domain\GestionIncidentes.Domain.csproj" />
+    <ProjectReference Include="..\GestionIncidentes.Infrastructure\GestionIncidentes.Infrastructure.csproj" />
+  </ItemGroup>
+
+  <PropertyGroup>
+    <TargetFramework>net9.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+
+</Project>
