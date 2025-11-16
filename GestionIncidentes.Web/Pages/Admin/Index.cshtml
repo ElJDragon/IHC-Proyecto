@@ -1,0 +1,60 @@
+﻿@page
+@model GestionIncidentes.Web.Pages.Admin.ManageModelUI
+@{
+    ViewData["Title"] = "Administrar Departamentos";
+}
+
+<h2>Administrar Departamentos</h2>
+
+<!-- Formulario de creación / edición -->
+<form method="post" asp-page-handler="@((Model.IsEditing) ? "Edit" : "Create")">
+    @Html.AntiForgeryToken()
+    <div class="form-group">
+        <label>Nombre del departamento</label>
+        <input asp-for="SelectedDepartment.Name" class="form-control" />
+        <span asp-validation-for="SelectedDepartment.Name" class="text-danger"></span>
+    </div>
+    <button type="submit" class="btn btn-primary mt-2">
+        @(Model.IsEditing ? "Actualizar" : "Crear")
+    </button>
+    @if (Model.IsEditing)
+    {
+        <a asp-page="ManageUI" class="btn btn-secondary mt-2">Cancelar</a>
+    }
+</form>
+
+<hr />
+
+<!-- Tabla de departamentos -->
+<table class="table table-striped mt-3">
+    <thead>
+        <tr>
+            <th>Nombre</th>
+            <th>Acciones</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var dept in Model.Departments)
+        {
+            <tr>
+                <td>@dept.Name</td>
+                <td>
+                    <!-- Editar -->
+                    <a asp-page="ManageUI" asp-route-id="@dept.Id" class="btn btn-sm btn-warning">Editar</a>
+
+                    <!-- Eliminar -->
+                    <form method="post" asp-page-handler="Delete" style="display:inline;">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" name="id" value="@dept.Id.ToString()" />
+                        <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('¿Eliminar departamento?')">Eliminar</button>
+                    </form>
+
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
