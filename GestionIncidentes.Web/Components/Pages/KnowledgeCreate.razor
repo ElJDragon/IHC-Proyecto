@@ -1,0 +1,121 @@
+@page "/knowledge/create"
+@using GestionIncidentes.Application.Features.Knowledge
+@using GestionIncidentes.Application.Interfaces
+@using MediatR
+@using Microsoft.AspNetCore.Components.Forms
+@inject IMediator Mediator
+@inject NavigationManager Navigation
+@inject ICurrentUser CurrentUser
+@rendermode InteractiveServer
+
+<PageTitle>Crear Entrada en Base de Conocimiento</PageTitle>
+
+<h3>Crear Nueva Entrada en Base de Conocimiento</h3>
+
+<EditForm Model="@model" OnValidSubmit="HandleSubmit" FormName="KnowledgeCreateForm">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <div class="mb-3">
+        <label class="form-label">Título</label>
+        <InputText class="form-control" @bind-Value="model.Title" />
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Categoría</label>
+        <InputSelect class="form-select" @bind-Value="model.Category">
+            <option value="">-- Seleccionar --</option>
+            <option value="Hardware">Hardware</option>
+            <option value="Software">Software</option>
+            <option value="Red">Red</option>
+            <option value="Otro">Otro</option>
+        </InputSelect>
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Descripción del Problema</label>
+        <InputTextArea class="form-control" rows="4" @bind-Value="model.Problem" />
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Solución</label>
+        <InputTextArea class="form-control" rows="6" @bind-Value="model.Solution" />
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Tags (separados por coma)</label>
+        <InputText class="form-control" @bind-Value="tagsInput" placeholder="ej: impresora, driver, windows" />
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Ticket Relacionado (opcional)</label>
+        <InputText class="form-control" @bind-Value="ticketIdInput" placeholder="ID del ticket" />
+    </div>
+
+    <div class="d-flex gap-2">
+        <button type="submit" class="btn btn-primary" disabled="@isSubmitting">
+            @if (isSubmitting)
+            {
+                <span class="spinner-border spinner-border-sm me-2" role="status"></span>
+            }
+            Crear Entrada
+        </button>
+        <button type="button" class="btn btn-secondary" @onclick="Cancel">Cancelar</button>
+    </div>
+</EditForm>
+
+@code {
+    private KnowledgeModel model = new();
+    private string tagsInput = string.Empty;
+    private string ticketIdInput = string.Empty;
+    private bool isSubmitting = false;
+
+    private async Task HandleSubmit()
+    {
+        isSubmitting = true;
+        try
+        {
+            var tags = tagsInput.Split(',', StringSplitOptions.RemoveEmptyEntries)
+                                .Select(t => t.Trim())
+                                .ToList();
+
+            Guid? relatedTicketId = null;
+            if (Guid.TryParse(ticketIdInput, out var ticketId))
+            {
+                relatedTicketId = ticketId;
+            }
+
+            var currentUserId = CurrentUser.UserId ?? Guid.Empty;
+
+            var command = new AddKnowledgeEntryCommand(
+                model.Title,
+                model.Problem,
+                model.Solution,
+                model.Category,
+                currentUserId,
+                relatedTicketId,
+                tags
+            );
+
+            await Mediator.Send(command);
+            Navigation.NavigateTo("/knowledge/search");
+        }
+        finally
+        {
+            isSubmitting = false;
+        }
+    }
+
+    private void Cancel()
+    {
+        Navigation.NavigateTo("/knowledge/search");
+    }
+
+    public class KnowledgeModel
+    {
+        public string Title { get; set; } = string.Empty;
+        public string Category { get; set; } = string.Empty;
+        public string Problem { get; set; } = string.Empty;
+        public string Solution { get; set; } = string.Empty;
+    }
+}

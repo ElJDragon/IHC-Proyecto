@@ -53,11 +53,24 @@ builder.Services.AddSwaggerGen(c =>
 
 // -------------------- Services / Dependency Injection --------------------
 
+// ✅ Blazor Components y Server
+builder.Services.AddRazorComponents()
+    .AddInteractiveServerComponents();
+
+// Configurar opciones de circuito para errores detallados
+builder.Services.Configure<Microsoft.AspNetCore.Components.Server.CircuitOptions>(options =>
+{
+    options.DetailedErrors = builder.Environment.IsDevelopment();
+});
+
 // Controllers / API
 builder.Services.AddControllers();
 
 // Razor Pages
 builder.Services.AddRazorPages();
+
+// ✅ Autenticación en cascada para Blazor
+builder.Services.AddCascadingAuthenticationState();
 
 // Agregar soporte para sesión
 builder.Services.AddDistributedMemoryCache();
@@ -101,13 +114,15 @@ builder.Services.AddAuthentication(options =>
     };
 });
 
-// MediatR
+// MediatR - Registrar todos los assemblies con handlers y event handlers
 builder.Services.AddMediatR(cfg =>
 {
     cfg.RegisterServicesFromAssemblies(
-        typeof(ListUsersQueryHandler).Assembly,
+        typeof(ListUsersQueryHandler).Assembly,  // Application assembly
         typeof(CreateUserCommandHandler).Assembly
     );
+    // Registrar behaviors
+    cfg.AddOpenBehavior(typeof(GestionIncidentes.Application.Behaviors.AuditBehavior<,>));
 });
 
 // AutoMapper
@@ -118,18 +133,45 @@ var connectionString = builder.Configuration.GetConnectionString("DefaultConnect
 builder.Services.AddDbContext<GestionIncidentesDbContext>(options =>
     options.UseNpgsql(connectionString));
 
-// Repositorios EF Core
+// -------------------- Repositorios EF Core --------------------
 builder.Services.AddScoped<IUserRepository, EfUserRepository>();
 builder.Services.AddScoped<IRoleRepository, EfRoleRepository>();
 builder.Services.AddScoped<IDepartmentRepository, EfDepartmentRepository>();
 builder.Services.AddScoped<ITicketRepository, EfTicketRepository>();
 
-// Servicios
+// ✅ Nuevos repositorios para Integración C
+builder.Services.AddScoped<IKnowledgeRepository, KnowledgeRepository>();
+builder.Services.AddScoped<INotificationRepository, NotificationRepository>();
+builder.Services.AddScoped<IAuditLogRepository, AuditLogRepository>();
+builder.Services.AddScoped<ITicketReportRepository, TicketReportRepository>();
+
+// -------------------- Servicios --------------------
 builder.Services.AddScoped<IWorkloadService, WorkloadService>();
+builder.Services.AddScoped<NotificationService>();
+builder.Services.AddScoped<ReportFormatter>();
 
 // Usuario actual
 builder.Services.AddHttpContextAccessor();
-builder.Services.AddScoped<ICurrentUser, HttpContextCurrentUser>();
+
+// Registrar BlazorCurrentUser directamente
+builder.Services.AddScoped<GestionIncidentes.Web.Services.BlazorCurrentUser>();
+
+// Usar HttpContextCurrentUser para APIs y BlazorCurrentUser para componentes Blazor
+builder.Services.AddScoped<ICurrentUser>(sp =>
+{
+    var httpContextAccessor = sp.GetRequiredService<IHttpContextAccessor>();
+    if (httpContextAccessor.HttpContext != null)
+    {
+        // Si hay HttpContext disponible (API/Razor Pages), usar HttpContextCurrentUser
+        return new HttpContextCurrentUser(httpContextAccessor);
+    }
+    else
+    {
+        // Si no hay HttpContext (componentes Blazor), usar BlazorCurrentUser
+        var authStateProvider = sp.GetRequiredService<Microsoft.AspNetCore.Components.Authorization.AuthenticationStateProvider>();
+        return new GestionIncidentes.Web.Services.BlazorCurrentUser(authStateProvider, httpContextAccessor);
+    }
+});
 
 // Authorization handlers & policies
 builder.Services.AddScoped<IAuthorizationHandler, RoleLevelHandler>();
@@ -151,11 +193,14 @@ builder.Services.AddHttpClient();
 // -------------------- Build app --------------------
 var app = builder.Build();
 
-// Aplicar migraciones automáticamente al iniciar
+// Aplicar migraciones y seed de datos automáticamente al iniciar
 using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<GestionIncidentesDbContext>();
-    db.Database.Migrate();
+    await db.Database.MigrateAsync();
+    
+    // Seed de datos de prueba
+    await GestionIncidentes.Web.Data.DatabaseSeeder.SeedAsync(db);
 }
 
 // Middleware
@@ -182,13 +227,17 @@ app.UseSession();
 app.UseAuthentication();
 app.UseAuthorization();
 
+// ✅ Anti-forgery para Blazor
+app.UseAntiforgery();
+
 // Map controllers
 app.MapControllers();
 
 // Map Razor Pages
 app.MapRazorPages();
 
-// Fallback para SPA o index
-app.MapFallbackToFile("index.html");
+// ✅ Map Blazor Components
+app.MapRazorComponents<GestionIncidentes.Web.Components.App>()
+    .AddInteractiveServerRenderMode();
 
 app.Run();

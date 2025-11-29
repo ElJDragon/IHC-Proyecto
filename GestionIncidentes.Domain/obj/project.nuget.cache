@@ -1,8 +1,10 @@
 {
   "version": 2,
-  "dgSpecHash": "foPb/OVPKyU=",
+  "dgSpecHash": "xKp7zefADYQ=",
   "success": true,
-  "projectFilePath": "C:\\Users\\Lenovo Ideapad\\Source\\Repos\\IHC-Proyecto\\GestionIncidentes.Domain\\GestionIncidentes.Domain.csproj",
-  "expectedPackageFiles": [],
+  "projectFilePath": "C:\\Users\\User\\Documents\\Joshua Universidad\\Quinto\\IHC\\ProyectoIHC\\IHC-Proyecto\\GestionIncidentes.Domain\\GestionIncidentes.Domain.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\User\\.nuget\\packages\\mediatr.contracts\\2.0.1\\mediatr.contracts.2.0.1.nupkg.sha512"
+  ],
   "logs": []
 }

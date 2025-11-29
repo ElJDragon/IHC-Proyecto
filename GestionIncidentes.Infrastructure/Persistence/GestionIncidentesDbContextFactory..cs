@@ -11,7 +11,7 @@ namespace GestionIncidentes.Infrastructure
             var optionsBuilder = new DbContextOptionsBuilder<GestionIncidentesDbContext>();
 
             // Aquí la misma cadena de conexión que pusiste en appsettings.json
-            optionsBuilder.UseNpgsql("Host=localhost;Port=5432;Database=GestionIncidentesDb;Username=postgres;Password=con1234");
+            optionsBuilder.UseNpgsql("Host=localhost;Port=5432;Database=GestionIncidentesDb;Username=postgres;Password=postgres");
 
             return new GestionIncidentesDbContext(optionsBuilder.Options);
         }

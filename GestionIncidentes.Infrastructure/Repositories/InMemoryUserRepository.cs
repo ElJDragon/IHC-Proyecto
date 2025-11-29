@@ -36,6 +36,10 @@ namespace GestionIncidentes.Infrastructure.Repositories
         public Task<IEnumerable<User>> ListAllAsync(CancellationToken ct = default)
             => Task.FromResult<IEnumerable<User>>(_store);
 
+        // ✅ Implementación de GetAllAsync para event handlers
+        public Task<List<User>> GetAllAsync()
+            => Task.FromResult(_store.ToList());
+
         // -------------------- Listar usuarios por departamento --------------------
         public Task<IEnumerable<User>> ListByDepartmentAsync(Guid deptId, CancellationToken ct = default)
             => Task.FromResult<IEnumerable<User>>(_store.Where(u => u.DepartmentId == deptId));

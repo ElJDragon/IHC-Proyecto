@@ -1,0 +1,125 @@
+@page "/reports/viewer"
+@using GestionIncidentes.Application.Features.Reports
+@using GestionIncidentes.Application.Interfaces
+@inject ITicketReportRepository ReportRepository
+@inject NavigationManager Navigation
+@rendermode InteractiveServer
+
+<PageTitle>Visor de Reportes</PageTitle>
+
+<h3>Reportes de Tickets</h3>
+
+@if (isLoading)
+{
+    <div class="text-center">
+        <div class="spinner-border" role="status">
+            <span class="visually-hidden">Cargando...</span>
+        </div>
+    </div>
+}
+else if (reports.Any())
+{
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Ticket ID</th>
+                <th>Técnico</th>
+                <th>Fecha</th>
+                <th>Tiempo Empleado</th>
+                <th>KDB Sugerida</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var report in reports)
+            {
+                <tr>
+                    <td>@report.TicketId</td>
+                    <td>@report.TechnicianId</td>
+                    <td>@report.CreatedAt.ToString("dd/MM/yyyy HH:mm")</td>
+                    <td>@report.TimeSpent</td>
+                    <td>
+                        @if (report.SuggestKnowledgeEntry)
+                        {
+                            <span class="badge bg-warning">Sí</span>
+                        }
+                        else
+                        {
+                            <span class="badge bg-secondary">No</span>
+                        }
+                    </td>
+                    <td>
+                        <button class="btn btn-sm btn-primary" @onclick="() => ViewReport(report.Id)">
+                            <i class="bi bi-eye"></i> Ver
+                        </button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+else
+{
+    <div class="alert alert-info">
+        No hay reportes disponibles.
+    </div>
+}
+
+@if (selectedReport != null)
+{
+    <div class="modal show d-block" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Reporte del Ticket @selectedReport.TicketId</h5>
+                    <button type="button" class="btn-close" @onclick="CloseReport"></button>
+                </div>
+                <div class="modal-body">
+                    <h6>Diagnóstico del Problema</h6>
+                    <p>@selectedReport.ProblemDiagnosis</p>
+                    
+                    <h6>Acciones Realizadas</h6>
+                    <p>@selectedReport.ActionsTaken</p>
+                    
+                    <h6>Detalles de Resolución</h6>
+                    <p>@selectedReport.ResolutionDetails</p>
+                    
+                    <p><strong>Tiempo Empleado:</strong> @selectedReport.TimeSpent</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" @onclick="CloseReport">Cerrar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal-backdrop show"></div>
+}
+
+@code {
+    private List<Domain.Entities.TicketReport> reports = new();
+    private Domain.Entities.TicketReport? selectedReport = null;
+    private bool isLoading = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        isLoading = true;
+        try
+        {
+            reports = await ReportRepository.GetAllAsync();
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+
+    private async Task ViewReport(Guid reportId)
+    {
+        selectedReport = await ReportRepository.GetByIdAsync(reportId);
+    }
+
+    private void CloseReport()
+    {
+        selectedReport = null;
+    }
+}

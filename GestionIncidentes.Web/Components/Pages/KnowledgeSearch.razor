@@ -1,0 +1,93 @@
+@page "/knowledge/search"
+@using GestionIncidentes.Application.Features.Knowledge
+@using MediatR
+@inject IMediator Mediator
+@rendermode InteractiveServer
+
+<PageTitle>Buscar en Base de Conocimiento</PageTitle>
+
+<h3>Buscar en Base de Conocimiento</h3>
+
+<div class="row mb-3">
+    <div class="col-md-8">
+        <input type="text" class="form-control" @bind="searchTerm" placeholder="Buscar problema o solución..." />
+    </div>
+    <div class="col-md-4">
+        <button class="btn btn-primary w-100" @onclick="Search">
+            <i class="bi bi-search"></i> Buscar
+        </button>
+    </div>
+</div>
+
+@if (isLoading)
+{
+    <div class="text-center">
+        <div class="spinner-border" role="status">
+            <span class="visually-hidden">Cargando...</span>
+        </div>
+    </div>
+}
+else if (results.Any())
+{
+    <div class="row">
+        @foreach (var entry in results)
+        {
+            <div class="col-md-6 mb-3">
+                <div class="card">
+                    <div class="card-header">
+                        <h5>@entry.Title</h5>
+                        <span class="badge bg-secondary">@entry.Category</span>
+                        <span class="badge bg-info">Usado @entry.UsageCount veces</span>
+                    </div>
+                    <div class="card-body">
+                        <h6>Problema:</h6>
+                        <p>@entry.Problem</p>
+                        <h6>Solución:</h6>
+                        <p>@entry.Solution</p>
+                        @if (entry.Tags.Any())
+                        {
+                            <div>
+                                @foreach (var tag in entry.Tags)
+                                {
+                                    <span class="badge bg-light text-dark me-1">@tag</span>
+                                }
+                            </div>
+                        }
+                    </div>
+                    <div class="card-footer text-muted">
+                        <small>Creado: @entry.CreatedAt.ToString("dd/MM/yyyy")</small>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+}
+else if (!string.IsNullOrWhiteSpace(searchTerm))
+{
+    <div class="alert alert-info">
+        No se encontraron resultados para "<strong>@searchTerm</strong>".
+    </div>
+}
+
+@code {
+    private string searchTerm = string.Empty;
+    private List<KnowledgeEntryDto> results = new();
+    private bool isLoading = false;
+
+    private async Task Search()
+    {
+        if (string.IsNullOrWhiteSpace(searchTerm))
+            return;
+
+        isLoading = true;
+        try
+        {
+            var query = new SearchKnowledgeQuery(searchTerm);
+            results = await Mediator.Send(query);
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+}

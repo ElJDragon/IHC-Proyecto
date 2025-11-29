@@ -48,6 +48,12 @@ namespace GestionIncidentes.Infrastructure.Repositories
             return await _context.Users.ToListAsync(ct);
         }
 
+        // ✅ Implementación de GetAllAsync para event handlers
+        public async Task<List<User>> GetAllAsync()
+        {
+            return await _context.Users.ToListAsync();
+        }
+
         // -------------------- Listar usuarios por departamento --------------------
         public async Task<IEnumerable<User>> ListByDepartmentAsync(Guid deptId, CancellationToken ct = default)
         {

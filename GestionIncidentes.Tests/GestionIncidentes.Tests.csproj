@@ -20,4 +20,9 @@
     <Using Include="Xunit" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\GestionIncidentes.Domain\GestionIncidentes.Domain.csproj" />
+    <ProjectReference Include="..\GestionIncidentes.Application\GestionIncidentes.Application.csproj" />
+  </ItemGroup>
+
 </Project>

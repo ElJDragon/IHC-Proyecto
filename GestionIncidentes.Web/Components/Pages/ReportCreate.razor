@@ -1,0 +1,144 @@
+@page "/reports/create/{TicketId:guid}"
+@using GestionIncidentes.Application.Features.Reports
+@using GestionIncidentes.Application.Interfaces
+@using MediatR
+@using Microsoft.AspNetCore.Components.Forms
+@inject IMediator Mediator
+@inject NavigationManager Navigation
+@inject ICurrentUser CurrentUser
+@inject ITicketRepository TicketRepository
+@rendermode InteractiveServer
+
+<PageTitle>Generar Reporte de Ticket</PageTitle>
+
+<h3>Generar Reporte de Ticket</h3>
+
+@if (ticket != null)
+{
+    <div class="alert alert-info mb-4">
+        <h5>@ticket.Title</h5>
+        <p>@ticket.Description</p>
+        <small>Estado: @ticket.Status</small>
+    </div>
+}
+
+<EditForm Model="@model" OnValidSubmit="HandleSubmit" FormName="ReportCreateForm">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <div class="mb-3">
+        <label class="form-label">Diagnóstico del Problema</label>
+        <InputTextArea class="form-control" rows="4" @bind-Value="model.ProblemDiagnosis" placeholder="Describe el problema identificado..." />
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Acciones Realizadas</label>
+        <InputTextArea class="form-control" rows="4" @bind-Value="model.ActionsTaken" placeholder="Describe las acciones que realizaste para resolver el problema..." />
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Detalles de Resolución</label>
+        <InputTextArea class="form-control" rows="6" @bind-Value="model.ResolutionDetails" placeholder="Detalla cómo se resolvió el problema..." />
+    </div>
+
+    <div class="row">
+        <div class="col-md-6 mb-3">
+            <label class="form-label">Tiempo Empleado (horas)</label>
+            <InputNumber class="form-control" @bind-Value="timeSpentHours" />
+        </div>
+        <div class="col-md-6 mb-3">
+            <label class="form-label">Tiempo Empleado (minutos)</label>
+            <InputNumber class="form-control" @bind-Value="timeSpentMinutes" />
+        </div>
+    </div>
+
+    <div class="mb-3 form-check">
+        <InputCheckbox class="form-check-input" id="suggestKnowledge" @bind-Value="model.SuggestKnowledgeEntry" />
+        <label class="form-check-label" for="suggestKnowledge">
+            Sugerir agregar a la Base de Conocimiento
+        </label>
+        <small class="form-text text-muted d-block">
+            Marca esta opción si consideras que esta solución debería agregarse a la base de conocimiento para futuras consultas.
+        </small>
+    </div>
+
+    <div class="d-flex gap-2">
+        <button type="submit" class="btn btn-primary" disabled="@isSubmitting">
+            @if (isSubmitting)
+            {
+                <span class="spinner-border spinner-border-sm me-2" role="status"></span>
+            }
+            Generar Reporte
+        </button>
+        <button type="button" class="btn btn-secondary" @onclick="Cancel">Cancelar</button>
+    </div>
+</EditForm>
+
+@code {
+    [Parameter]
+    public Guid TicketId { get; set; }
+
+    private ReportModel model = new();
+    private Domain.Entities.Ticket? ticket;
+    private int timeSpentHours = 0;
+    private int timeSpentMinutes = 0;
+    private bool isSubmitting = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        ticket = await TicketRepository.GetByIdAsync(TicketId);
+        if (ticket == null)
+        {
+            Navigation.NavigateTo("/reports/viewer");
+        }
+    }
+
+    private async Task HandleSubmit()
+    {
+        isSubmitting = true;
+        try
+        {
+            var timeSpent = TimeSpan.FromHours(timeSpentHours) + TimeSpan.FromMinutes(timeSpentMinutes);
+
+            var currentUserId = CurrentUser.UserId ?? Guid.Empty;
+
+            var command = new GenerateTicketReportQuery(
+                TicketId,
+                currentUserId,
+                model.ResolutionDetails,
+                model.ProblemDiagnosis,
+                model.ActionsTaken,
+                timeSpent,
+                model.SuggestKnowledgeEntry
+            );
+
+            var reportId = await Mediator.Send(command);
+
+            if (model.SuggestKnowledgeEntry)
+            {
+                Navigation.NavigateTo($"/knowledge/create?ticketId={TicketId}");
+            }
+            else
+            {
+                Navigation.NavigateTo("/reports/viewer");
+            }
+        }
+        finally
+        {
+            isSubmitting = false;
+        }
+    }
+
+    private void Cancel()
+    {
+        Navigation.NavigateTo("/reports/viewer");
+    }
+
+    public class ReportModel
+    {
+        public string ProblemDiagnosis { get; set; } = string.Empty;
+        public string ActionsTaken { get; set; } = string.Empty;
+        public string ResolutionDetails { get; set; } = string.Empty;
+        public bool SuggestKnowledgeEntry { get; set; } = false;
+    }
+}

@@ -1,0 +1,95 @@
+@using GestionIncidentes.Application.Features.Notifications
+@using GestionIncidentes.Application.Interfaces
+@inject INotificationRepository NotificationRepository
+@inject NavigationManager Navigation
+@inject ICurrentUser CurrentUser
+@implements IDisposable
+
+<div class="dropdown">
+    <button class="btn btn-light position-relative" type="button" id="notificationDropdown" data-bs-toggle="dropdown">
+        <i class="bi bi-bell"></i>
+        @if (unreadCount > 0)
+        {
+            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                @unreadCount
+                <span class="visually-hidden">notificaciones no leídas</span>
+            </span>
+        }
+    </button>
+    <ul class="dropdown-menu dropdown-menu-end" style="width: 300px; max-height: 400px; overflow-y: auto;">
+        <li class="dropdown-header">Notificaciones</li>
+        @if (notifications.Any())
+        {
+            @foreach (var notification in notifications.Take(5))
+            {
+                <li>
+                    <a class="dropdown-item @(!notification.IsRead ? "bg-light" : "")" 
+                       href="/notifications"
+                       @onclick:preventDefault
+                       @onclick="() => GoToNotifications()">
+                        <div class="d-flex flex-column">
+                            <strong>@notification.Title</strong>
+                            <small class="text-muted">@notification.Message</small>
+                            <small class="text-muted">@notification.CreatedAt.ToString("HH:mm")</small>
+                        </div>
+                    </a>
+                </li>
+                <li><hr class="dropdown-divider"></li>
+            }
+            <li>
+                <a class="dropdown-item text-center text-primary" href="/notifications">
+                    Ver todas las notificaciones
+                </a>
+            </li>
+        }
+        else
+        {
+            <li>
+                <span class="dropdown-item text-muted">No hay notificaciones</span>
+            </li>
+        }
+    </ul>
+</div>
+
+@code {
+    private List<Domain.Entities.Notification> notifications = new();
+    private int unreadCount = 0;
+    private System.Threading.Timer? timer;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadNotifications();
+        
+        // Actualizar notificaciones cada 30 segundos
+        timer = new System.Threading.Timer(async _ =>
+        {
+            await InvokeAsync(async () =>
+            {
+                await LoadNotifications();
+                StateHasChanged();
+            });
+        }, null, TimeSpan.FromSeconds(30), TimeSpan.FromSeconds(30));
+    }
+
+    private async Task LoadNotifications()
+    {
+        // Obtener el usuario actual del sistema de autenticación
+        var currentUserId = CurrentUser.UserId ?? Guid.Empty;
+        
+        if (currentUserId != Guid.Empty)
+        {
+            notifications = await NotificationRepository.GetByUserIdAsync(currentUserId);
+            unreadCount = notifications.Count(n => !n.IsRead);
+        }
+    }
+
+    private void GoToNotifications()
+    {
+        Navigation.NavigateTo("/notifications");
+    }
+
+    public void Dispose()
+    {
+        timer?.Dispose();
+    }
+}
