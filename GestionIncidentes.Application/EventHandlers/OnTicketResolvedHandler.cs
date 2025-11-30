@@ -23,9 +23,13 @@ public class OnTicketResolvedHandler : INotificationHandler<TicketResolved>
 
     public async Task Handle(TicketResolved notification, CancellationToken cancellationToken)
     {
-        // Notificar al tÈcnico que resolviÛ para que genere el reporte
+        // Obtener el ticket para saber qui√©n lo resolvi√≥
+        var ticket = await _ticketRepository.GetByIdAsync(notification.TicketId);
+        if (ticket == null) return;
+        
+        // Notificar al t√©cnico asignado para que genere el reporte
         var notif = Notification.Create(
-            notification.ResolvedByUserId,
+            ticket.UserId,
             "Ticket Resuelto - Generar Reporte",
             $"Has resuelto el ticket. Por favor genera el reporte correspondiente y considera agregarlo a la Base de Conocimiento.",
             "TicketResolved",
@@ -34,9 +38,8 @@ public class OnTicketResolvedHandler : INotificationHandler<TicketResolved>
 
         await _notificationRepository.AddAsync(notif);
 
-        // TambiÈn notificar al creador del ticket
-        var ticket = await _ticketRepository.GetByIdAsync(notification.TicketId);
-        if (ticket != null)
+        // Tambi√©n notificar al creador del ticket
+        if (ticket.CreatedByUserId != ticket.UserId)
         {
             var creatorNotif = Notification.Create(
                 ticket.CreatedByUserId,

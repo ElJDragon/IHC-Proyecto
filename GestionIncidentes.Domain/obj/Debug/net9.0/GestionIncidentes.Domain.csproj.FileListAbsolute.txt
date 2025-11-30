@@ -34,3 +34,16 @@ C:\Users\User\Documents\Joshua Universidad\Quinto\IHC\ProyectoIHC\IHC-Proyecto\G
 C:\Users\User\Documents\Joshua Universidad\Quinto\IHC\ProyectoIHC\IHC-Proyecto\GestionIncidentes.Domain\obj\Debug\net9.0\refint\GestionIncidentes.Domain.dll
 C:\Users\User\Documents\Joshua Universidad\Quinto\IHC\ProyectoIHC\IHC-Proyecto\GestionIncidentes.Domain\obj\Debug\net9.0\GestionIncidentes.Domain.pdb
 C:\Users\User\Documents\Joshua Universidad\Quinto\IHC\ProyectoIHC\IHC-Proyecto\GestionIncidentes.Domain\obj\Debug\net9.0\ref\GestionIncidentes.Domain.dll
+C:\IHC-Proyecto\GestionIncidentes.Domain\bin\Debug\net9.0\GestionIncidentes.Domain.deps.json
+C:\IHC-Proyecto\GestionIncidentes.Domain\bin\Debug\net9.0\GestionIncidentes.Domain.dll
+C:\IHC-Proyecto\GestionIncidentes.Domain\bin\Debug\net9.0\GestionIncidentes.Domain.pdb
+C:\IHC-Proyecto\GestionIncidentes.Domain\obj\Debug\net9.0\GestionIncidentes.Domain.csproj.AssemblyReference.cache
+C:\IHC-Proyecto\GestionIncidentes.Domain\obj\Debug\net9.0\GestionIncidentes.Domain.GeneratedMSBuildEditorConfig.editorconfig
+C:\IHC-Proyecto\GestionIncidentes.Domain\obj\Debug\net9.0\GestionIncidentes.Domain.AssemblyInfoInputs.cache
+C:\IHC-Proyecto\GestionIncidentes.Domain\obj\Debug\net9.0\GestionIncidentes.Domain.AssemblyInfo.cs
+C:\IHC-Proyecto\GestionIncidentes.Domain\obj\Debug\net9.0\GestionIncidentes.Domain.csproj.CoreCompileInputs.cache
+C:\IHC-Proyecto\GestionIncidentes.Domain\obj\Debug\net9.0\GestionIncidentes.Domain.sourcelink.json
+C:\IHC-Proyecto\GestionIncidentes.Domain\obj\Debug\net9.0\GestionIncidentes.Domain.dll
+C:\IHC-Proyecto\GestionIncidentes.Domain\obj\Debug\net9.0\refint\GestionIncidentes.Domain.dll
+C:\IHC-Proyecto\GestionIncidentes.Domain\obj\Debug\net9.0\GestionIncidentes.Domain.pdb
+C:\IHC-Proyecto\GestionIncidentes.Domain\obj\Debug\net9.0\ref\GestionIncidentes.Domain.dll

@@ -19,17 +19,18 @@ public class OnTicketCreatedHandler : INotificationHandler<TicketCreated>
 
     public async Task Handle(TicketCreated notification, CancellationToken cancellationToken)
     {
-        if (notification.AssignedToUserId.HasValue)
-        {
-            var notif = Notification.Create(
-                notification.AssignedToUserId.Value,
-                "Ticket Asignado",
-                $"Se te ha asignado un nuevo ticket.",
-                "TicketAssigned",
-                notification.TicketId
-            );
+        // El evento TicketCreated ya no tiene AssignedToUserId
+        // La notificación se enviará cuando se asigne el ticket (evento TicketAssigned)
+        
+        // Opcionalmente, notificar al creador que el ticket fue creado
+        var notif = Notification.Create(
+            notification.CreatedByUserId,
+            "Ticket Creado",
+            $"Tu ticket '{notification.Title}' ha sido creado exitosamente.",
+            "TicketCreated",
+            notification.TicketId
+        );
 
-            await _notificationRepository.AddAsync(notif);
-        }
+        await _notificationRepository.AddAsync(notif);
     }
 }

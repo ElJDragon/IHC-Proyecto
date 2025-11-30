@@ -139,6 +139,9 @@ builder.Services.AddScoped<IRoleRepository, EfRoleRepository>();
 builder.Services.AddScoped<IDepartmentRepository, EfDepartmentRepository>();
 builder.Services.AddScoped<ITicketRepository, EfTicketRepository>();
 
+// ✅ Repositorio Integrante A
+builder.Services.AddScoped<IIncidentRepository, IncidentRepository>();
+
 // ✅ Nuevos repositorios para Integración C
 builder.Services.AddScoped<IKnowledgeRepository, KnowledgeRepository>();
 builder.Services.AddScoped<INotificationRepository, NotificationRepository>();
@@ -194,6 +197,8 @@ builder.Services.AddHttpClient();
 var app = builder.Build();
 
 // Aplicar migraciones y seed de datos automáticamente al iniciar
+// COMENTADO: Usa el script SQL en lugar de migraciones automáticas
+/*
 using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<GestionIncidentesDbContext>();
@@ -202,6 +207,7 @@ using (var scope = app.Services.CreateScope())
     // Seed de datos de prueba
     await GestionIncidentes.Web.Data.DatabaseSeeder.SeedAsync(db);
 }
+*/
 
 // Middleware
 if (app.Environment.IsDevelopment())

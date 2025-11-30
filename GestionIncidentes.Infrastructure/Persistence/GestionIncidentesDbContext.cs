@@ -12,6 +12,7 @@ namespace GestionIncidentes.Infrastructure
         public DbSet<Role> Roles => Set<Role>();
         public DbSet<Department> Departments => Set<Department>();
         public DbSet<Ticket> Tickets => Set<Ticket>();
+        public DbSet<Incident> Incidents => Set<Incident>(); // ✅ Integrante A
         
         // ✅ Nuevas entidades para Base de Conocimiento, Reportes, Notificaciones y Auditoría
         public DbSet<KnowledgeEntry> KnowledgeEntries => Set<KnowledgeEntry>();
@@ -28,6 +29,7 @@ namespace GestionIncidentes.Infrastructure
             modelBuilder.Entity<Role>().HasKey(r => r.Id);
             modelBuilder.Entity<Department>().HasKey(d => d.Id);
             modelBuilder.Entity<Ticket>().HasKey(t => t.Id);
+            modelBuilder.Entity<Incident>().HasKey(i => i.Id); // ✅ Integrante A
             modelBuilder.Entity<KnowledgeEntry>().HasKey(k => k.Id);
             modelBuilder.Entity<Notification>().HasKey(n => n.Id);
             modelBuilder.Entity<AuditLog>().HasKey(a => a.Id);
@@ -44,6 +46,13 @@ namespace GestionIncidentes.Infrastructure
                 .HasOne<User>()
                 .WithMany()
                 .HasForeignKey(t => t.UserId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            // ✅ Integrante A: Incident reportado por usuario
+            modelBuilder.Entity<Incident>()
+                .HasOne<User>()
+                .WithMany()
+                .HasForeignKey(i => i.ReportedByUserId)
                 .OnDelete(DeleteBehavior.Restrict);
 
             modelBuilder.Entity<KnowledgeEntry>()
@@ -83,6 +92,11 @@ namespace GestionIncidentes.Infrastructure
             modelBuilder.Entity<Role>().Property(r => r.Name).IsRequired();
             modelBuilder.Entity<Ticket>().Property(t => t.Title).IsRequired();
             modelBuilder.Entity<Ticket>().Property(t => t.Status).IsRequired();
+            
+            // ✅ Integrante A: Incident
+            modelBuilder.Entity<Incident>().Property(i => i.Title).IsRequired();
+            modelBuilder.Entity<Incident>().Property(i => i.Description).IsRequired();
+            modelBuilder.Entity<Incident>().Property(i => i.Status).IsRequired();
             
             modelBuilder.Entity<KnowledgeEntry>().Property(k => k.Title).IsRequired();
             modelBuilder.Entity<KnowledgeEntry>().Property(k => k.Problem).IsRequired();
