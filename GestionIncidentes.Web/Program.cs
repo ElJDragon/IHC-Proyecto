@@ -150,6 +150,20 @@ builder.Services.AddScoped<IWorkloadService, WorkloadService>();
 builder.Services.AddScoped<NotificationService>();
 builder.Services.AddScoped<ReportFormatter>();
 
+// ✅ Servicios HTTP para comunicación Frontend-Backend
+builder.Services.AddHttpClient<GestionIncidentes.Web.Services.AdminTicketService>(client =>
+{
+    client.BaseAddress = new Uri("http://localhost:5238");
+});
+builder.Services.AddHttpClient<GestionIncidentes.Web.Services.TechnicianTicketService>(client =>
+{
+    client.BaseAddress = new Uri("http://localhost:5238");
+});
+builder.Services.AddHttpClient<GestionIncidentes.Web.Services.StudentReportService>(client =>
+{
+    client.BaseAddress = new Uri("http://localhost:5238");
+});
+
 // Usuario actual
 builder.Services.AddHttpContextAccessor();
 
@@ -200,7 +214,7 @@ using (var scope = app.Services.CreateScope())
     await db.Database.MigrateAsync();
     
     // Seed de datos de prueba
-    await GestionIncidentes.Web.Data.DatabaseSeeder.SeedAsync(db);
+    await GestionIncidentes.Infrastructure.Data.DbSeeder.SeedAsync(db);
 }
 
 // Middleware

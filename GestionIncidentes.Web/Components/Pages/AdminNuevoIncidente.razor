@@ -1,0 +1,212 @@
+@page "/admin/nuevo-incidente"
+@layout AdminLayout
+@rendermode InteractiveServer
+@inject NavigationManager Navigation
+
+<link rel="stylesheet" href="/css/pages.css" />
+
+<div class="page-shell">
+  <!-- Breadcrumbs -->
+  <nav style="margin-bottom: 24px; color: var(--text-gray); font-size: 14px">
+    <span style="cursor: pointer" @onclick='() => Navigation.NavigateTo("/admin/dashboard", forceLoad: true)'>Inicio</span>
+    <span style="margin: 0 8px">&gt;</span>
+    <span style="cursor: pointer" @onclick='() => Navigation.NavigateTo("/admin/incidentes", forceLoad: true)'>Incidentes</span>
+    <span style="margin: 0 8px">&gt;</span>
+    <span style="color: var(--color-primary)">Nuevo Ticket</span>
+  </nav>
+
+  <!-- Page Header -->
+  <div style="display: flex; align-items: center; gap: 16px; margin-bottom: 32px">
+    <div style="width: 48px; height: 48px; background: var(--color-primary-light); border-radius: 12px; display: flex; align-items: center; justify-content: center">
+      <span class="material-icons" style="color: var(--color-primary); font-size: 24px">error_outline</span>
+    </div>
+    <div>
+      <h1>Crear Nuevo Incidente</h1>
+      <p style="color: var(--text-gray); margin-top: 4px">Complete la información del problema técnico</p>
+    </div>
+  </div>
+
+  <div style="display: grid; grid-template-columns: 1fr 420px; gap: 24px">
+    <!-- Left - Form -->
+    <div class="card">
+      <div style="display: flex; flex-direction: column; gap: 20px">
+        <!-- Título -->
+        <div>
+          <label style="display: block; margin-bottom: 8px; font-weight: 500">Título del Incidente *</label>
+          <input type="text" @bind="titulo" placeholder="Ej: Sin conectividad en Aula 301" 
+            style="width: 100%; padding: 10px 12px; border: 1px solid var(--border-color); border-radius: 8px; font-size: 14px" required />
+        </div>
+
+        <!-- Categoría y Prioridad -->
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px">
+          <div>
+            <label style="display: block; margin-bottom: 8px; font-weight: 500">Categoría *</label>
+            <select @bind="categoria" style="width: 100%; padding: 10px 12px; border: 1px solid var(--border-color); border-radius: 8px; font-size: 14px" required>
+              <option value="">Seleccionar</option>
+              <option value="hardware">Hardware</option>
+              <option value="software">Software</option>
+              <option value="connectivity">Conectividad</option>
+              <option value="security">Seguridad</option>
+            </select>
+          </div>
+
+          <div>
+            <label style="display: block; margin-bottom: 8px; font-weight: 500">Prioridad *</label>
+            <select @bind="prioridad" style="width: 100%; padding: 10px 12px; border: 1px solid var(--border-color); border-radius: 8px; font-size: 14px" required>
+              <option value="">Seleccionar</option>
+              <option value="critical">🔴 Crítica</option>
+              <option value="high">🟠 Alta</option>
+              <option value="medium">🟡 Media</option>
+              <option value="low">🟢 Baja</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Afectación -->
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px">
+          <div>
+            <label style="display: block; margin-bottom: 8px; font-weight: 500">Tipo de Afectación *</label>
+            <select @bind="tipoAfectacion" style="width: 100%; padding: 10px 12px; border: 1px solid var(--border-color); border-radius: 8px; font-size: 14px" required>
+              <option value="">Seleccionar</option>
+              <option value="user">Usuario Individual</option>
+              <option value="classroom">Aula/Laboratorio</option>
+              <option value="building">Edificio Completo</option>
+              <option value="campus">Campus</option>
+            </select>
+          </div>
+
+          <div>
+            <label style="display: block; margin-bottom: 8px; font-weight: 500">Detalle de Ubicación *</label>
+            <input type="text" @bind="ubicacionDetalle" placeholder="Ej: Edificio A, Piso 3" 
+              style="width: 100%; padding: 10px 12px; border: 1px solid var(--border-color); border-radius: 8px; font-size: 14px" required />
+          </div>
+        </div>
+
+        <!-- Descripción -->
+        <div>
+          <label style="display: block; margin-bottom: 8px; font-weight: 500">Descripción Detallada *</label>
+          <textarea @bind="descripcion" @bind:event="oninput" rows="6" placeholder="Describa el problema con el mayor detalle posible..." 
+            style="width: 100%; padding: 10px 12px; border: 1px solid var(--border-color); border-radius: 8px; font-size: 14px; resize: none" required></textarea>
+          <p style="font-size: 12px; color: var(--text-gray); margin-top: 4px">@descripcion.Length/1000 caracteres</p>
+        </div>
+
+        <!-- Adjuntos -->
+        <div>
+          <label style="display: block; margin-bottom: 8px; font-weight: 500">Archivos Adjuntos</label>
+          <div style="border: 2px dashed var(--border-color); border-radius: 12px; padding: 32px; text-align: center; cursor: pointer; transition: all 0.2s"
+               onmouseover="this.style.borderColor='var(--color-primary)'; this.style.background='#f9fafb'"
+               onmouseout="this.style.borderColor='var(--border-color)'; this.style.background='transparent'">
+            <p style="color: var(--text-gray); font-size: 14px">Arrastre archivos aquí o haga clic para seleccionar</p>
+            <p style="color: var(--text-gray); font-size: 12px; margin-top: 4px">PNG, JPG, PDF hasta 10MB</p>
+          </div>
+        </div>
+
+        <!-- Actions -->
+        <div style="display: flex; gap: 12px; padding-top: 20px; border-top: 1px solid var(--border-color)">
+          <button @onclick="CrearTicket" 
+            style="display: flex; align-items: center; gap: 8px; padding: 12px 24px; background: var(--color-primary); color: white; border: none; border-radius: 8px; font-weight: 500; cursor: pointer; box-shadow: var(--shadow-sm)">
+            <span class="material-icons" style="font-size: 18px">save</span>
+            Crear Ticket
+          </button>
+          <button @onclick="Cancelar" 
+            style="padding: 12px 24px; background: none; border: none; color: var(--text-gray); cursor: pointer; font-size: 14px">
+            Cancelar
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right - Suggested Articles -->
+    <div class="card" style="@(mostrarSugerencias ? "border: 2px solid var(--color-primary)" : "border: 1px solid var(--border-color)"); position: sticky; top: 24px; max-height: calc(100vh - 120px); overflow-y: auto">
+      <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 20px">
+        <div style="width: 48px; height: 48px; background: var(--color-warning-bg); border-radius: 12px; display: flex; align-items: center; justify-content: center">
+          <span class="material-icons" style="color: var(--color-warning); font-size: 24px">lightbulb</span>
+        </div>
+        <div>
+          <h3 style="font-size: 16px; font-weight: 600; margin: 0">Asistente Inteligente</h3>
+          <p style="color: var(--text-gray); font-size: 13px; margin: 0">Artículos relacionados</p>
+        </div>
+      </div>
+
+      @if (!mostrarSugerencias)
+      {
+        <div style="text-align: center; padding: 40px 20px">
+          <span class="material-icons" style="font-size: 64px; color: var(--text-gray); margin-bottom: 16px">menu_book</span>
+          <p style="color: var(--text-gray); font-size: 14px">Comience a escribir la descripción para ver artículos sugeridos</p>
+        </div>
+      }
+      else
+      {
+        <div style="display: flex; flex-direction: column; gap: 12px">
+          <p style="color: var(--text-gray); font-size: 14px; margin-bottom: 8px">Estos artículos podrían ayudarle a resolver el problema:</p>
+          
+          @foreach (var articulo in articulosSugeridos)
+          {
+            <div style="padding: 16px; border: 1px solid var(--border-color); border-radius: 8px; cursor: pointer; transition: all 0.2s"
+                 onmouseover="this.style.borderColor='var(--color-primary)'; this.style.background='#f9fafb'"
+                 onmouseout="this.style.borderColor='var(--border-color)'; this.style.background='white'">
+              <div style="display: flex; gap: 12px">
+                <span class="material-icons" style="color: var(--color-primary); font-size: 20px">menu_book</span>
+                <div style="flex: 1">
+                  <h4 style="font-size: 14px; font-weight: 500; margin: 0 0 8px 0; color: var(--color-text-primary)">@articulo.Titulo</h4>
+                  <div style="display: flex; justify-content: space-between; align-items: center">
+                    <span style="font-size: 12px; color: var(--text-gray)">@articulo.Categoria</span>
+                    <div style="display: flex; align-items: center; gap: 6px">
+                      <div style="width: 48px; height: 6px; background: #e5e7eb; border-radius: 99px; overflow: hidden">
+                        <div style="height: 100%; background: var(--color-primary); border-radius: 99px; width: @(articulo.Relevancia)%"></div>
+                      </div>
+                      <span style="font-size: 12px; color: var(--text-gray)">@articulo.Relevancia%</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          }
+
+          <button style="width: 100%; padding: 10px; color: var(--color-primary); background: none; border: none; border-radius: 8px; cursor: pointer; font-size: 14px; margin-top: 8px"
+                  onmouseover="this.style.background='var(--color-primary-light)'"
+                  onmouseout="this.style.background='transparent'">
+            Ver más artículos
+          </button>
+        </div>
+      }
+    </div>
+  </div>
+</div>
+
+@code {
+  private string titulo = "";
+  private string categoria = "";
+  private string prioridad = "";
+  private string tipoAfectacion = "";
+  private string ubicacionDetalle = "";
+  private string descripcion = "";
+  private bool mostrarSugerencias => descripcion.Length > 10;
+
+  private List<ArticuloSugerido> articulosSugeridos = new List<ArticuloSugerido>
+  {
+    new ArticuloSugerido { Id = 1, Titulo = "Resolución de problemas de conectividad WiFi", Categoria = "Conectividad", Relevancia = 95 },
+    new ArticuloSugerido { Id = 2, Titulo = "Reinicio de routers Cisco - Procedimiento", Categoria = "Hardware", Relevancia = 87 },
+    new ArticuloSugerido { Id = 3, Titulo = "Diagnóstico de problemas de red en edificios", Categoria = "Conectividad", Relevancia = 82 },
+    new ArticuloSugerido { Id = 4, Titulo = "Configuración de switches de acceso", Categoria = "Hardware", Relevancia = 76 }
+  };
+
+  private void CrearTicket()
+  {
+    // TODO: Logic to create ticket
+    Navigation.NavigateTo("/admin/incidentes", forceLoad: true);
+  }
+
+  private void Cancelar()
+  {
+    Navigation.NavigateTo("/admin/incidentes", forceLoad: true);
+  }
+
+  public class ArticuloSugerido
+  {
+    public int Id { get; set; }
+    public string Titulo { get; set; } = "";
+    public string Categoria { get; set; } = "";
+    public int Relevancia { get; set; }
+  }
+}

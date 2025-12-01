@@ -1,0 +1,54 @@
+@page "/usuario/dashboard"
+@layout UsuarioLayout
+@rendermode InteractiveServer
+
+<link rel="stylesheet" href="/css/pages.css" />
+<link rel="stylesheet" href="/css/usuario.css" />
+
+<div class="page-shell">
+    <div class="page-header" style="text-align:center">
+        <h1 class="page-title">Mis Reportes</h1>
+        <p class="page-subtitle">Historial de incidentes reportados</p>
+    </div>
+
+    <div class="grid-cards" style="max-width:900px; margin:0 auto 24px">
+        <div class="card">
+            <div class="card-title">Tickets abiertos</div>
+            <div class="card-value">2</div>
+            <div class="card-desc">En espera de atención</div>
+        </div>
+        <div class="card">
+            <div class="card-title">Última actualización</div>
+            <div class="card-value">Hoy</div>
+            <div class="card-desc">Actividad reciente</div>
+        </div>
+    </div>
+
+    <div class="table-shell" style="max-width:900px; margin:0 auto">
+        <div class="table-title">Tus Incidentes</div>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Ubicación</th>
+                    <th>Problema</th>
+                    <th>Estado</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>#901</strong></td>
+                    <td>Lab 2 - PC-L2-04</td>
+                    <td>Error al cargar portal</td>
+                    <td><span class="badge media">Abierto</span></td>
+                </tr>
+                <tr>
+                    <td><strong>#895</strong></td>
+                    <td>Lab 1 - PC-L1-03</td>
+                    <td>Teclado defectuoso</td>
+                    <td><span class="badge baja">Resuelto</span></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>

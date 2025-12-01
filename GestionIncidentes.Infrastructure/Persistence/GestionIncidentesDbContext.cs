@@ -43,8 +43,14 @@ namespace GestionIncidentes.Infrastructure
             modelBuilder.Entity<Ticket>()
                 .HasOne<User>()
                 .WithMany()
-                .HasForeignKey(t => t.UserId)
+                .HasForeignKey(t => t.CreatedByUserId)
                 .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<Ticket>()
+                .HasOne<User>()
+                .WithMany()
+                .HasForeignKey(t => t.AssignedToUserId)
+                .OnDelete(DeleteBehavior.SetNull);
 
             modelBuilder.Entity<KnowledgeEntry>()
                 .HasOne<User>()

@@ -4,56 +4,69 @@
     ViewData["Title"] = "Administrar Departamentos";
 }
 
-<h2>Administrar Departamentos</h2>
+<link rel="stylesheet" href="/css/theme.css" />
+<link rel="stylesheet" href="/css/pages.css" />
 
-<!-- Formulario de creación / edición -->
-<form method="post" asp-page-handler="@((Model.IsEditing) ? "Edit" : "Create")">
-    @Html.AntiForgeryToken()
-    <div class="form-group">
-        <label>Nombre del departamento</label>
-        <input asp-for="SelectedDepartment.Name" class="form-control" />
-        <span asp-validation-for="SelectedDepartment.Name" class="text-danger"></span>
+<div class="page-shell">
+    <div class="page-header">
+        <h1 class="page-title">Administrar Departamentos</h1>
+        <p class="page-subtitle">Crear, editar y eliminar departamentos</p>
     </div>
-    <button type="submit" class="btn btn-primary mt-2">
-        @(Model.IsEditing ? "Actualizar" : "Crear")
-    </button>
-    @if (Model.IsEditing)
-    {
-        <a asp-page="ManageUI" class="btn btn-secondary mt-2">Cancelar</a>
-    }
-</form>
+
+    <!-- Formulario de creación / edición -->
+    <div class="card">
+        <form method="post" asp-page-handler="@((Model.IsEditing) ? "Edit" : "Create")">
+            @Html.AntiForgeryToken()
+            <div class="form-row">
+                <label class="form-label">Nombre del departamento</label>
+                <input asp-for="SelectedDepartment.Name" class="input" />
+                <span asp-validation-for="SelectedDepartment.Name" class="input-error"></span>
+            </div>
+            <div class="actions">
+                <button type="submit" class="btn btn-primary">
+                    @(Model.IsEditing ? "Actualizar" : "Crear")
+                </button>
+                @if (Model.IsEditing)
+                {
+                    <a asp-page="ManageUI" class="btn btn-secondary">Cancelar</a>
+                }
+            </div>
+        </form>
+    </div>
 
 <hr />
 
-<!-- Tabla de departamentos -->
-<table class="table table-striped mt-3">
-    <thead>
-        <tr>
-            <th>Nombre</th>
-            <th>Acciones</th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var dept in Model.Departments)
-        {
-            <tr>
-                <td>@dept.Name</td>
-                <td>
-                    <!-- Editar -->
-                    <a asp-page="ManageUI" asp-route-id="@dept.Id" class="btn btn-sm btn-warning">Editar</a>
+    <!-- Tabla de departamentos -->
+    <div class="table-shell">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Nombre</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var dept in Model.Departments)
+                {
+                    <tr>
+                        <td>@dept.Name</td>
+                        <td class="table-actions">
+                            <a asp-page="ManageUI" asp-route-id="@dept.Id" class="action-btn edit" title="Editar">
+                                Editar
+                            </a>
+                            <form method="post" asp-page-handler="Delete" class="inline">
+                                @Html.AntiForgeryToken()
+                                <input type="hidden" name="id" value="@dept.Id.ToString()" />
+                                <button type="submit" class="action-btn delete" onclick="return confirm('¿Eliminar departamento?')">Eliminar</button>
+                            </form>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
 
-                    <!-- Eliminar -->
-                    <form method="post" asp-page-handler="Delete" style="display:inline;">
-                        @Html.AntiForgeryToken()
-                        <input type="hidden" name="id" value="@dept.Id.ToString()" />
-                        <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('¿Eliminar departamento?')">Eliminar</button>
-                    </form>
-
-                </td>
-            </tr>
-        }
-    </tbody>
-</table>
+</div>
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />

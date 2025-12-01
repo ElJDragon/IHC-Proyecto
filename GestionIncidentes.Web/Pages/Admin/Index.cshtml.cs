@@ -27,7 +27,7 @@ namespace GestionIncidentes.Web.Pages.Admin
 
         public bool IsEditing { get; set; } = false;
 
-        // -------------------- Cargar página --------------------
+        // -------------------- Cargar pï¿½gina --------------------
         public async Task OnGetAsync(Guid? id)
         {
             await LoadDepartmentsAsync();
@@ -96,7 +96,7 @@ namespace GestionIncidentes.Web.Pages.Admin
         {
             if (id == Guid.Empty)
             {
-                ModelState.AddModelError(string.Empty, "ID inválido");
+                ModelState.AddModelError(string.Empty, "ID invï¿½lido");
                 await LoadDepartmentsAsync();
                 return Page();
             }
@@ -106,7 +106,7 @@ namespace GestionIncidentes.Web.Pages.Admin
 
             if (!response.IsSuccessStatusCode)
             {
-                ModelState.AddModelError(string.Empty, $"Error al eliminar departamento. Código: {response.StatusCode}");
+                ModelState.AddModelError(string.Empty, $"Error al eliminar departamento. Cï¿½digo: {response.StatusCode}");
             }
 
             return RedirectToPage();
@@ -127,18 +127,27 @@ namespace GestionIncidentes.Web.Pages.Admin
 
         private async Task LoadDepartmentsAsync()
         {
-            var client = CreateHttpClient();
-            var response = await client.GetAsync("api/admin/departments");
+            try
+            {
+                var client = CreateHttpClient();
+                var response = await client.GetAsync("api/admin/departments");
 
-            if (response.IsSuccessStatusCode)
-            {
-                var json = await response.Content.ReadAsStringAsync();
-                Departments = JsonSerializer.Deserialize<List<DepartmentDto>>(json, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+                if (response.IsSuccessStatusCode)
+                {
+                    var json = await response.Content.ReadAsStringAsync();
+                    Departments = JsonSerializer.Deserialize<List<DepartmentDto>>(json, new JsonSerializerOptions { PropertyNameCaseInsensitive = true }) ?? new List<DepartmentDto>();
+                }
+                else
+                {
+                    Departments = new List<DepartmentDto>();
+                    ModelState.AddModelError(string.Empty, "No se pudieron cargar los departamentos desde la API");
+                }
             }
-            else
+            catch (Exception)
             {
+                // API offline / conexiÃ³n rechazada: mostrar pÃ¡gina sin datos en lugar de romper
                 Departments = new List<DepartmentDto>();
-                ModelState.AddModelError(string.Empty, "No se pudieron cargar los departamentos desde la API");
+                ModelState.AddModelError(string.Empty, "API de administraciÃ³n no disponible");
             }
         }
     }

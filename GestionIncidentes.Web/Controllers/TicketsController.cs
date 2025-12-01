@@ -27,8 +27,8 @@ namespace GestionIncidentes.Web.Controllers
                 Id = Guid.NewGuid(), // Generado automáticamente
                 Title = dto.Title,
                 Description = dto.Description,
-                UserId = dto.UserId,
                 CreatedByUserId=dto.CreatedByUserId,
+                Status = "Pendiente",
                 CreatedAt = DateTime.UtcNow
             };
 
@@ -69,7 +69,6 @@ namespace GestionIncidentes.Web.Controllers
             // Actualizar propiedades
             existingTicket.Title = dto.Title;
             existingTicket.Description = dto.Description;
-            existingTicket.UserId = dto.UserId;
 
             await _ticketRepo.UpdateAsync(existingTicket);
             return NoContent();

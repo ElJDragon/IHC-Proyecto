@@ -1,0 +1,57 @@
+@page "/login"
+@layout EmptyLayout
+@inject NavigationManager Navigation
+@rendermode InteractiveServer
+
+<link rel="stylesheet" href="css/login.css" />
+
+<div class="login-container">
+    <div class="login-card">
+        <div class="login-header">
+            <div class="brand-logo">
+                <span class="brand-icon">SI</span>
+            </div>
+            <h1 class="login-title">Sistema de Incidentes</h1>
+            <p class="login-subtitle">Universidad</p>
+        </div>
+
+        <div class="demo-section">
+            <div class="demo-title">Selecciona tu perfil</div>
+            <div class="demo-buttons">
+                <button type="button" class="demo-btn admin-btn" @onclick="GoToAdmin">
+                    <span class="demo-role">Administrador</span>
+                    <span class="demo-badge">Admin</span>
+                </button>
+                <button type="button" class="demo-btn tech-btn" @onclick="GoToTecnico">
+                    <span class="demo-role">Tecnico</span>
+                    <span class="demo-badge">Technician</span>
+                </button>
+                <button type="button" class="demo-btn user-btn" @onclick="GoToUsuario">
+                    <span class="demo-role">Usuario Regular</span>
+                    <span class="demo-badge">User</span>
+                </button>
+            </div>
+        </div>
+
+        <div class="login-footer">
+            <p>Necesitas ayuda Contacta a <a href="mailto:soporte@universidad.edu">soporte@universidad.edu</a></p>
+        </div>
+    </div>
+</div>
+
+@code {
+    private void GoToAdmin()
+    {
+        Navigation.NavigateTo("/admin/dashboard", forceLoad: true);
+    }
+
+    private void GoToTecnico()
+    {
+        Navigation.NavigateTo("/tecnico/dashboard", forceLoad: true);
+    }
+
+    private void GoToUsuario()
+    {
+        Navigation.NavigateTo("/usuario/reportar", forceLoad: true);
+    }
+}

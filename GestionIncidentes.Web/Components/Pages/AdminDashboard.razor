@@ -1,0 +1,217 @@
+@page "/admin/dashboard"
+@layout AdminLayout
+@inject NavigationManager Navigation
+@inject GestionIncidentes.Web.Services.AdminTicketService TicketService
+@rendermode InteractiveServer
+
+<link rel="stylesheet" href="/css/pages.css" />
+
+<div class="page-shell">
+    <!-- Breadcrumbs -->
+    <nav style="margin-bottom: 24px; color: var(--text-gray); font-size: 14px">
+        <span>Inicio</span>
+        <span style="margin: 0 8px">&gt;</span>
+        <span>Administración</span>
+        <span style="margin: 0 8px">&gt;</span>
+        <span style="color: var(--color-primary)">Visión Global</span>
+    </nav>
+
+    <!-- Page Header -->
+    <div style="margin-bottom: 24px">
+        <h1>Panel de Administración</h1>
+        <p style="color: var(--text-gray); margin-top: 4px">Monitoreo global del sistema y gestión centralizada</p>
+    </div>
+
+    <!-- KPI Cards -->
+    <div class="grid-cards" style="margin-bottom: 24px">
+        <!-- Total Incidentes -->
+        <div class="card" style="transition: box-shadow 0.3s" onmouseover="this.style.boxShadow='var(--shadow-md)'" onmouseout="this.style.boxShadow='var(--shadow-sm)'">
+            <div style="display: flex; align-items: start; justify-content: space-between">
+                <div style="flex: 1">
+                    <p style="font-size: 14px; color: var(--text-gray); margin-bottom: 8px">Total Incidentes</p>
+                    <h2 style="font-size: 36px; font-weight: 600; margin: 0 0 8px 0">@(stats?.TotalIncidents ?? 0)</h2>
+                    <div style="display: flex; align-items: center; gap: 4px">
+                        <span class="material-icons" style="font-size: 16px; color: var(--color-success)">trending_up</span>
+                        <span style="font-size: 13px; color: var(--color-success)">Últimos 30 días</span>
+                    </div>
+                </div>
+                <div style="width: 48px; height: 48px; background: var(--color-primary-light); border-radius: 12px; display: flex; align-items: center; justify-content: center">
+                    <span class="material-icons" style="color: var(--color-primary); font-size: 24px">computer</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tiempo Promedio -->
+        <div class="card" style="transition: box-shadow 0.3s" onmouseover="this.style.boxShadow='var(--shadow-md)'" onmouseout="this.style.boxShadow='var(--shadow-sm)'">
+            <div style="display: flex; align-items: start; justify-content: space-between">
+                <div style="flex: 1">
+                    <p style="font-size: 14px; color: var(--text-gray); margin-bottom: 8px">Tiempo Promedio</p>
+                    <h2 style="font-size: 36px; font-weight: 600; margin: 0 0 8px 0">@(stats?.AvgResolutionTime.ToString("F1") ?? "0.0")h</h2>
+                    <div style="display: flex; align-items: center; gap: 4px">
+                        <span style="font-size: 13px; color: var(--color-success)">Meta: &lt;6h</span>
+                    </div>
+                </div>
+                <div style="width: 48px; height: 48px; background: var(--color-success-bg); border-radius: 12px; display: flex; align-items: center; justify-content: center">
+                    <span class="material-icons" style="color: var(--color-success); font-size: 24px">schedule</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Equipos Críticos -->
+        <div class="card" style="transition: box-shadow 0.3s" onmouseover="this.style.boxShadow='var(--shadow-md)'" onmouseout="this.style.boxShadow='var(--shadow-sm)'">
+            <div style="display: flex; align-items: start; justify-content: space-between">
+                <div style="flex: 1">
+                    <p style="font-size: 14px; color: var(--text-gray); margin-bottom: 8px">Equipos Críticos</p>
+                    <h2 style="font-size: 36px; font-weight: 600; margin: 0 0 8px 0">@(stats?.CriticalLab ?? "N/A")</h2>
+                    <div style="display: flex; align-items: center; gap: 4px">
+                        <span style="font-size: 13px; color: var(--text-gray)">@(stats?.CriticalLabCount ?? 0) reportes</span>
+                    </div>
+                </div>
+                <div style="width: 48px; height: 48px; background: var(--color-critical-bg); border-radius: 12px; display: flex; align-items: center; justify-content: center">
+                    <span class="material-icons" style="color: var(--color-critical); font-size: 24px">computer</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Eficiencia -->
+        <div class="card" style="transition: box-shadow 0.3s" onmouseover="this.style.boxShadow='var(--shadow-md)'" onmouseout="this.style.boxShadow='var(--shadow-sm)'">
+            <div style="display: flex; align-items: start; justify-content: space-between">
+                <div style="flex: 1">
+                    <p style="font-size: 14px; color: var(--text-gray); margin-bottom: 8px">Eficiencia Dpto.</p>
+                    <h2 style="font-size: 36px; font-weight: 600; margin: 0 0 8px 0; color: var(--color-success)">@(stats?.DepartmentEfficiency.ToString("F0") ?? "0")%</h2>
+                    <div style="display: flex; align-items: center; gap: 4px">
+                        <span style="font-size: 13px; color: var(--text-gray)">SLA cumplido</span>
+                    </div>
+                </div>
+                <div style="width: 48px; height: 48px; background: var(--color-success-bg); border-radius: 12px; display: flex; align-items: center; justify-content: center">
+                    <span class="material-icons" style="color: var(--color-success); font-size: 24px">groups</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Chart Section -->
+    <div class="card" style="margin-bottom: 24px">
+        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px">
+            <div>
+                <h3 style="font-size: 18px; font-weight: 600; margin: 0">Incidentes por Laboratorio</h3>
+                <p style="font-size: 14px; color: var(--text-gray); margin-top: 4px">Mapa de calor - Últimos 30 días</p>
+            </div>
+            <div style="display: flex; align-items: center; gap: 24px">
+                <div style="display: flex; gap: 16px; font-size: 13px">
+                    <div style="display: flex; align-items: center; gap: 6px">
+                        <div style="width: 12px; height: 12px; background: var(--color-success); border-radius: 2px"></div>
+                        <span style="color: var(--text-gray)">Bajo (&lt;15)</span>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 6px">
+                        <div style="width: 12px; height: 12px; background: var(--color-warning); border-radius: 2px"></div>
+                        <span style="color: var(--text-gray)">Medio (15-30)</span>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 6px">
+                        <div style="width: 12px; height: 12px; background: var(--color-critical); border-radius: 2px"></div>
+                        <span style="color: var(--text-gray)">Alto (&gt;30)</span>
+                    </div>
+                </div>
+                <button style="display: flex; align-items: center; gap: 8px; padding: 8px 16px; border: 1px solid var(--border-color); border-radius: 8px; background: white; cursor: pointer; font-size: 14px"
+                        onmouseover="this.style.background='#f9fafb'" onmouseout="this.style.background='white'">
+                    <span class="material-icons" style="font-size: 18px">file_download</span>
+                    Exportar
+                </button>
+            </div>
+        </div>
+
+        <!-- Bar Chart Placeholder -->
+        <div style="height: 280px; background: linear-gradient(to bottom, #f9fafb 0%, white 100%); border-radius: 8px; display: flex; align-items: end; padding: 20px; gap: 24px">
+            @foreach (var lab in chartData)
+            {
+                <div style="flex: 1; display: flex; flex-direction: column; align-items: center; gap: 8px">
+                    <div style="width: 100%; height: @(lab.Incidentes * 3)px; background: @lab.Color; border-radius: 8px 8px 0 0; transition: all 0.3s"
+                         onmouseover="this.style.opacity='0.8'" onmouseout="this.style.opacity='1'"></div>
+                    <span style="font-size: 12px; color: var(--text-gray)">@lab.Nombre</span>
+                </div>
+            }
+        </div>
+    </div>
+
+    <!-- Quick Actions or Recent Activity -->
+    <div style="display: grid; grid-template-columns: 1fr; gap: 24px">
+        <div class="card">
+            <h3 style="font-size: 18px; font-weight: 600; margin: 0 0 16px 0">Acciones Rápidas</h3>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px">
+                <button @onclick='() => Navigation.NavigateTo("/admin/nuevo-incidente", forceLoad: true)' 
+                    style="display: flex; align-items: center; gap: 12px; padding: 16px; border: 1px solid var(--border-color); border-radius: 8px; background: white; cursor: pointer; text-align: left; transition: all 0.2s"
+                    onmouseover="this.style.borderColor='var(--color-primary)'; this.style.background='#f9fafb'" 
+                    onmouseout="this.style.borderColor='var(--border-color)'; this.style.background='white'">
+                    <span class="material-icons" style="color: var(--color-primary); font-size: 24px">add_circle</span>
+                    <span style="font-weight: 500">Nuevo Ticket</span>
+                </button>
+                
+                <button @onclick='() => Navigation.NavigateTo("/admin/usuarios", forceLoad: true)' 
+                    style="display: flex; align-items: center; gap: 12px; padding: 16px; border: 1px solid var(--border-color); border-radius: 8px; background: white; cursor: pointer; text-align: left; transition: all 0.2s"
+                    onmouseover="this.style.borderColor='var(--color-primary)'; this.style.background='#f9fafb'" 
+                    onmouseout="this.style.borderColor='var(--border-color)'; this.style.background='white'">
+                    <span class="material-icons" style="color: var(--color-primary); font-size: 24px">people</span>
+                    <span style="font-weight: 500">Ver Usuarios</span>
+                </button>
+                
+                <button @onclick='() => Navigation.NavigateTo("/admin/activos-red", forceLoad: true)' 
+                    style="display: flex; align-items: center; gap: 12px; padding: 16px; border: 1px solid var(--border-color); border-radius: 8px; background: white; cursor: pointer; text-align: left; transition: all 0.2s"
+                    onmouseover="this.style.borderColor='var(--color-primary)'; this.style.background='#f9fafb'" 
+                    onmouseout="this.style.borderColor='var(--border-color)'; this.style.background='white'">
+                    <span class="material-icons" style="color: var(--color-primary); font-size: 24px">hub</span>
+                    <span style="font-weight: 500">Activos de Red</span>
+                </button>
+
+                <button @onclick='() => Navigation.NavigateTo("/admin/historial", forceLoad: true)' 
+                    style="display: flex; align-items: center; gap: 12px; padding: 16px; border: 1px solid var(--border-color); border-radius: 8px; background: white; cursor: pointer; text-align: left; transition: all 0.2s"
+                    onmouseover="this.style.borderColor='var(--color-primary)'; this.style.background='#f9fafb'" 
+                    onmouseout="this.style.borderColor='var(--border-color)'; this.style.background='white'">
+                    <span class="material-icons" style="color: var(--color-primary); font-size: 24px">history</span>
+                    <span style="font-weight: 500">Ver Historial</span>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    private GestionIncidentes.Application.Models.AdminDashboardStatsDto? stats;
+    private List<LabChart> chartData = new List<LabChart>();
+    private bool isLoading = true;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadDashboardData();
+    }
+
+    private async Task LoadDashboardData()
+    {
+        isLoading = true;
+        
+        // Cargar estadísticas desde la API
+        stats = await TicketService.GetDashboardStatsAsync();
+        
+        // Convertir datos de laboratorios para el gráfico
+        if (stats?.LabIncidents != null && stats.LabIncidents.Any())
+        {
+            chartData = stats.LabIncidents.Select(lab => new LabChart
+            {
+                Nombre = lab.Location,
+                Incidentes = lab.Count,
+                Color = lab.Count > 30 ? "#d32f2f" : lab.Count > 15 ? "#f57c00" : "#388e3c"
+            }).ToList();
+        }
+        
+        isLoading = false;
+        StateHasChanged();
+    }
+
+    public class LabChart
+    {
+        public string Nombre { get; set; } = "";
+        public int Incidentes { get; set; }
+        public string Color { get; set; } = "";
+    }
+}
+
+

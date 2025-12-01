@@ -1,0 +1,182 @@
+@page "/admin/historial"
+@layout AdminLayout
+@rendermode InteractiveServer
+@inject NavigationManager Navigation
+
+<link rel="stylesheet" href="/css/pages.css" />
+
+<div class="page-shell">
+  <!-- Breadcrumbs -->
+  <nav style="margin-bottom: 24px; color: var(--text-gray); font-size: 14px">
+    <span>Inicio</span>
+    <span style="margin: 0 8px">&gt;</span>
+    <span>Administración</span>
+    <span style="margin: 0 8px">&gt;</span>
+    <span style="color: var(--color-primary)">Historial de Incidentes</span>
+  </nav>
+
+  <!-- Page Header -->
+  <div class="page-header" style="text-align: left">
+    <h1>Historial de Incidentes</h1>
+    <p>Registro completo de todos los incidentes resueltos y archivados</p>
+  </div>
+
+  <!-- Search and Filters -->
+  <div class="card" style="margin-bottom: 24px">
+    <div style="display: flex; gap: 12px; align-items: center">
+      <div style="position: relative; flex: 1; max-width: 400px">
+        <span class="material-icons" style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--text-gray); font-size: 20px">search</span>
+        <input type="text" @bind="searchQuery" @bind:event="oninput" placeholder="Buscar en historial..." 
+          style="width: 100%; padding: 10px 12px 10px 42px; border: 1px solid var(--border-color); border-radius: 8px; font-size: 14px" />
+      </div>
+
+      <select @bind="filterMes" style="padding: 10px 12px; border: 1px solid var(--border-color); border-radius: 8px; font-size: 14px">
+        <option value="all">Todos los meses</option>
+        <option value="11">Noviembre 2025</option>
+        <option value="10">Octubre 2025</option>
+        <option value="09">Septiembre 2025</option>
+      </select>
+
+      <button style="display: flex; align-items: center; gap: 8px; padding: 10px 16px; border: 1px solid var(--border-color); border-radius: 8px; background: white; cursor: pointer">
+        <span class="material-icons" style="font-size: 20px">file_download</span>
+        Exportar
+      </button>
+    </div>
+  </div>
+
+  <!-- Stats Cards -->
+  <div class="grid-cards" style="margin-bottom: 24px">
+    <div class="card">
+      <div style="display: flex; align-items: start; justify-content: space-between">
+        <div>
+          <p style="color: var(--text-gray); font-size: 14px; margin-bottom: 8px">Total Resueltos</p>
+          <h2 style="font-size: 32px; font-weight: 600; margin: 0">342</h2>
+          <p style="color: var(--color-success); font-size: 13px; margin-top: 8px">Este mes</p>
+        </div>
+        <div style="width: 48px; height: 48px; background: var(--color-success-bg); border-radius: 12px; display: flex; align-items: center; justify-content: center">
+          <span class="material-icons" style="color: var(--color-success); font-size: 24px">check_circle</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div style="display: flex; align-items: start; justify-content: space-between">
+        <div>
+          <p style="color: var(--text-gray); font-size: 14px; margin-bottom: 8px">Tiempo Promedio</p>
+          <h2 style="font-size: 32px; font-weight: 600; margin: 0">3.8h</h2>
+          <p style="color: var(--text-gray); font-size: 13px; margin-top: 8px">Resolución</p>
+        </div>
+        <div style="width: 48px; height: 48px; background: #dbeafe; border-radius: 12px; display: flex; align-items: center; justify-content: center">
+          <span class="material-icons" style="color: #2563eb; font-size: 24px">schedule</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div style="display: flex; align-items: start; justify-content: space-between">
+        <div>
+          <p style="color: var(--text-gray); font-size: 14px; margin-bottom: 8px">Satisfacción</p>
+          <h2 style="font-size: 32px; font-weight: 600; margin: 0">92%</h2>
+          <p style="color: var(--color-success); font-size: 13px; margin-top: 8px">+3% vs anterior</p>
+        </div>
+        <div style="width: 48px; height: 48px; background: var(--color-warning-bg); border-radius: 12px; display: flex; align-items: center; justify-content: center">
+          <span class="material-icons" style="color: var(--color-warning); font-size: 24px">thumb_up</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Historial Table -->
+  <div class="table-shell">
+    <table class="table">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Título</th>
+          <th>Categoría</th>
+          <th>Técnico</th>
+          <th>Fecha Creación</th>
+          <th>Fecha Resolución</th>
+          <th>Tiempo Total</th>
+          <th>Valoración</th>
+        </tr>
+      </thead>
+      <tbody>
+        @foreach (var item in GetFilteredHistorial())
+        {
+          <tr>
+            <td><strong style="color: var(--color-primary)">@item.Id</strong></td>
+            <td>@item.Titulo</td>
+            <td><span class="badge badge-info">@item.Categoria</span></td>
+            <td style="color: var(--text-gray)">@item.Tecnico</td>
+            <td style="color: var(--text-gray); font-size: 13px">@item.FechaCreacion</td>
+            <td style="color: var(--text-gray); font-size: 13px">@item.FechaResolucion</td>
+            <td><span style="color: var(--color-success); font-weight: 500">@item.TiempoTotal</span></td>
+            <td>
+              <div style="display: flex; align-items: center; gap: 4px">
+                @for (int i = 0; i < item.Valoracion; i++)
+                {
+                  <span class="material-icons" style="font-size: 16px; color: #fbbf24">star</span>
+                }
+                @for (int i = item.Valoracion; i < 5; i++)
+                {
+                  <span class="material-icons" style="font-size: 16px; color: #e5e7eb">star</span>
+                }
+              </div>
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+</div>
+
+@code {
+  private string searchQuery = "";
+  private string filterMes = "all";
+
+  private List<IncidenteHistorial> historial = new List<IncidenteHistorial>
+  {
+    new IncidenteHistorial { Id = "TKT-203", Titulo = "Pantalla no enciende", Categoria = "Hardware", Tecnico = "Ana Torres", FechaCreacion = "2025-11-30 08:45", FechaResolucion = "2025-11-30 11:20", TiempoTotal = "2h 35m", Valoracion = 5 },
+    new IncidenteHistorial { Id = "TKT-199", Titulo = "Monitor parpadeante", Categoria = "Hardware", Tecnico = "Luis García", FechaCreacion = "2025-11-29 09:15", FechaResolucion = "2025-11-29 12:45", TiempoTotal = "3h 30m", Valoracion = 4 },
+    new IncidenteHistorial { Id = "TKT-198", Titulo = "Licencia expirada", Categoria = "Software", Tecnico = "Carlos Méndez", FechaCreacion = "2025-11-28 15:45", FechaResolucion = "2025-11-28 17:20", TiempoTotal = "1h 35m", Valoracion = 5 },
+    new IncidenteHistorial { Id = "TKT-195", Titulo = "Teclado no responde", Categoria = "Hardware", Tecnico = "Ana Torres", FechaCreacion = "2025-11-27 10:15", FechaResolucion = "2025-11-27 14:30", TiempoTotal = "4h 15m", Valoracion = 4 },
+    new IncidenteHistorial { Id = "TKT-192", Titulo = "Impresora atascada", Categoria = "Hardware", Tecnico = "Luis García", FechaCreacion = "2025-11-26 13:20", FechaResolucion = "2025-11-26 15:45", TiempoTotal = "2h 25m", Valoracion = 5 },
+    new IncidenteHistorial { Id = "TKT-189", Titulo = "WiFi lento", Categoria = "Conectividad", Tecnico = "Carlos Méndez", FechaCreacion = "2025-11-25 08:00", FechaResolucion = "2025-11-25 16:30", TiempoTotal = "8h 30m", Valoracion = 3 },
+    new IncidenteHistorial { Id = "TKT-187", Titulo = "Software no actualiza", Categoria = "Software", Tecnico = "Ana Torres", FechaCreacion = "2025-11-24 11:45", FechaResolucion = "2025-11-24 13:15", TiempoTotal = "1h 30m", Valoracion = 5 },
+    new IncidenteHistorial { Id = "TKT-184", Titulo = "Proyector sin señal", Categoria = "Hardware", Tecnico = "Luis García", FechaCreacion = "2025-11-23 14:00", FechaResolucion = "2025-11-23 15:45", TiempoTotal = "1h 45m", Valoracion = 4 }
+  };
+
+  private List<IncidenteHistorial> GetFilteredHistorial()
+  {
+    return historial.Where(h =>
+      string.IsNullOrEmpty(searchQuery) || 
+      h.Titulo.Contains(searchQuery, StringComparison.OrdinalIgnoreCase) ||
+      h.Id.Contains(searchQuery, StringComparison.OrdinalIgnoreCase)
+    ).ToList();
+  }
+
+  public class IncidenteHistorial
+  {
+    public string Id { get; set; } = "";
+    public string Titulo { get; set; } = "";
+    public string Categoria { get; set; } = "";
+    public string Tecnico { get; set; } = "";
+    public string FechaCreacion { get; set; } = "";
+    public string FechaResolucion { get; set; } = "";
+    public string TiempoTotal { get; set; } = "";
+    public int Valoracion { get; set; }
+  }
+}
+
+<style>
+.badge-info {
+  display: inline-block;
+  padding: 4px 10px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 500;
+  background: #dbeafe;
+  color: #2563eb;
+}
+</style>

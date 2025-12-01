@@ -32,8 +32,56 @@ build_property.EnableCodeStyleSeverity =
 build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xBcHAucmF6b3I=
 build_metadata.AdditionalFiles.CssScope = 
 
+[C:/Users/User/Documents/Joshua Universidad/Quinto/IHC/ProyectoIHC/IHC-Proyecto/GestionIncidentes.Web/Components/Layout/AdminLayout.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xMYXlvdXRcQWRtaW5MYXlvdXQucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/User/Documents/Joshua Universidad/Quinto/IHC/ProyectoIHC/IHC-Proyecto/GestionIncidentes.Web/Components/Layout/EmptyLayout.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xMYXlvdXRcRW1wdHlMYXlvdXQucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/User/Documents/Joshua Universidad/Quinto/IHC/ProyectoIHC/IHC-Proyecto/GestionIncidentes.Web/Components/Layout/TecnicoLayout.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xMYXlvdXRcVGVjbmljb0xheW91dC5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/User/Documents/Joshua Universidad/Quinto/IHC/ProyectoIHC/IHC-Proyecto/GestionIncidentes.Web/Components/Layout/UsuarioLayout.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xMYXlvdXRcVXN1YXJpb0xheW91dC5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
 [C:/Users/User/Documents/Joshua Universidad/Quinto/IHC/ProyectoIHC/IHC-Proyecto/GestionIncidentes.Web/Components/NotificationPanel.razor]
 build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xOb3RpZmljYXRpb25QYW5lbC5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/User/Documents/Joshua Universidad/Quinto/IHC/ProyectoIHC/IHC-Proyecto/GestionIncidentes.Web/Components/Pages/AdminActivosRed.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xQYWdlc1xBZG1pbkFjdGl2b3NSZWQucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/User/Documents/Joshua Universidad/Quinto/IHC/ProyectoIHC/IHC-Proyecto/GestionIncidentes.Web/Components/Pages/AdminBaseConocimientos.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xQYWdlc1xBZG1pbkJhc2VDb25vY2ltaWVudG9zLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/User/Documents/Joshua Universidad/Quinto/IHC/ProyectoIHC/IHC-Proyecto/GestionIncidentes.Web/Components/Pages/AdminConfiguracion.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xQYWdlc1xBZG1pbkNvbmZpZ3VyYWNpb24ucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/User/Documents/Joshua Universidad/Quinto/IHC/ProyectoIHC/IHC-Proyecto/GestionIncidentes.Web/Components/Pages/AdminDashboard.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xQYWdlc1xBZG1pbkRhc2hib2FyZC5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/User/Documents/Joshua Universidad/Quinto/IHC/ProyectoIHC/IHC-Proyecto/GestionIncidentes.Web/Components/Pages/AdminHistorial.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xQYWdlc1xBZG1pbkhpc3RvcmlhbC5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/User/Documents/Joshua Universidad/Quinto/IHC/ProyectoIHC/IHC-Proyecto/GestionIncidentes.Web/Components/Pages/AdminIncidentes.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xQYWdlc1xBZG1pbkluY2lkZW50ZXMucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/User/Documents/Joshua Universidad/Quinto/IHC/ProyectoIHC/IHC-Proyecto/GestionIncidentes.Web/Components/Pages/AdminNuevoIncidente.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xQYWdlc1xBZG1pbk51ZXZvSW5jaWRlbnRlLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/User/Documents/Joshua Universidad/Quinto/IHC/ProyectoIHC/IHC-Proyecto/GestionIncidentes.Web/Components/Pages/AdminUsuarios.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xQYWdlc1xBZG1pblVzdWFyaW9zLnJhem9y
 build_metadata.AdditionalFiles.CssScope = 
 
 [C:/Users/User/Documents/Joshua Universidad/Quinto/IHC/ProyectoIHC/IHC-Proyecto/GestionIncidentes.Web/Components/Pages/Counter.razor]
@@ -48,12 +96,20 @@ build_metadata.AdditionalFiles.CssScope =
 build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xQYWdlc1xIb21lLnJhem9y
 build_metadata.AdditionalFiles.CssScope = 
 
+[C:/Users/User/Documents/Joshua Universidad/Quinto/IHC/ProyectoIHC/IHC-Proyecto/GestionIncidentes.Web/Components/Pages/IncidentsDashboard.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xQYWdlc1xJbmNpZGVudHNEYXNoYm9hcmQucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
 [C:/Users/User/Documents/Joshua Universidad/Quinto/IHC/ProyectoIHC/IHC-Proyecto/GestionIncidentes.Web/Components/Pages/KnowledgeCreate.razor]
 build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xQYWdlc1xLbm93bGVkZ2VDcmVhdGUucmF6b3I=
 build_metadata.AdditionalFiles.CssScope = 
 
 [C:/Users/User/Documents/Joshua Universidad/Quinto/IHC/ProyectoIHC/IHC-Proyecto/GestionIncidentes.Web/Components/Pages/KnowledgeSearch.razor]
 build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xQYWdlc1xLbm93bGVkZ2VTZWFyY2gucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/User/Documents/Joshua Universidad/Quinto/IHC/ProyectoIHC/IHC-Proyecto/GestionIncidentes.Web/Components/Pages/Login.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xQYWdlc1xMb2dpbi5yYXpvcg==
 build_metadata.AdditionalFiles.CssScope = 
 
 [C:/Users/User/Documents/Joshua Universidad/Quinto/IHC/ProyectoIHC/IHC-Proyecto/GestionIncidentes.Web/Components/Pages/NotificationsPage.razor]
@@ -66,6 +122,34 @@ build_metadata.AdditionalFiles.CssScope =
 
 [C:/Users/User/Documents/Joshua Universidad/Quinto/IHC/ProyectoIHC/IHC-Proyecto/GestionIncidentes.Web/Components/Pages/ReportViewer.razor]
 build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xQYWdlc1xSZXBvcnRWaWV3ZXIucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/User/Documents/Joshua Universidad/Quinto/IHC/ProyectoIHC/IHC-Proyecto/GestionIncidentes.Web/Components/Pages/TecnicoActivosRed.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xQYWdlc1xUZWNuaWNvQWN0aXZvc1JlZC5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/User/Documents/Joshua Universidad/Quinto/IHC/ProyectoIHC/IHC-Proyecto/GestionIncidentes.Web/Components/Pages/TecnicoBaseConocimientos.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xQYWdlc1xUZWNuaWNvQmFzZUNvbm9jaW1pZW50b3MucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/User/Documents/Joshua Universidad/Quinto/IHC/ProyectoIHC/IHC-Proyecto/GestionIncidentes.Web/Components/Pages/TecnicoConfiguracion.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xQYWdlc1xUZWNuaWNvQ29uZmlndXJhY2lvbi5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/User/Documents/Joshua Universidad/Quinto/IHC/ProyectoIHC/IHC-Proyecto/GestionIncidentes.Web/Components/Pages/TecnicoDashboard.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xQYWdlc1xUZWNuaWNvRGFzaGJvYXJkLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/User/Documents/Joshua Universidad/Quinto/IHC/ProyectoIHC/IHC-Proyecto/GestionIncidentes.Web/Components/Pages/UsuarioAyuda.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xQYWdlc1xVc3VhcmlvQXl1ZGEucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/User/Documents/Joshua Universidad/Quinto/IHC/ProyectoIHC/IHC-Proyecto/GestionIncidentes.Web/Components/Pages/UsuarioDashboard.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xQYWdlc1xVc3VhcmlvRGFzaGJvYXJkLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/User/Documents/Joshua Universidad/Quinto/IHC/ProyectoIHC/IHC-Proyecto/GestionIncidentes.Web/Components/Pages/UsuarioReportar.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xQYWdlc1xVc3VhcmlvUmVwb3J0YXIucmF6b3I=
 build_metadata.AdditionalFiles.CssScope = 
 
 [C:/Users/User/Documents/Joshua Universidad/Quinto/IHC/ProyectoIHC/IHC-Proyecto/GestionIncidentes.Web/Components/Pages/Weather.razor]

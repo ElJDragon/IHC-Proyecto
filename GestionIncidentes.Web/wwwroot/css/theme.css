@@ -1,0 +1,59 @@
+/* Theme variables ported from the Figma-based Vite template */
+:root {
+  --color-background: #f4f7fc;
+  --color-primary: #0056d2;
+  --color-primary-hover: #003d9a;
+  --color-primary-light: #e6f0ff;
+  --color-surface: #ffffff;
+  --color-border: #e0e5ee;
+  --color-critical: #d32f2f;
+  --color-critical-bg: #ffebee;
+  --color-warning: #f57c00;
+  --color-warning-bg: #fff3e0;
+  --color-success: #388e3c;
+  --color-success-bg: #e8f5e9;
+  --color-text-primary: #1a1d29;
+  --color-text-secondary: #5f6478;
+  --color-text-tertiary: #9095a6;
+
+  --radius-lg: 12px;
+  --radius-full: 9999px;
+  --shadow-sm: 0 1px 2px 0 #0000000d;
+  --shadow-md: 0 4px 6px -1px #00000014, 0 2px 4px -1px #0000000a;
+}
+
+html, body {
+  background-color: var(--color-background);
+  color: var(--color-text-primary);
+}
+
+/* Generic components */
+.btn-primary {
+  background-color: var(--color-primary);
+  border-color: var(--color-primary);
+}
+
+.btn-primary:hover,
+.btn-primary:focus {
+  background-color: var(--color-primary-hover);
+  border-color: var(--color-primary-hover);
+}
+
+.card, .surface {
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+}
+
+.link, a, .btn-link { color: var(--color-primary); }
+
+/* Layout */
+.sidebar {
+  background: linear-gradient(180deg, var(--color-primary) 0%, var(--color-primary-hover) 70%);
+}
+
+.top-row {
+  background-color: var(--color-surface);
+  border-bottom: 1px solid var(--color-border);
+}

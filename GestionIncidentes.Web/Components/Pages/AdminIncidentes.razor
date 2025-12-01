@@ -1,0 +1,224 @@
+@page "/admin/incidentes"
+@layout AdminLayout
+@rendermode InteractiveServer
+@inject NavigationManager Navigation
+
+<link rel="stylesheet" href="/css/pages.css" />
+
+<div class="page-shell">
+  <!-- Breadcrumbs -->
+  <nav style="margin-bottom: 24px; color: var(--text-gray); font-size: 14px">
+    <span>Inicio</span>
+    <span style="margin: 0 8px">&gt;</span>
+    <span>Administración</span>
+    <span style="margin: 0 8px">&gt;</span>
+    <span style="color: var(--color-primary)">Gestión de Tickets</span>
+  </nav>
+
+  <!-- Page Header -->
+  <div class="page-header" style="text-align: left">
+    <h1>Gestión de Tickets</h1>
+    <p>Administración y seguimiento de incidentes reportados</p>
+  </div>
+
+  <!-- Filters and Search -->
+  <div class="card" style="margin-bottom: 24px">
+    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px">
+      <div style="display: flex; align-items: center; gap: 12px">
+        <span class="material-icons" style="color: var(--text-gray)">filter_list</span>
+        <span style="font-weight: 500">Filtros:</span>
+        
+        <select @bind="filterTecnico" style="padding: 8px 12px; border: 1px solid var(--border-color); border-radius: 8px; font-size: 14px">
+          <option value="all">Todos los técnicos</option>
+          <option value="Carlos Méndez">Carlos Méndez</option>
+          <option value="Ana Torres">Ana Torres</option>
+          <option value="Luis García">Luis García</option>
+        </select>
+
+        <select @bind="filterEstado" style="padding: 8px 12px; border: 1px solid var(--border-color); border-radius: 8px; font-size: 14px">
+          <option value="all">Todos los estados</option>
+          <option value="Pendiente">Pendiente</option>
+          <option value="En proceso">En proceso</option>
+          <option value="Resuelto">Resuelto</option>
+        </select>
+
+        <select @bind="filterPrioridad" style="padding: 8px 12px; border: 1px solid var(--border-color); border-radius: 8px; font-size: 14px">
+          <option value="all">Todas las prioridades</option>
+          <option value="critical">Crítica</option>
+          <option value="high">Alta</option>
+          <option value="medium">Media</option>
+          <option value="low">Baja</option>
+        </select>
+
+        @if (filterTecnico != "all" || filterEstado != "all" || filterPrioridad != "all")
+        {
+          <button @onclick="LimpiarFiltros" style="color: var(--color-primary); font-size: 14px; background: none; border: none; cursor: pointer; text-decoration: underline">
+            Limpiar filtros
+          </button>
+        }
+      </div>
+
+      <div style="position: relative; width: 280px">
+        <span class="material-icons" style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--text-gray); font-size: 20px">search</span>
+        <input type="text" @bind="searchQuery" @bind:event="oninput" placeholder="Buscar tickets..." 
+          style="width: 100%; padding: 10px 12px 10px 42px; border: 1px solid var(--border-color); border-radius: 8px; font-size: 14px" />
+      </div>
+    </div>
+  </div>
+
+  <!-- Tickets Table -->
+  <div class="table-shell">
+    <table class="table">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Título</th>
+          <th>Laboratorio</th>
+          <th>Técnico</th>
+          <th>Estado</th>
+          <th>Prioridad</th>
+          <th>SLA</th>
+          <th>Fecha</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        @foreach (var ticket in GetFilteredTickets())
+        {
+          <tr>
+            <td><strong style="color: var(--color-primary)">@ticket.Id</strong></td>
+            <td>@ticket.Titulo</td>
+            <td style="color: var(--text-gray)">@ticket.Laboratorio</td>
+            <td style="color: var(--text-gray)">@ticket.Tecnico</td>
+            <td><span class="badge @GetEstadoBadgeClass(ticket.Estado)">@ticket.Estado</span></td>
+            <td><span class="badge @GetPrioridadBadgeClass(ticket.Prioridad)">@GetPrioridadLabel(ticket.Prioridad)</span></td>
+            <td><span style="color: @(ticket.Sla != "-" ? "var(--color-warning)" : "var(--text-gray)")">@ticket.Sla</span></td>
+            <td style="color: var(--text-gray); font-size: 13px">@ticket.Fecha</td>
+            <td>
+              <button style="padding: 4px; border: none; background: none; cursor: pointer; border-radius: 4px" title="Más opciones">
+                <span class="material-icons" style="font-size: 20px; color: var(--text-gray)">more_vert</span>
+              </button>
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+
+    <!-- Pagination Footer -->
+    <div style="display: flex; align-items: center; justify-content: space-between; padding: 16px 24px; border-top: 1px solid var(--border-color); background: #f9fafb">
+      <p style="color: var(--text-gray); font-size: 14px">Mostrando @GetFilteredTickets().Count resultados</p>
+      <div style="display: flex; gap: 8px">
+        <button style="padding: 8px 16px; border: 1px solid var(--border-color); border-radius: 8px; background: white; cursor: pointer; font-size: 14px">Anterior</button>
+        <button style="padding: 8px 16px; background: var(--color-primary); color: white; border: none; border-radius: 8px; font-weight: 500">1</button>
+        <button style="padding: 8px 16px; border: 1px solid var(--border-color); border-radius: 8px; background: white; cursor: pointer; font-size: 14px">2</button>
+        <button style="padding: 8px 16px; border: 1px solid var(--border-color); border-radius: 8px; background: white; cursor: pointer; font-size: 14px">Siguiente</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+@code {
+  private string filterTecnico = "all";
+  private string filterEstado = "all";
+  private string filterPrioridad = "all";
+  private string searchQuery = "";
+
+  private List<Ticket> allTickets = new List<Ticket>
+  {
+    new Ticket { Id = "TKT-204", Titulo = "Router sin respuesta", Tecnico = "Carlos Méndez", Estado = "En proceso", Prioridad = "critical", Laboratorio = "Lab 1", Fecha = "2025-11-30 09:15", Sla = "2h" },
+    new Ticket { Id = "TKT-203", Titulo = "Pantalla no enciende", Tecnico = "Ana Torres", Estado = "Resuelto", Prioridad = "medium", Laboratorio = "Lab 3", Fecha = "2025-11-30 08:45", Sla = "-" },
+    new Ticket { Id = "TKT-202", Titulo = "Software no inicia", Tecnico = "Luis García", Estado = "Pendiente", Prioridad = "high", Laboratorio = "Lab 2", Fecha = "2025-11-29 16:30", Sla = "6h" },
+    new Ticket { Id = "TKT-201", Titulo = "Teclado defectuoso", Tecnico = "Carlos Méndez", Estado = "En proceso", Prioridad = "low", Laboratorio = "Lab 1", Fecha = "2025-11-29 14:20", Sla = "24h" },
+    new Ticket { Id = "TKT-200", Titulo = "WiFi intermitente", Tecnico = "Ana Torres", Estado = "Pendiente", Prioridad = "critical", Laboratorio = "Biblioteca", Fecha = "2025-11-29 11:00", Sla = "1h" },
+    new Ticket { Id = "TKT-199", Titulo = "Monitor parpadeante", Tecnico = "Luis García", Estado = "Resuelto", Prioridad = "medium", Laboratorio = "Lab 4", Fecha = "2025-11-29 09:15", Sla = "-" },
+    new Ticket { Id = "TKT-198", Titulo = "Licencia expirada", Tecnico = "Carlos Méndez", Estado = "Resuelto", Prioridad = "high", Laboratorio = "Lab 3", Fecha = "2025-11-28 15:45", Sla = "-" },
+    new Ticket { Id = "TKT-197", Titulo = "Proyector no funciona", Tecnico = "Ana Torres", Estado = "En proceso", Prioridad = "medium", Laboratorio = "Auditorio", Fecha = "2025-11-28 13:30", Sla = "12h" }
+  };
+
+  private List<Ticket> GetFilteredTickets()
+  {
+    return allTickets.Where(t =>
+      (filterTecnico == "all" || t.Tecnico == filterTecnico) &&
+      (filterEstado == "all" || t.Estado == filterEstado) &&
+      (filterPrioridad == "all" || t.Prioridad == filterPrioridad) &&
+      (string.IsNullOrEmpty(searchQuery) || 
+        t.Titulo.Contains(searchQuery, StringComparison.OrdinalIgnoreCase) ||
+        t.Id.Contains(searchQuery, StringComparison.OrdinalIgnoreCase))
+    ).ToList();
+  }
+
+  private void LimpiarFiltros()
+  {
+    filterTecnico = "all";
+    filterEstado = "all";
+    filterPrioridad = "all";
+  }
+
+  private string GetEstadoBadgeClass(string estado) => estado switch
+  {
+    "Resuelto" => "badge-success",
+    "En proceso" => "badge-info",
+    "Pendiente" => "badge-warning",
+    _ => ""
+  };
+
+  private string GetPrioridadBadgeClass(string prioridad) => prioridad switch
+  {
+    "critical" => "badge-critical",
+    "high" => "badge-warning",
+    "medium" => "badge-info",
+    "low" => "badge-success",
+    _ => ""
+  };
+
+  private string GetPrioridadLabel(string prioridad) => prioridad switch
+  {
+    "critical" => "Crítica",
+    "high" => "Alta",
+    "medium" => "Media",
+    "low" => "Baja",
+    _ => prioridad
+  };
+
+  public class Ticket
+  {
+    public string Id { get; set; } = "";
+    public string Titulo { get; set; } = "";
+    public string Tecnico { get; set; } = "";
+    public string Estado { get; set; } = "";
+    public string Prioridad { get; set; } = "";
+    public string Laboratorio { get; set; } = "";
+    public string Fecha { get; set; } = "";
+    public string Sla { get; set; } = "";
+  }
+}
+
+<style>
+.badge {
+  display: inline-block;
+  padding: 4px 10px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.badge-success {
+  background: var(--color-success-bg);
+  color: var(--color-success);
+}
+
+.badge-info {
+  background: #dbeafe;
+  color: #2563eb;
+}
+
+.badge-warning {
+  background: var(--color-warning-bg);
+  color: var(--color-warning);
+}
+
+.badge-critical {
+  background: var(--color-critical-bg);
+  color: var(--color-critical);
+}
+</style>

@@ -1,0 +1,101 @@
+@page "/tecnico/dashboard"
+@layout TecnicoLayout
+@rendermode InteractiveServer
+
+<link rel="stylesheet" href="/css/pages.css" />
+<link rel="stylesheet" href="/css/tecnico.css" />
+
+<div class="page-shell">
+    <div class="page-header">
+        <h1 class="page-title">Mis Tickets Asignados</h1>
+        <p class="page-subtitle">4 tickets pendientes</p>
+    </div>
+
+    <div class="tickets-shell">
+        <div class="tickets-list">
+            <div class="list-title">Ordenados por SLA (urgencia)</div>
+
+            <div class="ticket-item">
+                <div class="header">
+                    <div class="title">TKT-204</div>
+                    <div class="badge critica">Crítica</div>
+                </div>
+                <div class="meta">
+                    <span>Router sin respuesta</span>
+                    <span>Lab 1 - PC-L1-05</span>
+                    <span>SLA: 2h</span>
+                </div>
+                <div class="progress"><div class="bar" style="width:65%"></div></div>
+            </div>
+
+            <div class="ticket-item">
+                <div class="header">
+                    <div class="title">TKT-198</div>
+                    <div class="badge alta">Alta</div>
+                </div>
+                <div class="meta">
+                    <span>Licencia expirada AutoCAD</span>
+                    <span>Lab 3 - PC-L3-02</span>
+                    <span>SLA: 6h</span>
+                </div>
+                <div class="progress"><div class="bar" style="width:40%"></div></div>
+            </div>
+
+            <div class="ticket-item">
+                <div class="header">
+                    <div class="title">TKT-195</div>
+                    <div class="badge media">Media</div>
+                </div>
+                <div class="meta">
+                    <span>Photoshop no abre</span>
+                    <span>Lab 2 - PC-L2-01</span>
+                    <span>SLA: 12h</span>
+                </div>
+                <div class="progress"><div class="bar" style="width:25%"></div></div>
+            </div>
+
+            <div class="ticket-item">
+                <div class="header">
+                    <div class="title">TKT-201</div>
+                    <div class="badge baja">Baja</div>
+                </div>
+                <div class="meta">
+                    <span>Teclado defectuoso</span>
+                    <span>Lab 1 - PC-L1-03</span>
+                    <span>SLA: 24h</span>
+                </div>
+                <div class="progress"><div class="bar" style="width:15%"></div></div>
+            </div>
+        </div>
+
+        <div class="ticket-detail">
+            <div class="title">TKT-204 <span class="badge critica">Prioridad Crítica</span></div>
+            <div class="divider"></div>
+            <div class="meta" style="gap:24px; color:var(--text-gray)">
+                <span>Ubicación: Lab 1</span>
+                <span>Equipo: PC-L1-05</span>
+                <span>Reportado por: Juan Pérez</span>
+            </div>
+
+            <div class="actions">
+                <div class="action-card">
+                    <div style="font-weight:600; margin-bottom:8px">Cambiar Estado</div>
+                    <select class="form-select"><option>Seleccionar</option></select>
+                    <button class="btn-primary" style="margin-top:8px">Aplicar</button>
+                </div>
+                <div class="action-card">
+                    <div style="font-weight:600; margin-bottom:8px">Reasignar Ticket</div>
+                    <button class="btn-primary">Reasignar</button>
+                </div>
+            </div>
+
+            <div class="log-card">
+                <div style="font-weight:600; margin-bottom:8px">Bitácora de Solución</div>
+                <textarea class="form-control" rows="5" placeholder="Describe los pasos realizados para resolver el problema..."></textarea>
+                <div style="display:flex; justify-content:flex-end; margin-top:12px">
+                    <button class="btn-primary">Cerrar Ticket</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

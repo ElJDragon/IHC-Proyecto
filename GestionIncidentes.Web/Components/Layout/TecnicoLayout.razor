@@ -1,0 +1,73 @@
+@inherits LayoutComponentBase
+@using Microsoft.AspNetCore.Components.Routing
+
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" />
+<link rel="stylesheet" href="/css/theme.css" />
+<link rel="stylesheet" href="/css/admin-layout.css" />
+
+<div class="admin-layout">
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <button class="menu-toggle">
+        <span class="material-icons">menu</span>
+      </button>
+      <div class="brand">
+        <span class="brand-icon">NM</span>
+        <span class="brand-text">NetManager<br/>Universidad</span>
+      </div>
+    </div>
+    <nav class="sidebar-nav">
+      <NavLink class="nav-item" href="tecnico/dashboard" Match="NavLinkMatch.All">
+        <span class="material-icons">assignment_turned_in</span>
+        <span class="nav-text">Mis Tickets</span>
+      </NavLink>
+      <NavLink class="nav-item" href="tecnico/base-conocimientos">
+        <span class="material-icons">menu_book</span>
+        <span class="nav-text">Base de Conocimientos</span>
+      </NavLink>
+      <NavLink class="nav-item" href="tecnico/activos-red">
+        <span class="material-icons">hub</span>
+        <span class="nav-text">Activos de Red</span>
+      </NavLink>
+      <NavLink class="nav-item" href="tecnico/configuracion">
+        <span class="material-icons">settings</span>
+        <span class="nav-text">Configuración</span>
+      </NavLink>
+    </nav>
+    <div class="sidebar-footer">
+      <div class="status-indicator">
+        <span class="status-dot"></span>
+        <span>Todos los servicios operativos</span>
+      </div>
+    </div>
+  </aside>
+
+  <div class="main-content">
+    <header class="top-navbar">
+      <div class="navbar-content">
+        <div class="navbar-left">
+          <div class="search-box">
+            <span class="material-icons">search</span>
+            <input class="search-input" placeholder="Buscar tickets..." />
+          </div>
+        </div>
+        <div class="navbar-right">
+          <button class="icon-button"><span class="material-icons">notifications_none</span></button>
+          <div class="user-menu">
+            <div class="user-button">
+              <span class="material-icons">person</span>
+              <div class="user-info">
+                <div class="user-name">Técnico Red</div>
+                <div class="user-role">Técnico</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <main class="page-content">
+      @Body
+    </main>
+  </div>
+</div>

@@ -1,0 +1,58 @@
+@page "/incidents"
+@layout MainLayout
+
+<link rel="stylesheet" href="css/incidents.css" />
+
+<div class="incidents-page">
+  <div class="incidents-header">
+    <h1 class="incidents-title">Incidentes</h1>
+    <div class="incidents-actions">
+      <button class="btn btn-primary">Nuevo incidente</button>
+    </div>
+  </div>
+
+  <div class="stats-grid">
+    <div class="stat-card">
+      <div class="stat-label">Abiertos</div>
+      <div class="stat-value">12</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">En progreso</div>
+      <div class="stat-value">7</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Resueltos</div>
+      <div class="stat-value">23</div>
+    </div>
+  </div>
+
+  <div class="incidents-table">
+    <table>
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Titulo</th>
+          <th>Estado</th>
+          <th>Asignado</th>
+          <th>Fecha</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>#1023</td>
+          <td>Error al iniciar sesión</td>
+          <td>Abierto</td>
+          <td>Soporte 1</td>
+          <td>2025-11-28</td>
+        </tr>
+        <tr>
+          <td>#1022</td>
+          <td>Fallo en impresión</td>
+          <td>En progreso</td>
+          <td>Soporte 2</td>
+          <td>2025-11-27</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>

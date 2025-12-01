@@ -1,0 +1,198 @@
+@page "/usuario/reportar"
+@layout UsuarioLayout
+@rendermode InteractiveServer
+@inject NavigationManager Navigation
+
+<link rel="stylesheet" href="/css/pages.css" />
+<link rel="stylesheet" href="/css/usuario.css" />
+
+<div class="report-form">
+  <div class="page-header" style="text-align:center; margin-bottom:32px">
+    <div style="width:56px; height:56px; background:#eff6ff; border-radius:12px; display:flex; align-items:center; justify-content:center; margin:0 auto 16px">
+      <span class="material-icons" style="font-size:32px; color:var(--color-primary)">error_outline</span>
+    </div>
+    <h1 class="page-title">Reportar Problema</h1>
+    <p class="page-subtitle">Completa los pasos para reportar un problema técnico</p>
+  </div>
+
+  <div class="form-section @(selectedLab != "" ? "active" : "")">
+    <div style="display:flex; align-items:center; gap:12px; margin-bottom:20px">
+      <div class="step-number">1</div>
+      <div>
+        <div class="section-title">Ubicación del Equipo</div>
+        <div class="section-desc">Selecciona el laboratorio y equipo donde está el problema</div>
+      </div>
+    </div>
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px">
+      <div>
+        <label style="display:block; margin-bottom:8px; font-weight:500">Laboratorio *</label>
+        <select @bind="selectedLab" class="form-select" style="width:100%; padding:12px; border:2px solid var(--border-color); border-radius:10px">
+          <option value="">Seleccionar laboratorio</option>
+          <option value="lab1">Laboratorio 1 - Ingeniería</option>
+          <option value="lab2">Laboratorio 2 - Diseño</option>
+          <option value="lab3">Laboratorio 3 - Arquitectura</option>
+        </select>
+      </div>
+      <div>
+        <label style="display:block; margin-bottom:8px; font-weight:500">Equipo *</label>
+        <select @bind="selectedEquipo" class="form-select" disabled="@(selectedLab == "")" style="width:100%; padding:12px; border:2px solid var(--border-color); border-radius:10px">
+          <option value="">@(selectedLab == "" ? "Primero selecciona laboratorio" : "Seleccionar equipo")</option>
+          @if(selectedLab == "lab1")
+          {
+            <option value="PC-L1-01">PC-L1-01</option>
+            <option value="PC-L1-02">PC-L1-02</option>
+            <option value="PC-L1-03">PC-L1-03</option>
+          }
+          @if(selectedLab == "lab2")
+          {
+            <option value="PC-L2-01">PC-L2-01</option>
+            <option value="PC-L2-02">PC-L2-02</option>
+          }
+          @if(selectedLab == "lab3")
+          {
+            <option value="PC-L3-01">PC-L3-01</option>
+            <option value="PC-L3-02">PC-L3-02</option>
+          }
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <div class="form-section @(tipoFalla != "" ? "active" : "")">
+    <div style="display:flex; align-items:center; gap:12px; margin-bottom:20px">
+      <div class="step-number">2</div>
+      <div>
+        <div class="section-title">Tipo de Problema</div>
+        <div class="section-desc">¿El problema es de hardware o software?</div>
+      </div>
+    </div>
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px">
+      <div class="choice-card @(tipoFalla == "hardware" ? "selected" : "")" @onclick='() => tipoFalla = "hardware"'>
+        <div style="display:flex; align-items:center; gap:12px">
+          <div class="choice-icon">
+            <span class="material-icons">monitor</span>
+          </div>
+          <div>
+            <div style="font-weight:600">Hardware</div>
+            <div style="font-size:13px; color:var(--text-gray)">Teclado, pantalla, mouse</div>
+          </div>
+        </div>
+      </div>
+      <div class="choice-card @(tipoFalla == "software" ? "selected" : "")" @onclick='() => tipoFalla = "software"'>
+        <div style="display:flex; align-items:center; gap:12px">
+          <div class="choice-icon">
+            <span class="material-icons">apps</span>
+          </div>
+          <div>
+            <div style="font-weight:600">Software</div>
+            <div style="font-size:13px; color:var(--text-gray)">Programas, sistema operativo</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  @if(tipoFalla == "software")
+  {
+    <div class="form-section active" style="animation:slideDown 0.3s ease">
+      <div style="display:flex; align-items:center; gap:12px; margin-bottom:20px">
+        <div class="step-number">3</div>
+        <div>
+          <div class="section-title">Detalles del Problema</div>
+          <div class="section-desc">Proporciona información sobre el error</div>
+        </div>
+      </div>
+      <div style="margin-bottom:16px">
+        <label style="display:block; margin-bottom:8px; font-weight:500">Nombre del Programa *</label>
+        <input @bind="nombrePrograma" type="text" placeholder="Ej: Microsoft Word, AutoCAD" class="form-control" style="width:100%; padding:12px; border:2px solid var(--border-color); border-radius:10px" />
+      </div>
+      <div>
+        <label style="display:block; margin-bottom:8px; font-weight:500">Mensaje de Error *</label>
+        <textarea @bind="mensajeError" rows="4" placeholder="Describe el mensaje de error o comportamiento..." class="form-control" style="width:100%; padding:12px; border:2px solid var(--border-color); border-radius:10px; resize:none"></textarea>
+      </div>
+    </div>
+  }
+
+  @if(tipoFalla == "hardware")
+  {
+    <div class="form-section active" style="animation:slideDown 0.3s ease">
+      <div style="display:flex; align-items:center; gap:12px; margin-bottom:20px">
+        <div class="step-number">3</div>
+        <div>
+          <div class="section-title">Partes Afectadas</div>
+          <div class="section-desc">Selecciona las partes que presentan problemas</div>
+        </div>
+      </div>
+      <div style="display:grid; grid-template-columns:repeat(3,1fr); gap:12px">
+        @foreach(var parte in partesHardware)
+        {
+          <div class="choice-card @(partesSeleccionadas.Contains(parte) ? "selected" : "")" @onclick="() => ToggleParte(parte)" style="padding:12px">
+            <span class="material-icons" style="font-size:20px; color:var(--color-primary)">@GetParteIcon(parte)</span>
+            <div style="font-size:13px; margin-top:4px">@parte</div>
+          </div>
+        }
+      </div>
+    </div>
+  }
+
+  <div style="display:flex; justify-content:center; gap:16px; margin-top:32px">
+    <button class="btn-cancel" @onclick="CancelReport" style="padding:12px 24px; border:none; background:transparent; color:var(--text-gray); cursor:pointer">Cancelar</button>
+    <button class="btn-submit" disabled="@(!IsFormValid())" @onclick="SubmitReport">Enviar Reporte</button>
+  </div>
+</div>
+
+<style>
+@@keyframes slideDown {
+  from { opacity:0; transform:translateY(-10px); }
+  to { opacity:1; transform:translateY(0); }
+}
+</style>
+
+@code {
+  private string selectedLab = "";
+  private string selectedEquipo = "";
+  private string tipoFalla = "";
+  private string nombrePrograma = "";
+  private string mensajeError = "";
+  private List<string> partesHardware = new() { "Monitor", "Teclado", "Mouse", "CPU", "Bocinas", "Otro" };
+  private List<string> partesSeleccionadas = new();
+
+  private void ToggleParte(string parte)
+  {
+    if(partesSeleccionadas.Contains(parte))
+      partesSeleccionadas.Remove(parte);
+    else
+      partesSeleccionadas.Add(parte);
+  }
+
+  private string GetParteIcon(string parte) => parte switch
+  {
+    "Monitor" => "monitor",
+    "Teclado" => "keyboard",
+    "Mouse" => "mouse",
+    "CPU" => "computer",
+    "Bocinas" => "volume_up",
+    _ => "hardware"
+  };
+
+  private bool IsFormValid()
+  {
+    if(string.IsNullOrEmpty(selectedLab) || string.IsNullOrEmpty(selectedEquipo) || string.IsNullOrEmpty(tipoFalla))
+      return false;
+    if(tipoFalla == "software")
+      return !string.IsNullOrEmpty(nombrePrograma) && !string.IsNullOrEmpty(mensajeError);
+    if(tipoFalla == "hardware")
+      return partesSeleccionadas.Count > 0;
+    return false;
+  }
+
+  private void CancelReport()
+  {
+    Navigation.NavigateTo("/usuario/dashboard", forceLoad: true);
+  }
+
+  private void SubmitReport()
+  {
+    Navigation.NavigateTo("/usuario/dashboard", forceLoad: true);
+  }
+}

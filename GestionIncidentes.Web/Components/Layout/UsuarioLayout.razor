@@ -1,0 +1,64 @@
+@inherits LayoutComponentBase
+@using Microsoft.AspNetCore.Components.Routing
+
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" />
+<link rel="stylesheet" href="/css/theme.css" />
+<link rel="stylesheet" href="/css/admin-layout.css" />
+
+<div class="admin-layout">
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <button class="menu-toggle">
+        <span class="material-icons">menu</span>
+      </button>
+      <div class="brand">
+        <span class="brand-icon">NM</span>
+        <span class="brand-text">NetManager<br/>Universidad</span>
+      </div>
+    </div>
+    <nav class="sidebar-nav">
+      <NavLink class="nav-item" href="usuario/reportar" Match="NavLinkMatch.All">
+        <span class="material-icons">add_circle_outline</span>
+        <span class="nav-text">Reportar Problema</span>
+      </NavLink>
+      <NavLink class="nav-item" href="usuario/dashboard">
+        <span class="material-icons">assignment</span>
+        <span class="nav-text">Mis Reportes</span>
+      </NavLink>
+      <NavLink class="nav-item" href="usuario/ayuda">
+        <span class="material-icons">help_outline</span>
+        <span class="nav-text">Ayuda</span>
+      </NavLink>
+    </nav>
+    <div class="sidebar-footer">
+      <div class="status-indicator">
+        <span class="status-dot"></span>
+        <span>Todos los servicios operativos</span>
+      </div>
+    </div>
+  </aside>
+
+  <div class="main-content">
+    <header class="top-navbar">
+      <div class="navbar-content">
+        <div class="navbar-left"></div>
+        <div class="navbar-right">
+          <button class="icon-button"><span class="material-icons">notifications_none</span></button>
+          <div class="user-menu">
+            <div class="user-button">
+              <span class="material-icons">person</span>
+              <div class="user-info">
+                <div class="user-name">Usuario</div>
+                <div class="user-role">Estudiante</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <main class="page-content">
+      @Body
+    </main>
+  </div>
+</div>
