@@ -2,6 +2,8 @@
 @layout AdminLayout
 @rendermode InteractiveServer
 @inject NavigationManager Navigation
+@inject GestionIncidentes.Web.Services.AdminTicketService TicketService
+@using GestionIncidentes.Application.Models
 
 <link rel="stylesheet" href="/css/pages.css" />
 
@@ -83,23 +85,38 @@
         </tr>
       </thead>
       <tbody>
-        @foreach (var ticket in GetFilteredTickets())
+        @if (loading)
         {
           <tr>
-            <td><strong style="color: var(--color-primary)">@ticket.Id</strong></td>
-            <td>@ticket.Titulo</td>
-            <td style="color: var(--text-gray)">@ticket.Laboratorio</td>
-            <td style="color: var(--text-gray)">@ticket.Tecnico</td>
-            <td><span class="badge @GetEstadoBadgeClass(ticket.Estado)">@ticket.Estado</span></td>
-            <td><span class="badge @GetPrioridadBadgeClass(ticket.Prioridad)">@GetPrioridadLabel(ticket.Prioridad)</span></td>
-            <td><span style="color: @(ticket.Sla != "-" ? "var(--color-warning)" : "var(--text-gray)")">@ticket.Sla</span></td>
-            <td style="color: var(--text-gray); font-size: 13px">@ticket.Fecha</td>
-            <td>
-              <button style="padding: 4px; border: none; background: none; cursor: pointer; border-radius: 4px" title="Más opciones">
-                <span class="material-icons" style="font-size: 20px; color: var(--text-gray)">more_vert</span>
-              </button>
-            </td>
+            <td colspan="9" style="text-align:center; padding:40px">Cargando tickets...</td>
           </tr>
+        }
+        else if (!GetFilteredTickets().Any())
+        {
+          <tr>
+            <td colspan="9" style="text-align:center; padding:40px; color:var(--text-gray)">No se encontraron tickets</td>
+          </tr>
+        }
+        else
+        {
+          @foreach (var ticket in GetFilteredTickets())
+          {
+            <tr>
+              <td><strong style="color: var(--color-primary)">@ticket.TicketNumber</strong></td>
+              <td>@ticket.Title</td>
+              <td style="color: var(--text-gray)">@ticket.Location</td>
+              <td style="color: var(--text-gray)">@(ticket.AssignedToName ?? "Sin asignar")</td>
+              <td><span class="badge @GetEstadoBadgeClass(ticket.Status)">@ticket.Status</span></td>
+              <td><span class="badge @GetPrioridadBadgeClass(ticket.Priority)">@GetPrioridadLabel(ticket.Priority)</span></td>
+              <td><span style="color: @(ticket.SlaDeadline != null ? "var(--color-warning)" : "var(--text-gray)")">@CalculateSLA(ticket.SlaDeadline)</span></td>
+              <td style="color: var(--text-gray); font-size: 13px">@FormatDate(ticket.CreatedAt)</td>
+              <td>
+                <button style="padding: 4px; border: none; background: none; cursor: pointer; border-radius: 4px" title="Más opciones">
+                  <span class="material-icons" style="font-size: 20px; color: var(--text-gray)">more_vert</span>
+                </button>
+              </td>
+            </tr>
+          }
         }
       </tbody>
     </table>
@@ -122,28 +139,41 @@
   private string filterEstado = "all";
   private string filterPrioridad = "all";
   private string searchQuery = "";
+  private List<TicketResponseDto> allTickets = new List<TicketResponseDto>();
+  private bool loading = true;
 
-  private List<Ticket> allTickets = new List<Ticket>
+  protected override async Task OnInitializedAsync()
   {
-    new Ticket { Id = "TKT-204", Titulo = "Router sin respuesta", Tecnico = "Carlos Méndez", Estado = "En proceso", Prioridad = "critical", Laboratorio = "Lab 1", Fecha = "2025-11-30 09:15", Sla = "2h" },
-    new Ticket { Id = "TKT-203", Titulo = "Pantalla no enciende", Tecnico = "Ana Torres", Estado = "Resuelto", Prioridad = "medium", Laboratorio = "Lab 3", Fecha = "2025-11-30 08:45", Sla = "-" },
-    new Ticket { Id = "TKT-202", Titulo = "Software no inicia", Tecnico = "Luis García", Estado = "Pendiente", Prioridad = "high", Laboratorio = "Lab 2", Fecha = "2025-11-29 16:30", Sla = "6h" },
-    new Ticket { Id = "TKT-201", Titulo = "Teclado defectuoso", Tecnico = "Carlos Méndez", Estado = "En proceso", Prioridad = "low", Laboratorio = "Lab 1", Fecha = "2025-11-29 14:20", Sla = "24h" },
-    new Ticket { Id = "TKT-200", Titulo = "WiFi intermitente", Tecnico = "Ana Torres", Estado = "Pendiente", Prioridad = "critical", Laboratorio = "Biblioteca", Fecha = "2025-11-29 11:00", Sla = "1h" },
-    new Ticket { Id = "TKT-199", Titulo = "Monitor parpadeante", Tecnico = "Luis García", Estado = "Resuelto", Prioridad = "medium", Laboratorio = "Lab 4", Fecha = "2025-11-29 09:15", Sla = "-" },
-    new Ticket { Id = "TKT-198", Titulo = "Licencia expirada", Tecnico = "Carlos Méndez", Estado = "Resuelto", Prioridad = "high", Laboratorio = "Lab 3", Fecha = "2025-11-28 15:45", Sla = "-" },
-    new Ticket { Id = "TKT-197", Titulo = "Proyector no funciona", Tecnico = "Ana Torres", Estado = "En proceso", Prioridad = "medium", Laboratorio = "Auditorio", Fecha = "2025-11-28 13:30", Sla = "12h" }
-  };
+    await LoadTicketsAsync();
+  }
 
-  private List<Ticket> GetFilteredTickets()
+  private async Task LoadTicketsAsync()
+  {
+    loading = true;
+    try
+    {
+      allTickets = await TicketService.ListTicketsAsync(null) ?? new List<TicketResponseDto>();
+    }
+    catch (Exception ex)
+    {
+      Console.WriteLine($"Error loading tickets: {ex.Message}");
+      allTickets = new List<TicketResponseDto>();
+    }
+    finally
+    {
+      loading = false;
+    }
+  }
+
+  private List<TicketResponseDto> GetFilteredTickets()
   {
     return allTickets.Where(t =>
-      (filterTecnico == "all" || t.Tecnico == filterTecnico) &&
-      (filterEstado == "all" || t.Estado == filterEstado) &&
-      (filterPrioridad == "all" || t.Prioridad == filterPrioridad) &&
+      (filterTecnico == "all" || (t.AssignedToName ?? "").Contains(filterTecnico)) &&
+      (filterEstado == "all" || t.Status == filterEstado) &&
+      (filterPrioridad == "all" || t.Priority == filterPrioridad) &&
       (string.IsNullOrEmpty(searchQuery) || 
-        t.Titulo.Contains(searchQuery, StringComparison.OrdinalIgnoreCase) ||
-        t.Id.Contains(searchQuery, StringComparison.OrdinalIgnoreCase))
+        t.Title.Contains(searchQuery, StringComparison.OrdinalIgnoreCase) ||
+        t.TicketNumber.Contains(searchQuery, StringComparison.OrdinalIgnoreCase))
     ).ToList();
   }
 
@@ -179,17 +209,16 @@
     "low" => "Baja",
     _ => prioridad
   };
-
-  public class Ticket
+  
+  private string FormatDate(DateTime date) => date.ToString("yyyy-MM-dd HH:mm");
+  
+  private string CalculateSLA(DateTime? deadline)
   {
-    public string Id { get; set; } = "";
-    public string Titulo { get; set; } = "";
-    public string Tecnico { get; set; } = "";
-    public string Estado { get; set; } = "";
-    public string Prioridad { get; set; } = "";
-    public string Laboratorio { get; set; } = "";
-    public string Fecha { get; set; } = "";
-    public string Sla { get; set; } = "";
+    if (deadline == null) return "-";
+    var remaining = deadline.Value - DateTime.UtcNow;
+    if (remaining.TotalHours < 0) return "Vencido";
+    if (remaining.TotalHours < 24) return $"{(int)remaining.TotalHours}h";
+    return $"{(int)remaining.TotalDays}d";
   }
 }
 

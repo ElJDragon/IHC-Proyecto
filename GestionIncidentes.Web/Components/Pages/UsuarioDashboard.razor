@@ -1,6 +1,8 @@
 @page "/usuario/dashboard"
 @layout UsuarioLayout
 @rendermode InteractiveServer
+@inject GestionIncidentes.Web.Services.StudentReportService ReportService
+@using GestionIncidentes.Application.Models
 
 <link rel="stylesheet" href="/css/pages.css" />
 <link rel="stylesheet" href="/css/usuario.css" />
@@ -11,44 +13,209 @@
         <p class="page-subtitle">Historial de incidentes reportados</p>
     </div>
 
-    <div class="grid-cards" style="max-width:900px; margin:0 auto 24px">
-        <div class="card">
-            <div class="card-title">Tickets abiertos</div>
-            <div class="card-value">2</div>
-            <div class="card-desc">En espera de atención</div>
+    @if (loading)
+    {
+        <div style="text-align:center; padding:40px">Cargando reportes...</div>
+    }
+    else
+    {
+        <div class="grid-cards" style="max-width:900px; margin:0 auto 24px">
+            <div class="card">
+                <div class="card-title">Tickets abiertos</div>
+                <div class="card-value">@myReports.Count(r => r.Status != "Resuelto")</div>
+                <div class="card-desc">En espera de atención</div>
+            </div>
+            <div class="card">
+                <div class="card-title">Total reportados</div>
+                <div class="card-value">@myReports.Count</div>
+                <div class="card-desc">Historial completo</div>
+            </div>
         </div>
-        <div class="card">
-            <div class="card-title">Última actualización</div>
-            <div class="card-value">Hoy</div>
-            <div class="card-desc">Actividad reciente</div>
-        </div>
-    </div>
 
-    <div class="table-shell" style="max-width:900px; margin:0 auto">
-        <div class="table-title">Tus Incidentes</div>
-        <table class="table">
-            <thead>
-                <tr>
-                    <th>ID</th>
-                    <th>Ubicación</th>
-                    <th>Problema</th>
-                    <th>Estado</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td><strong>#901</strong></td>
-                    <td>Lab 2 - PC-L2-04</td>
-                    <td>Error al cargar portal</td>
-                    <td><span class="badge media">Abierto</span></td>
-                </tr>
-                <tr>
-                    <td><strong>#895</strong></td>
-                    <td>Lab 1 - PC-L1-03</td>
-                    <td>Teclado defectuoso</td>
-                    <td><span class="badge baja">Resuelto</span></td>
-                </tr>
-            </tbody>
-        </table>
-    </div>
+        <div class="table-shell" style="max-width:900px; margin:0 auto">
+            <div class="table-title">Tus Incidentes</div>
+            @if (myReports.Any())
+            {
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Ubicación</th>
+                            <th>Problema</th>
+                            <th>Estado</th>
+                            <th>Fecha</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var report in myReports.OrderByDescending(r => r.CreatedAt))
+                        {
+                            <tr>
+                                <td><strong>@report.TicketNumber</strong></td>
+                                <td>@report.Location @(string.IsNullOrEmpty(report.LocationDetail) ? "" : $"- {report.LocationDetail}")</td>
+                                <td>@report.Title</td>
+                                <td><span class="badge @GetStatusClass(report.Status)">@report.Status</span></td>
+                                <td>@report.CreatedAt.ToString("dd/MM/yyyy")</td>
+                                <td>
+                                    @if (report.Status == "Resuelto" && report.Rating == null)
+                                    {
+                                        <button class="btn-small" @onclick="() => ShowRatingModal(report.Id)">Calificar</button>
+                                    }
+                                    else if (report.Rating != null)
+                                    {
+                                        <span style="color:var(--color-warning)">⭐ @report.Rating</span>
+                                    }
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            }
+            else
+            {
+                <div style="text-align:center; padding:40px; color:var(--text-gray)">
+                    No has reportado ningún incidente aún
+                </div>
+            }
+        </div>
+    }
+
+    @if (showRatingModal)
+    {
+        <div class="modal-overlay" @onclick="CloseRatingModal">
+            <div class="modal-content" @onclick:stopPropagation="true">
+                <h3>Calificar Servicio</h3>
+                <div style="margin:20px 0; display:flex; gap:8px; justify-content:center">
+                    @for (int i = 1; i <= 5; i++)
+                    {
+                        var rating = i;
+                        <button class="star-btn" @onclick="() => selectedRating = rating">
+                            <span style="font-size:32px; color:@(selectedRating >= rating ? "var(--color-warning)" : "var(--text-gray)")">⭐</span>
+                        </button>
+                    }
+                </div>
+                <textarea @bind="feedbackComment" placeholder="Comentarios adicionales (opcional)" rows="3" style="width:100%; padding:12px; border:1px solid var(--border-color); border-radius:8px; margin-bottom:16px"></textarea>
+                <div style="display:flex; gap:12px; justify-content:flex-end">
+                    <button class="btn-secondary" @onclick="CloseRatingModal">Cancelar</button>
+                    <button class="btn-primary" @onclick="SubmitRating" disabled="@(selectedRating == 0)">Enviar</button>
+                </div>
+            </div>
+        </div>
+    }
 </div>
+
+@code {
+    private List<TicketResponseDto> myReports = new();
+    private bool loading = true;
+    private bool showRatingModal = false;
+    private Guid? ratingTicketId = null;
+    private int selectedRating = 0;
+    private string feedbackComment = "";
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadReportsAsync();
+    }
+
+    private async Task LoadReportsAsync()
+    {
+        loading = true;
+        try
+        {
+            myReports = await ReportService.GetMyReportsAsync() ?? new List<TicketResponseDto>();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error loading reports: {ex.Message}");
+            myReports = new List<TicketResponseDto>();
+        }
+        finally
+        {
+            loading = false;
+        }
+    }
+
+    private void ShowRatingModal(Guid ticketId)
+    {
+        ratingTicketId = ticketId;
+        selectedRating = 0;
+        feedbackComment = "";
+        showRatingModal = true;
+    }
+
+    private void CloseRatingModal()
+    {
+        showRatingModal = false;
+        ratingTicketId = null;
+    }
+
+    private async Task SubmitRating()
+    {
+        if (ratingTicketId == null || selectedRating == 0) return;
+        
+        try
+        {
+            var dto = new RateTicketDto(selectedRating, feedbackComment);
+            await ReportService.RateTicketAsync(ratingTicketId.Value, dto);
+            await LoadReportsAsync();
+            CloseRatingModal();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error submitting rating: {ex.Message}");
+        }
+    }
+
+    private string GetStatusClass(string status) => status?.ToLower() switch
+    {
+        "resuelto" => "baja",
+        "en proceso" => "media",
+        "pendiente" => "alta",
+        _ => "media"
+    };
+}
+
+<style>
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+}
+
+.modal-content {
+    background: white;
+    padding: 24px;
+    border-radius: 12px;
+    max-width: 500px;
+    width: 90%;
+}
+
+.star-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 4px;
+}
+
+.btn-small {
+    padding: 4px 12px;
+    font-size: 12px;
+    border: 1px solid var(--color-primary);
+    background: white;
+    color: var(--color-primary);
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+.btn-small:hover {
+    background: var(--color-primary);
+    color: white;
+}
+</style>
