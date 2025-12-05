@@ -1,11 +1,14 @@
+/* Load theme variables and layout components */
+@import url('/css/theme.css');
+@import url('/css/layout.css');
+
 html, body {
-    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', sans-serif;
     background-color: var(--color-background);
     color: var(--color-text-primary);
+    margin: 0;
+    padding: 0;
 }
-
-/* Load theme variables */
-@import url('/css/theme.css');
 
 a, .btn-link {
     color: var(--color-primary);

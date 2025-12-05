@@ -7,138 +7,149 @@
 
 <link rel="stylesheet" href="/css/pages.css" />
 
-<div class="page-shell">
+<div>
   <!-- Breadcrumbs -->
-  <nav style="margin-bottom: 24px; color: var(--text-gray); font-size: 14px">
+  <div class="breadcrumbs">
     <span>Inicio</span>
-    <span style="margin: 0 8px">&gt;</span>
-    <span>Administración</span>
-    <span style="margin: 0 8px">&gt;</span>
-    <span style="color: var(--color-primary)">Gestión de Tickets</span>
-  </nav>
-
-  <!-- Page Header -->
-  <div class="page-header" style="text-align: left">
-    <h1>Gestión de Tickets</h1>
-    <p>Administración y seguimiento de incidentes reportados</p>
+    <svg style="width: 16px; height: 16px;" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"></polyline></svg>
+    <span style="color: var(--color-text-primary);">Incidentes</span>
   </div>
 
-  <!-- Filters and Search -->
-  <div class="card" style="margin-bottom: 24px">
-    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px">
-      <div style="display: flex; align-items: center; gap: 12px">
-        <span class="material-icons" style="color: var(--text-gray)">filter_list</span>
-        <span style="font-weight: 500">Filtros:</span>
-        
-        <select @bind="filterTecnico" style="padding: 8px 12px; border: 1px solid var(--border-color); border-radius: 8px; font-size: 14px">
-          <option value="all">Todos los técnicos</option>
-          <option value="Carlos Méndez">Carlos Méndez</option>
-          <option value="Ana Torres">Ana Torres</option>
-          <option value="Luis García">Luis García</option>
-        </select>
-
-        <select @bind="filterEstado" style="padding: 8px 12px; border: 1px solid var(--border-color); border-radius: 8px; font-size: 14px">
-          <option value="all">Todos los estados</option>
-          <option value="Pendiente">Pendiente</option>
-          <option value="En proceso">En proceso</option>
-          <option value="Resuelto">Resuelto</option>
-        </select>
-
-        <select @bind="filterPrioridad" style="padding: 8px 12px; border: 1px solid var(--border-color); border-radius: 8px; font-size: 14px">
-          <option value="all">Todas las prioridades</option>
-          <option value="critical">Crítica</option>
-          <option value="high">Alta</option>
-          <option value="medium">Media</option>
-          <option value="low">Baja</option>
-        </select>
-
-        @if (filterTecnico != "all" || filterEstado != "all" || filterPrioridad != "all")
-        {
-          <button @onclick="LimpiarFiltros" style="color: var(--color-primary); font-size: 14px; background: none; border: none; cursor: pointer; text-decoration: underline">
-            Limpiar filtros
-          </button>
-        }
-      </div>
-
-      <div style="position: relative; width: 280px">
-        <span class="material-icons" style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--text-gray); font-size: 20px">search</span>
-        <input type="text" @bind="searchQuery" @bind:event="oninput" placeholder="Buscar tickets..." 
-          style="width: 100%; padding: 10px 12px 10px 42px; border: 1px solid var(--border-color); border-radius: 8px; font-size: 14px" />
-      </div>
+  <!-- Page Header with Action Button -->
+  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+    <div>
+      <h1>Gestión de Incidentes</h1>
+      <p style="color: var(--color-text-secondary); margin-top: 0.25rem;">Administra todos los tickets del sistema</p>
     </div>
+    <button class="btn-primary" @onclick="NavigateToNewTicket">
+      <svg style="width: 20px; height: 20px;" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+      Nuevo Incidente
+    </button>
   </div>
 
-  <!-- Tickets Table -->
-  <div class="table-shell">
-    <table class="table">
-      <thead>
-        <tr>
-          <th>ID</th>
-          <th>Título</th>
-          <th>Laboratorio</th>
-          <th>Técnico</th>
-          <th>Estado</th>
-          <th>Prioridad</th>
-          <th>SLA</th>
-          <th>Fecha</th>
-          <th>Acciones</th>
-        </tr>
-      </thead>
-      <tbody>
-        @if (loading)
-        {
-          <tr>
-            <td colspan="9" style="text-align:center; padding:40px">Cargando tickets...</td>
-          </tr>
-        }
-        else if (!GetFilteredTickets().Any())
-        {
-          <tr>
-            <td colspan="9" style="text-align:center; padding:40px; color:var(--text-gray)">No se encontraron tickets</td>
-          </tr>
-        }
-        else
-        {
-          @foreach (var ticket in GetFilteredTickets())
-          {
-            <tr>
-              <td><strong style="color: var(--color-primary)">@ticket.TicketNumber</strong></td>
-              <td>@ticket.Title</td>
-              <td style="color: var(--text-gray)">@ticket.Location</td>
-              <td style="color: var(--text-gray)">@(ticket.AssignedToName ?? "Sin asignar")</td>
-              <td><span class="badge @GetEstadoBadgeClass(ticket.Status)">@ticket.Status</span></td>
-              <td><span class="badge @GetPrioridadBadgeClass(ticket.Priority)">@GetPrioridadLabel(ticket.Priority)</span></td>
-              <td><span style="color: @(ticket.SlaDeadline != null ? "var(--color-warning)" : "var(--text-gray)")">@CalculateSLA(ticket.SlaDeadline)</span></td>
-              <td style="color: var(--text-gray); font-size: 13px">@FormatDate(ticket.CreatedAt)</td>
-              <td>
-                <button style="padding: 4px; border: none; background: none; cursor: pointer; border-radius: 4px" title="Más opciones">
-                  <span class="material-icons" style="font-size: 20px; color: var(--text-gray)">more_vert</span>
-                </button>
-              </td>
-            </tr>
-          }
-        }
-      </tbody>
-    </table>
+  <!-- Tabs -->
+  <div class="tabs">
+    <button class="tab @(selectedTab == "all" ? "active" : "")" @onclick='() => selectedTab = "all"'>
+      Todos (@allTickets.Count)
+    </button>
+    <button class="tab @(selectedTab == "open" ? "active" : "")" @onclick='() => selectedTab = "open"'>
+      Abiertos (@allTickets.Count(t => t.Status == "Abierto"))
+    </button>
+    <button class="tab @(selectedTab == "in-progress" ? "active" : "")" @onclick='() => selectedTab = "in-progress"'>
+      En Proceso (@allTickets.Count(t => t.Status == "En Progreso"))
+    </button>
+    <button class="tab @(selectedTab == "resolved" ? "active" : "")" @onclick='() => selectedTab = "resolved"'>
+      Resueltos (@allTickets.Count(t => t.Status == "Resuelto"))
+    </button>
+  </div>
 
-    <!-- Pagination Footer -->
-    <div style="display: flex; align-items: center; justify-content: space-between; padding: 16px 24px; border-top: 1px solid var(--border-color); background: #f9fafb">
-      <p style="color: var(--text-gray); font-size: 14px">Mostrando @GetFilteredTickets().Count resultados</p>
-      <div style="display: flex; gap: 8px">
-        <button style="padding: 8px 16px; border: 1px solid var(--border-color); border-radius: 8px; background: white; cursor: pointer; font-size: 14px">Anterior</button>
-        <button style="padding: 8px 16px; background: var(--color-primary); color: white; border: none; border-radius: 8px; font-weight: 500">1</button>
-        <button style="padding: 8px 16px; border: 1px solid var(--border-color); border-radius: 8px; background: white; cursor: pointer; font-size: 14px">2</button>
-        <button style="padding: 8px 16px; border: 1px solid var(--border-color); border-radius: 8px; background: white; cursor: pointer; font-size: 14px">Siguiente</button>
-      </div>
+  <!-- Filters -->
+  <div class="filters-bar">
+    <div style="display: flex; align-items: center; gap: 0.5rem;">
+      <svg style="width: 16px; height: 16px; color: var(--color-text-tertiary);" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon></svg>
+      <span style="font-size: 14px; font-weight: 500;">Filtros:</span>
     </div>
+    
+    <select @bind="filterPrioridad" class="filter-select">
+      <option value="all">Todas las prioridades</option>
+      <option value="critical">Crítica</option>
+      <option value="high">Alta</option>
+      <option value="medium">Media</option>
+      <option value="low">Baja</option>
+    </select>
+    
+    <select @bind="filterLaboratorio" class="filter-select">
+      <option value="all">Todos los laboratorios</option>
+      <option value="Lab 1">Lab 1</option>
+      <option value="Lab 2">Lab 2</option>
+      <option value="Lab 3">Lab 3</option>
+      <option value="Lab 4">Lab 4</option>
+      <option value="Lab 5">Lab 5</option>
+    </select>
+    
+    <select @bind="filterTecnico" class="filter-select">
+      <option value="all">Todos los técnicos</option>
+      <option value="Carlos Méndez">Carlos Méndez</option>
+      <option value="Ana Torres">Ana Torres</option>
+      <option value="Luis García">Luis García</option>
+    </select>
+  </div>
+
+  <!-- Incidents List -->
+  <div id="incidentsList">
+    @if (loading)
+    {
+      <div class="empty-state">
+        <p>Cargando incidentes...</p>
+      </div>
+    }
+    else if (!GetFilteredTickets().Any())
+    {
+      <div class="empty-state">
+        <div class="empty-icon">
+          <svg style="width: 40px; height: 40px; color: var(--color-text-tertiary);" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10"></circle>
+            <line x1="12" y1="8" x2="12" y2="12"></line>
+            <line x1="12" y1="16" x2="12.01" y2="16"></line>
+          </svg>
+        </div>
+        <h3>No se encontraron incidentes</h3>
+        <p style="color: var(--color-text-secondary); margin-top: 0.5rem;">Intenta ajustar los filtros</p>
+      </div>
+    }
+    else
+    {
+      @foreach (var ticket in GetFilteredTickets())
+      {
+        <div class="incident-card">
+          <div class="incident-header">
+            <span class="incident-id">@ticket.TicketNumber</span>
+            <span class="incident-priority @GetPriorityBadgeClass(ticket.Priority)">@GetPrioridadLabel(ticket.Priority)</span>
+          </div>
+          <h3 class="incident-title">@ticket.Description</h3>
+          <p class="incident-description">
+            @if (!string.IsNullOrEmpty(ticket.TechnicianNotes))
+            {
+              @ticket.TechnicianNotes
+            }
+            else
+            {
+              <text>Problema reportado el @ticket.CreatedAt.ToString("dd/MM/yyyy")</text>
+            }
+          </p>
+          <div class="incident-meta">
+            <span>📍 @ticket.LocationDetail</span>
+            <span>⏱️ @GetTimeAgo(ticket.CreatedAt)</span>
+            <span>📅 @ticket.CreatedAt.ToString("dd MMM yyyy, HH:mm")</span>
+          </div>
+          <div class="incident-footer">
+            <div class="assignee">
+              @if (!string.IsNullOrEmpty(ticket.AssignedToName))
+              {
+                <div class="assignee-avatar">@GetInitials(ticket.AssignedToName)</div>
+                <div>
+                  <div style="font-size: 14px; font-weight: 500;">@ticket.AssignedToName</div>
+                  <div style="font-size: 12px; color: var(--color-text-tertiary);">@ticket.Status</div>
+                </div>
+              }
+              else
+              {
+                <div style="font-size: 14px; color: var(--color-text-tertiary);">Sin asignar</div>
+              }
+            </div>
+            <span class="badge @GetStatusBadgeClass(ticket.Status)">@ticket.Status</span>
+          </div>
+        </div>
+      }
+    }
   </div>
 </div>
 
 @code {
+  private string selectedTab = "all";
   private string filterTecnico = "all";
-  private string filterEstado = "all";
+  private string filterLaboratorio = "all";
   private string filterPrioridad = "all";
-  private string searchQuery = "";
   private List<TicketResponseDto> allTickets = new List<TicketResponseDto>();
   private bool loading = true;
 
@@ -167,87 +178,79 @@
 
   private List<TicketResponseDto> GetFilteredTickets()
   {
-    return allTickets.Where(t =>
+    var filtered = allTickets.AsEnumerable();
+
+    // Filtrar por tab
+    if (selectedTab != "all")
+    {
+      filtered = selectedTab switch
+      {
+        "open" => filtered.Where(t => t.Status == "Abierto"),
+        "in-progress" => filtered.Where(t => t.Status == "En Progreso"),
+        "resolved" => filtered.Where(t => t.Status == "Resuelto"),
+        _ => filtered
+      };
+    }
+
+    // Aplicar filtros adicionales
+    filtered = filtered.Where(t =>
       (filterTecnico == "all" || (t.AssignedToName ?? "").Contains(filterTecnico)) &&
-      (filterEstado == "all" || t.Status == filterEstado) &&
-      (filterPrioridad == "all" || t.Priority == filterPrioridad) &&
-      (string.IsNullOrEmpty(searchQuery) || 
-        t.Title.Contains(searchQuery, StringComparison.OrdinalIgnoreCase) ||
-        t.TicketNumber.Contains(searchQuery, StringComparison.OrdinalIgnoreCase))
-    ).ToList();
+      (filterLaboratorio == "all" || (t.LocationDetail ?? "").Contains(filterLaboratorio)) &&
+      (filterPrioridad == "all" || t.Priority == filterPrioridad)
+    );
+
+    return filtered.ToList();
   }
 
-  private void LimpiarFiltros()
+  private void NavigateToNewTicket()
   {
-    filterTecnico = "all";
-    filterEstado = "all";
-    filterPrioridad = "all";
+    Navigation.NavigateTo("/admin/nuevo-incidente");
   }
 
-  private string GetEstadoBadgeClass(string estado) => estado switch
-  {
-    "Resuelto" => "badge-success",
-    "En proceso" => "badge-info",
-    "Pendiente" => "badge-warning",
-    _ => ""
-  };
-
-  private string GetPrioridadBadgeClass(string prioridad) => prioridad switch
+  private string GetPriorityBadgeClass(string prioridad) => prioridad?.ToLower() switch
   {
     "critical" => "badge-critical",
-    "high" => "badge-warning",
-    "medium" => "badge-info",
-    "low" => "badge-success",
-    _ => ""
+    "high" or "alta" => "badge-warning",
+    "medium" or "media" => "badge-info",
+    "low" or "baja" => "badge-success",
+    _ => "badge-info"
   };
 
-  private string GetPrioridadLabel(string prioridad) => prioridad switch
+  private string GetStatusBadgeClass(string status) => status switch
+  {
+    "Resuelto" => "badge-success",
+    "En Progreso" => "badge-info",
+    "Abierto" => "badge-warning",
+    _ => "badge-info"
+  };
+
+  private string GetPrioridadLabel(string prioridad) => prioridad?.ToLower() switch
   {
     "critical" => "Crítica",
     "high" => "Alta",
     "medium" => "Media",
     "low" => "Baja",
-    _ => prioridad
+    _ => prioridad ?? "Media"
   };
-  
-  private string FormatDate(DateTime date) => date.ToString("yyyy-MM-dd HH:mm");
-  
-  private string CalculateSLA(DateTime? deadline)
+
+  private string GetInitials(string name)
   {
-    if (deadline == null) return "-";
-    var remaining = deadline.Value - DateTime.UtcNow;
-    if (remaining.TotalHours < 0) return "Vencido";
-    if (remaining.TotalHours < 24) return $"{(int)remaining.TotalHours}h";
-    return $"{(int)remaining.TotalDays}d";
+    if (string.IsNullOrEmpty(name)) return "??";
+    var parts = name.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+    if (parts.Length >= 2)
+      return $"{parts[0][0]}{parts[1][0]}".ToUpper();
+    return parts[0].Substring(0, Math.Min(2, parts[0].Length)).ToUpper();
+  }
+
+  private string GetTimeAgo(DateTime date)
+  {
+    var timeSpan = DateTime.Now - date;
+    if (timeSpan.TotalMinutes < 60)
+      return $"Hace {(int)timeSpan.TotalMinutes} min";
+    if (timeSpan.TotalHours < 24)
+      return $"Hace {(int)timeSpan.TotalHours}h";
+    return $"Hace {(int)timeSpan.TotalDays}d";
   }
 }
 
-<style>
-.badge {
-  display: inline-block;
-  padding: 4px 10px;
-  border-radius: 12px;
-  font-size: 12px;
-  font-weight: 500;
-}
 
-.badge-success {
-  background: var(--color-success-bg);
-  color: var(--color-success);
-}
-
-.badge-info {
-  background: #dbeafe;
-  color: #2563eb;
-}
-
-.badge-warning {
-  background: var(--color-warning-bg);
-  color: var(--color-warning);
-}
-
-.badge-critical {
-  background: var(--color-critical-bg);
-  color: var(--color-critical);
-}
-</style>

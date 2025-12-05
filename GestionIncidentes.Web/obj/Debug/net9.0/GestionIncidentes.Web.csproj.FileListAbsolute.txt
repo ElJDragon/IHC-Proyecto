@@ -369,14 +369,12 @@ C:\Users\User\Documents\Joshua Universidad\Quinto\IHC\ProyectoIHC\IHC-Proyecto\G
 C:\Users\User\Documents\Joshua Universidad\Quinto\IHC\ProyectoIHC\IHC-Proyecto\GestionIncidentes.Web\obj\Debug\net9.0\scopedcss\Components\Layout\NavMenu.razor.rz.scp.css
 C:\Users\User\Documents\Joshua Universidad\Quinto\IHC\ProyectoIHC\IHC-Proyecto\GestionIncidentes.Web\obj\Debug\net9.0\scopedcss\bundle\GestionIncidentes.Web.styles.css
 C:\Users\User\Documents\Joshua Universidad\Quinto\IHC\ProyectoIHC\IHC-Proyecto\GestionIncidentes.Web\obj\Debug\net9.0\scopedcss\projectbundle\GestionIncidentes.Web.bundle.scp.css
-C:\Users\User\Documents\Joshua Universidad\Quinto\IHC\ProyectoIHC\IHC-Proyecto\GestionIncidentes.Web\obj\Debug\net9.0\compressed\9uqx7yhk8r-9rfsj0jdqj.gz
 C:\Users\User\Documents\Joshua Universidad\Quinto\IHC\ProyectoIHC\IHC-Proyecto\GestionIncidentes.Web\obj\Debug\net9.0\compressed\u4m6xdq29d-wdwgsbt4vm.gz
 C:\Users\User\Documents\Joshua Universidad\Quinto\IHC\ProyectoIHC\IHC-Proyecto\GestionIncidentes.Web\obj\Debug\net9.0\compressed\lsylqkfzq4-2w3u40mc6j.gz
 C:\Users\User\Documents\Joshua Universidad\Quinto\IHC\ProyectoIHC\IHC-Proyecto\GestionIncidentes.Web\obj\Debug\net9.0\compressed\o26r4q0rey-40wv3z8t95.gz
 C:\Users\User\Documents\Joshua Universidad\Quinto\IHC\ProyectoIHC\IHC-Proyecto\GestionIncidentes.Web\obj\Debug\net9.0\compressed\m1ctpoeivv-ltooahddgu.gz
 C:\Users\User\Documents\Joshua Universidad\Quinto\IHC\ProyectoIHC\IHC-Proyecto\GestionIncidentes.Web\obj\Debug\net9.0\compressed\evtjnwq253-d2uhevpzh5.gz
 C:\Users\User\Documents\Joshua Universidad\Quinto\IHC\ProyectoIHC\IHC-Proyecto\GestionIncidentes.Web\obj\Debug\net9.0\compressed\6f8di7qwe0-n4hzg2dtz6.gz
-C:\Users\User\Documents\Joshua Universidad\Quinto\IHC\ProyectoIHC\IHC-Proyecto\GestionIncidentes.Web\obj\Debug\net9.0\compressed\pdh8hr1sws-xamtqm7two.gz
 C:\Users\User\Documents\Joshua Universidad\Quinto\IHC\ProyectoIHC\IHC-Proyecto\GestionIncidentes.Web\obj\Debug\net9.0\compressed\3sgmg4nmch-jpd0xwbo4u.gz
 C:\Users\User\Documents\Joshua Universidad\Quinto\IHC\ProyectoIHC\IHC-Proyecto\GestionIncidentes.Web\obj\Debug\net9.0\compressed\w35lvbd57n-hc7ynjw99z.gz
 C:\Users\User\Documents\Joshua Universidad\Quinto\IHC\ProyectoIHC\IHC-Proyecto\GestionIncidentes.Web\obj\Debug\net9.0\compressed\32gfuo6k4p-t1cqhe9u97.gz
@@ -435,3 +433,6 @@ C:\Users\User\Documents\Joshua Universidad\Quinto\IHC\ProyectoIHC\IHC-Proyecto\G
 C:\Users\User\Documents\Joshua Universidad\Quinto\IHC\ProyectoIHC\IHC-Proyecto\GestionIncidentes.Web\obj\Debug\net9.0\GestionIncidentes.Web.pdb
 C:\Users\User\Documents\Joshua Universidad\Quinto\IHC\ProyectoIHC\IHC-Proyecto\GestionIncidentes.Web\obj\Debug\net9.0\GestionIncidentes.Web.genruntimeconfig.cache
 C:\Users\User\Documents\Joshua Universidad\Quinto\IHC\ProyectoIHC\IHC-Proyecto\GestionIncidentes.Web\obj\Debug\net9.0\ref\GestionIncidentes.Web.dll
+C:\Users\User\Documents\Joshua Universidad\Quinto\IHC\ProyectoIHC\IHC-Proyecto\GestionIncidentes.Web\obj\Debug\net9.0\compressed\9uqx7yhk8r-gsnicxdsaj.gz
+C:\Users\User\Documents\Joshua Universidad\Quinto\IHC\ProyectoIHC\IHC-Proyecto\GestionIncidentes.Web\obj\Debug\net9.0\compressed\0fenr9y6sn-6zqzz2ua4r.gz
+C:\Users\User\Documents\Joshua Universidad\Quinto\IHC\ProyectoIHC\IHC-Proyecto\GestionIncidentes.Web\obj\Debug\net9.0\compressed\pdh8hr1sws-ntynnkzaxg.gz

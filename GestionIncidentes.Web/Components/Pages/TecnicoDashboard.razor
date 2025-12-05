@@ -5,93 +5,75 @@
 @using GestionIncidentes.Application.Models
 
 <link rel="stylesheet" href="/css/pages.css" />
-<link rel="stylesheet" href="/css/tecnico.css" />
 
-<div class="page-shell">
-    <div class="page-header">
-        <h1 class="page-title">Mis Tickets Asignados</h1>
-        <p class="page-subtitle">@myTickets.Count(t => t.Status != "Resuelto") tickets pendientes</p>
+<div>
+    <div style="margin-bottom: 1.5rem;">
+        <h1>Mis Tickets Asignados</h1>
+        <p style="color: var(--color-text-secondary); margin-top: 0.25rem;">Gestiona los tickets que te han sido asignados</p>
+    </div>
+
+    <!-- KPI Cards -->
+    <div class="grid grid-cols-3" style="margin-bottom: 1.5rem; gap: 1rem;">
+        <div class="card">
+            <div style="font-size: 14px; color: var(--color-text-secondary); margin-bottom: 0.25rem;">Pendientes</div>
+            <div style="font-size: 32px; font-weight: 600; color: var(--color-warning);">@myTickets.Count(t => t.Status == "Abierto")</div>
+            <div style="font-size: 12px; color: var(--color-text-tertiary); margin-top: 0.5rem;">Requieren atención</div>
+        </div>
+        <div class="card">
+            <div style="font-size: 14px; color: var(--color-text-secondary); margin-bottom: 0.25rem;">En Proceso</div>
+            <div style="font-size: 32px; font-weight: 600; color: #1976d2;">@myTickets.Count(t => t.Status == "En Progreso")</div>
+            <div style="font-size: 12px; color: var(--color-text-tertiary); margin-top: 0.5rem;">Trabajando en ellos</div>
+        </div>
+        <div class="card">
+            <div style="font-size: 14px; color: var(--color-text-secondary); margin-bottom: 0.25rem;">Resueltos Hoy</div>
+            <div style="font-size: 32px; font-weight: 600; color: var(--color-success);">@myTickets.Count(t => t.Status == "Resuelto" && t.ResolvedAt.HasValue && t.ResolvedAt.Value.Date == DateTime.Today)</div>
+            <div style="font-size: 12px; color: var(--color-text-tertiary); margin-top: 0.5rem;">Completados</div>
+        </div>
     </div>
 
     @if (loading)
     {
-        <div style="text-align:center; padding:40px">Cargando tickets...</div>
+        <div class="empty-state">
+            <p>Cargando tickets...</p>
+        </div>
     }
     else
     {
-        <div class="tickets-shell">
-            <div class="tickets-list">
-                <div class="list-title">Ordenados por SLA (urgencia)</div>
+        <!-- Tickets List -->
+        <div>
+            <h3 style="margin-bottom: 1rem;">Tickets Activos</h3>
 
-                @foreach (var ticket in myTickets.OrderBy(t => t.SlaDeadline))
-                {
-                    <div class="ticket-item @(selectedTicketId == ticket.Id ? "selected" : "")" @onclick="() => SelectTicket(ticket.Id)">
-                        <div class="header">
-                            <div class="title">@ticket.TicketNumber</div>
-                            <div class="badge @GetPriorityClass(ticket.Priority)">@GetPriorityLabel(ticket.Priority)</div>
-                        </div>
-                        <div class="meta">
-                            <span>@ticket.Title</span>
-                            <span>@ticket.Location @(string.IsNullOrEmpty(ticket.LocationDetail) ? "" : $"- {ticket.LocationDetail}")</span>
-                            <span>SLA: @CalculateSLA(ticket.SlaDeadline)</span>
-                        </div>
-                        <div class="progress"><div class="bar" style="width:@CalculateProgress(ticket)%"></div></div>
-                    </div>
-                }
-
-                @if (myTickets.Count == 0)
-                {
-                    <div style="text-align:center; padding:40px; color:var(--text-gray)">No tienes tickets asignados</div>
-                }
-            </div>
-
-            @if (selectedTicket != null)
+            @if (!myTickets.Any())
             {
-                <div class="ticket-detail">
-                    <div class="title">@selectedTicket.TicketNumber <span class="badge @GetPriorityClass(selectedTicket.Priority)">Prioridad @GetPriorityLabel(selectedTicket.Priority)</span></div>
-                    <div class="divider"></div>
-                    <div class="meta" style="gap:24px; color:var(--text-gray)">
-                        <span>Ubicación: @selectedTicket.Location</span>
-                        @if (!string.IsNullOrEmpty(selectedTicket.LocationDetail))
-                        {
-                            <span>Detalle: @selectedTicket.LocationDetail</span>
-                        }
-                        <span>Reportado por: @selectedTicket.CreatedByName</span>
+                <div class="empty-state">
+                    <div class="empty-icon">
+                        <svg style="width: 40px; height: 40px; color: var(--color-text-tertiary);" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="12" cy="12" r="10"></circle>
+                            <line x1="12" y1="8" x2="12" y2="12"></line>
+                            <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                        </svg>
                     </div>
-
-                    <div style="margin:16px 0; padding:16px; background:var(--bg-secondary); border-radius:8px">
-                        <div style="font-weight:600; margin-bottom:8px">Descripción:</div>
-                        <div>@selectedTicket.Description</div>
-                    </div>
-
-                    <div class="actions">
-                        <div class="action-card">
-                            <div style="font-weight:600; margin-bottom:8px">Cambiar Estado</div>
-                            <select @bind="newStatus" class="form-select">
-                                <option value="">Seleccionar</option>
-                                <option value="Pendiente">Pendiente</option>
-                                <option value="En proceso">En proceso</option>
-                                <option value="Resuelto">Resuelto</option>
-                            </select>
-                            <button class="btn-primary" style="margin-top:8px" @onclick="ChangeStatus" disabled="@string.IsNullOrEmpty(newStatus)">Aplicar</button>
-                        </div>
-                    </div>
-
-                    <div class="log-card">
-                        <div style="font-weight:600; margin-bottom:8px">Bitácora de Solución</div>
-                        <textarea @bind="technicianNotes" class="form-control" rows="5" placeholder="Describe los pasos realizados para resolver el problema..."></textarea>
-                        <div style="display:flex; gap:12px; justify-content:flex-end; margin-top:12px">
-                            <button class="btn-secondary" @onclick="SaveNotes" disabled="@string.IsNullOrEmpty(technicianNotes)">Guardar Notas</button>
-                            <button class="btn-primary" @onclick="CloseTicket" disabled="@(selectedTicket.Status == "Resuelto")">Cerrar Ticket</button>
-                        </div>
-                    </div>
+                    <h3>No tienes tickets asignados</h3>
+                    <p style="color: var(--color-text-secondary); margin-top: 0.5rem;">Cuando se te asignen tickets, aparecerán aquí</p>
                 </div>
             }
             else
             {
-                <div class="ticket-detail" style="display:flex; align-items:center; justify-content:center; color:var(--text-gray)">
-                    Selecciona un ticket para ver los detalles
-                </div>
+                @foreach (var ticket in myTickets.OrderByDescending(t => t.Priority).ThenBy(t => t.CreatedAt))
+                {
+                    <div class="ticket-card" @onclick="() => SelectTicket(ticket.Id)">
+                        <div class="ticket-header">
+                            <div class="ticket-id">@ticket.TicketNumber</div>
+                            <span class="ticket-status @GetStatusClass(ticket.Status)">@ticket.Status</span>
+                        </div>
+                        <div class="ticket-title">@ticket.Description</div>
+                        <div class="ticket-meta">
+                            <span>📍 @ticket.LocationDetail</span>
+                            <span>⏱️ @GetTimeAgo(ticket.CreatedAt)</span>
+                            <span>@GetPriorityEmoji(ticket.Priority) Prioridad: @GetPriorityLabel(ticket.Priority)</span>
+                        </div>
+                    </div>
+                }
             }
         </div>
     }
@@ -99,11 +81,7 @@
 
 @code {
     private List<TicketResponseDto> myTickets = new();
-    private TicketResponseDto? selectedTicket = null;
-    private Guid? selectedTicketId = null;
     private bool loading = true;
-    private string newStatus = "";
-    private string technicianNotes = "";
 
     protected override async Task OnInitializedAsync()
     {
@@ -116,15 +94,11 @@
         try
         {
             myTickets = await TicketService.GetMyTicketsAsync() ?? new List<TicketResponseDto>();
-            if (myTickets.Any())
-            {
-                selectedTicketId = myTickets.First().Id;
-                await SelectTicket(selectedTicketId.Value);
-            }
         }
         catch (Exception ex)
         {
             Console.WriteLine($"Error loading tickets: {ex.Message}");
+            myTickets = new List<TicketResponseDto>();
         }
         finally
         {
@@ -132,67 +106,21 @@
         }
     }
 
-    private async Task SelectTicket(Guid ticketId)
+    private void SelectTicket(Guid ticketId)
     {
-        selectedTicketId = ticketId;
-        selectedTicket = await TicketService.GetTicketAsync(ticketId);
-        technicianNotes = selectedTicket?.TechnicianNotes ?? "";
-        newStatus = "";
+        // Navigate to detail page or show modal
+        // For now, just log it
+        Console.WriteLine($"Selected ticket: {ticketId}");
     }
 
-    private async Task ChangeStatus()
+    private string GetStatusClass(string status) => status switch
     {
-        if (selectedTicket == null || string.IsNullOrEmpty(newStatus)) return;
-        
-        try
-        {
-            await TicketService.ChangeStatusAsync(selectedTicket.Id, new ChangeTicketStatusDto(newStatus, null));
-            await LoadTicketsAsync();
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"Error changing status: {ex.Message}");
-        }
-    }
-
-    private async Task SaveNotes()
-    {
-        if (selectedTicket == null) return;
-        
-        try
-        {
-            await TicketService.UpdateNotesAsync(selectedTicket.Id, technicianNotes);
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"Error saving notes: {ex.Message}");
-        }
-    }
-
-    private async Task CloseTicket()
-    {
-        if (selectedTicket == null) return;
-        
-        try
-        {
-            await TicketService.CloseTicketAsync(selectedTicket.Id, new CloseTicketDto(technicianNotes, null));
-            await LoadTicketsAsync();
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"Error closing ticket: {ex.Message}");
-        }
-    }
-
-    private string GetPriorityClass(string priority) => priority?.ToLower() switch
-    {
-        "critical" => "critica",
-        "high" => "alta",
-        "medium" => "media",
-        "low" => "baja",
-        _ => "media"
+        "Abierto" => "status-pending",
+        "En Progreso" => "status-in-progress",
+        "Resuelto" => "status-resolved",
+        _ => "status-pending"
     };
-    
+
     private string GetPriorityLabel(string priority) => priority?.ToLower() switch
     {
         "critical" => "Crítica",
@@ -201,21 +129,23 @@
         "low" => "Baja",
         _ => priority ?? "Media"
     };
-    
-    private string CalculateSLA(DateTime? deadline)
+
+    private string GetPriorityEmoji(string priority) => priority?.ToLower() switch
     {
-        if (deadline == null) return "-";
-        var remaining = deadline.Value - DateTime.UtcNow;
-        if (remaining.TotalHours < 0) return "Vencido";
-        if (remaining.TotalHours < 24) return $"{(int)remaining.TotalHours}h";
-        return $"{(int)remaining.TotalDays}d";
-    }
-    
-    private int CalculateProgress(TicketResponseDto ticket)
+        "critical" => "🔴",
+        "high" => "🟠",
+        "medium" => "🔵",
+        "low" => "🟢",
+        _ => "🔵"
+    };
+
+    private string GetTimeAgo(DateTime date)
     {
-        if (ticket.SlaDeadline == null) return 0;
-        var total = (ticket.SlaDeadline.Value - ticket.CreatedAt).TotalMinutes;
-        var elapsed = (DateTime.UtcNow - ticket.CreatedAt).TotalMinutes;
-        return Math.Min(100, (int)((elapsed / total) * 100));
+        var timeSpan = DateTime.Now - date;
+        if (timeSpan.TotalMinutes < 60)
+            return $"Hace {(int)timeSpan.TotalMinutes} min";
+        if (timeSpan.TotalHours < 24)
+            return $"Hace {(int)timeSpan.TotalHours}h";
+        return $"Hace {(int)timeSpan.TotalDays}d";
     }
 }
