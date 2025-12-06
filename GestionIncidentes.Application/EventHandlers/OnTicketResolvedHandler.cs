@@ -29,7 +29,7 @@ public class OnTicketResolvedHandler : INotificationHandler<TicketResolved>
         
         // Notificar al técnico asignado para que genere el reporte
         var notif = Notification.Create(
-            ticket.UserId,
+            ticket.AssignedToUserId ?? ticket.CreatedByUserId,
             "Ticket Resuelto - Generar Reporte",
             $"Has resuelto el ticket. Por favor genera el reporte correspondiente y considera agregarlo a la Base de Conocimiento.",
             "TicketResolved",
@@ -39,7 +39,7 @@ public class OnTicketResolvedHandler : INotificationHandler<TicketResolved>
         await _notificationRepository.AddAsync(notif);
 
         // También notificar al creador del ticket
-        if (ticket.CreatedByUserId != ticket.UserId)
+        if (ticket.AssignedToUserId.HasValue && ticket.CreatedByUserId != ticket.AssignedToUserId.Value)
         {
             var creatorNotif = Notification.Create(
                 ticket.CreatedByUserId,

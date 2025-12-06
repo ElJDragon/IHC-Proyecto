@@ -1,10 +1,10 @@
 {
   "version": 2,
-  "dgSpecHash": "HMu+QUa1kmE=",
+  "dgSpecHash": "xKp7zefADYQ=",
   "success": true,
-  "projectFilePath": "C:\\IHC-Proyecto\\GestionIncidentes.Domain\\GestionIncidentes.Domain.csproj",
+  "projectFilePath": "C:\\Users\\User\\Documents\\Joshua Universidad\\Quinto\\IHC\\ProyectoIHC\\IHC-Proyecto\\GestionIncidentes.Domain\\GestionIncidentes.Domain.csproj",
   "expectedPackageFiles": [
-    "C:\\Users\\Compus\\.nuget\\packages\\mediatr.contracts\\2.0.1\\mediatr.contracts.2.0.1.nupkg.sha512"
+    "C:\\Users\\User\\.nuget\\packages\\mediatr.contracts\\2.0.1\\mediatr.contracts.2.0.1.nupkg.sha512"
   ],
   "logs": []
 }

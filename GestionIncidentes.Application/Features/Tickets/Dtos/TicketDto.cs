@@ -7,7 +7,7 @@ public record TicketDto(
     string Title,
     string Description,
     Guid CreatedByUserId,
-    Guid UserId,
+    Guid? AssignedToUserId,
     DateTime CreatedAt,
     string Status
 );

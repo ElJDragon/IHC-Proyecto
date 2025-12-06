@@ -48,7 +48,7 @@
                                 <p><strong>Creado por:</strong> @ticket.CreatedByUserId</p>
                             </div>
                             <div class="col-md-6">
-                                <p><strong>Asignado a:</strong> @ticket.UserId</p>
+                                <p><strong>Asignado a:</strong> @(ticket.AssignedToUserId?.ToString() ?? "Sin asignar")</p>
                                 <p><strong>Fecha de creación:</strong> @ticket.CreatedAt.ToString("dd/MM/yyyy HH:mm")</p>
                             </div>
                         </div>

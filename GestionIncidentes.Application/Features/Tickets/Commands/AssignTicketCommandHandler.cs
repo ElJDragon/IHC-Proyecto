@@ -31,7 +31,7 @@ public class AssignTicketCommandHandler : IRequestHandler<AssignTicketCommand, U
         if (ticket == null)
             throw new KeyNotFoundException("Ticket no encontrado");
 
-        ticket.UserId = request.AssigneeUserId;
+        ticket.AssignedToUserId = request.AssigneeUserId;
         ticket.Status = "Assigned";
 
         await _ticketRepo.UpdateAsync(ticket);

@@ -22,7 +22,7 @@ public class ListTicketsByAssigneeQueryHandler : IRequestHandler<ListTicketsByAs
             t.Title,
             t.Description,
             t.CreatedByUserId,
-            t.UserId,
+            t.AssignedToUserId,
             t.CreatedAt,
             t.Status
         )).ToList();

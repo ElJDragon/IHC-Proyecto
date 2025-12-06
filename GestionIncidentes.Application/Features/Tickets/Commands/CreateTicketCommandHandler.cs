@@ -34,7 +34,7 @@ public class CreateTicketCommandHandler : IRequestHandler<CreateTicketCommand, G
             Title = request.Title,
             Description = request.Description,
             CreatedByUserId = userId,
-            UserId = userId, // Inicialmente asignado al creador
+            AssignedToUserId = null, // Sin asignar inicialmente
             CreatedAt = DateTime.UtcNow,
             Status = "Open"
         };
