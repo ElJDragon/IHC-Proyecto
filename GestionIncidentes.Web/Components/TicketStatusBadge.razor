@@ -1,0 +1,80 @@
+@* Componente: Badge de estado del ticket *@
+
+<div class="status-badge-container">
+    <div class="status-badge @GetStatusClass()">
+        <i class="bi @GetStatusIcon()"></i>
+        <span class="ms-2">@GetStatusText()</span>
+    </div>
+    <p class="mt-2 text-muted small">@GetStatusDescription()</p>
+</div>
+
+@code {
+    [Parameter]
+    public string Status { get; set; } = "Open";
+
+    private string GetStatusClass()
+    {
+        return Status switch
+        {
+            "Open" => "bg-warning text-dark",
+            "Assigned" => "bg-primary text-white",
+            "InProgress" => "bg-info text-dark",
+            "Resolved" => "bg-success text-white",
+            "Closed" => "bg-secondary text-white",
+            _ => "bg-secondary text-white"
+        };
+    }
+
+    private string GetStatusIcon()
+    {
+        return Status switch
+        {
+            "Open" => "bi-folder2-open",
+            "Assigned" => "bi-person-check",
+            "InProgress" => "bi-hourglass-split",
+            "Resolved" => "bi-check-circle",
+            "Closed" => "bi-x-circle",
+            _ => "bi-question-circle"
+        };
+    }
+
+    private string GetStatusText()
+    {
+        return Status switch
+        {
+            "Open" => "Abierto",
+            "Assigned" => "Asignado",
+            "InProgress" => "En Progreso",
+            "Resolved" => "Resuelto",
+            "Closed" => "Cerrado",
+            _ => Status
+        };
+    }
+
+    private string GetStatusDescription()
+    {
+        return Status switch
+        {
+            "Open" => "El ticket está esperando ser asignado a un técnico.",
+            "Assigned" => "El ticket ha sido asignado y está pendiente de atención.",
+            "InProgress" => "El técnico está trabajando activamente en la resolución.",
+            "Resolved" => "El ticket ha sido resuelto exitosamente.",
+            "Closed" => "El ticket está cerrado y archivado.",
+            _ => "Estado desconocido."
+        };
+    }
+}
+
+<style>
+    .status-badge-container {
+        padding: 1rem;
+    }
+
+    .status-badge {
+        padding: 0.5rem 1rem;
+        border-radius: 0.5rem;
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+    }
+</style>

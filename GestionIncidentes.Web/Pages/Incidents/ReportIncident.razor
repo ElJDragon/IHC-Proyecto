@@ -1,0 +1,109 @@
+@page "/incidents/report"
+@using GestionIncidentes.Application.Features.Incidents.Commands
+@using MediatR
+@inject IMediator Mediator
+@inject NavigationManager Navigation
+
+<PageTitle>Reportar Incidente</PageTitle>
+
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-8 offset-md-2">
+            <div class="card">
+                <div class="card-header bg-danger text-white">
+                    <h3><i class="bi bi-exclamation-triangle"></i> Reportar Nuevo Incidente</h3>
+                </div>
+                <div class="card-body">
+                    <EditForm Model="@model" OnValidSubmit="@HandleSubmit">
+                        <DataAnnotationsValidator />
+                        <ValidationSummary class="text-danger" />
+
+                        <div class="mb-3">
+                            <label for="title" class="form-label">Título del Incidente</label>
+                            <InputText id="title" class="form-control" @bind-value="model.Title" placeholder="Resumen breve del problema" />
+                            <ValidationMessage For="@(() => model.Title)" />
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="description" class="form-label">Descripción Detallada</label>
+                            <InputTextArea id="description" class="form-control" rows="6" @bind-value="model.Description" 
+                                placeholder="Describe el incidente con el mayor detalle posible..." />
+                            <ValidationMessage For="@(() => model.Description)" />
+                        </div>
+
+                        @if (!string.IsNullOrEmpty(errorMessage))
+                        {
+                            <div class="alert alert-danger">@errorMessage</div>
+                        }
+
+                        @if (!string.IsNullOrEmpty(successMessage))
+                        {
+                            <div class="alert alert-success">@successMessage</div>
+                        }
+
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                            <button type="button" class="btn btn-secondary" @onclick="Cancel">
+                                <i class="bi bi-x-circle"></i> Cancelar
+                            </button>
+                            <button type="submit" class="btn btn-danger" disabled="@isSubmitting">
+                                @if (isSubmitting)
+                                {
+                                    <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                                }
+                                <i class="bi bi-send"></i> Reportar Incidente
+                            </button>
+                        </div>
+                    </EditForm>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    private ReportModel model = new();
+    private bool isSubmitting = false;
+    private string? errorMessage;
+    private string? successMessage;
+
+    private async Task HandleSubmit()
+    {
+        try
+        {
+            isSubmitting = true;
+            errorMessage = null;
+            successMessage = null;
+
+            var command = new ReportIncidentCommand(model.Title, model.Description);
+            var incidentId = await Mediator.Send(command);
+
+            successMessage = "¡Incidente reportado exitosamente!";
+            await Task.Delay(1500);
+            Navigation.NavigateTo($"/incidents/{incidentId}");
+        }
+        catch (Exception ex)
+        {
+            errorMessage = $"Error al reportar el incidente: {ex.Message}";
+        }
+        finally
+        {
+            isSubmitting = false;
+        }
+    }
+
+    private void Cancel()
+    {
+        Navigation.NavigateTo("/incidents");
+    }
+
+    public class ReportModel
+    {
+        [Required(ErrorMessage = "El título es requerido")]
+        [StringLength(200, ErrorMessage = "El título no puede exceder 200 caracteres")]
+        public string Title { get; set; } = string.Empty;
+
+        [Required(ErrorMessage = "La descripción es requerida")]
+        [StringLength(2000, MinimumLength = 10, ErrorMessage = "La descripción debe tener entre 10 y 2000 caracteres")]
+        public string Description { get; set; } = string.Empty;
+    }
+}
