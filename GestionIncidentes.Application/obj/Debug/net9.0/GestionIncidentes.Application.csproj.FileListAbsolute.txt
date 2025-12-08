@@ -29,22 +29,6 @@ C:\Users\Lenovo Ideapad\Source\Repos\IHC-Proyecto\GestionIncidentes.Application\
 C:\Users\Lenovo Ideapad\Source\Repos\IHC-Proyecto\GestionIncidentes.Application\obj\Debug\net9.0\refint\GestionIncidentes.Application.dll
 C:\Users\Lenovo Ideapad\Source\Repos\IHC-Proyecto\GestionIncidentes.Application\obj\Debug\net9.0\GestionIncidentes.Application.pdb
 C:\Users\Lenovo Ideapad\Source\Repos\IHC-Proyecto\GestionIncidentes.Application\obj\Debug\net9.0\ref\GestionIncidentes.Application.dll
-C:\Users\User\Documents\Joshua Universidad\Quinto\IHC\ProyectoIHC\IHC-Proyecto\GestionIncidentes.Application\bin\Debug\net9.0\GestionIncidentes.Application.deps.json
-C:\Users\User\Documents\Joshua Universidad\Quinto\IHC\ProyectoIHC\IHC-Proyecto\GestionIncidentes.Application\bin\Debug\net9.0\GestionIncidentes.Application.dll
-C:\Users\User\Documents\Joshua Universidad\Quinto\IHC\ProyectoIHC\IHC-Proyecto\GestionIncidentes.Application\bin\Debug\net9.0\GestionIncidentes.Application.pdb
-C:\Users\User\Documents\Joshua Universidad\Quinto\IHC\ProyectoIHC\IHC-Proyecto\GestionIncidentes.Application\bin\Debug\net9.0\GestionIncidentes.Domain.dll
-C:\Users\User\Documents\Joshua Universidad\Quinto\IHC\ProyectoIHC\IHC-Proyecto\GestionIncidentes.Application\bin\Debug\net9.0\GestionIncidentes.Domain.pdb
-C:\Users\User\Documents\Joshua Universidad\Quinto\IHC\ProyectoIHC\IHC-Proyecto\GestionIncidentes.Application\obj\Debug\net9.0\GestionIncidentes.Application.csproj.AssemblyReference.cache
-C:\Users\User\Documents\Joshua Universidad\Quinto\IHC\ProyectoIHC\IHC-Proyecto\GestionIncidentes.Application\obj\Debug\net9.0\GestionIncidentes.Application.GeneratedMSBuildEditorConfig.editorconfig
-C:\Users\User\Documents\Joshua Universidad\Quinto\IHC\ProyectoIHC\IHC-Proyecto\GestionIncidentes.Application\obj\Debug\net9.0\GestionIncidentes.Application.AssemblyInfoInputs.cache
-C:\Users\User\Documents\Joshua Universidad\Quinto\IHC\ProyectoIHC\IHC-Proyecto\GestionIncidentes.Application\obj\Debug\net9.0\GestionIncidentes.Application.AssemblyInfo.cs
-C:\Users\User\Documents\Joshua Universidad\Quinto\IHC\ProyectoIHC\IHC-Proyecto\GestionIncidentes.Application\obj\Debug\net9.0\GestionIncidentes.Application.csproj.CoreCompileInputs.cache
-C:\Users\User\Documents\Joshua Universidad\Quinto\IHC\ProyectoIHC\IHC-Proyecto\GestionIncidentes.Application\obj\Debug\net9.0\GestionIncidentes.Application.sourcelink.json
-C:\Users\User\Documents\Joshua Universidad\Quinto\IHC\ProyectoIHC\IHC-Proyecto\GestionIncidentes.Application\obj\Debug\net9.0\GestionI.B4BC0063.Up2Date
-C:\Users\User\Documents\Joshua Universidad\Quinto\IHC\ProyectoIHC\IHC-Proyecto\GestionIncidentes.Application\obj\Debug\net9.0\GestionIncidentes.Application.dll
-C:\Users\User\Documents\Joshua Universidad\Quinto\IHC\ProyectoIHC\IHC-Proyecto\GestionIncidentes.Application\obj\Debug\net9.0\refint\GestionIncidentes.Application.dll
-C:\Users\User\Documents\Joshua Universidad\Quinto\IHC\ProyectoIHC\IHC-Proyecto\GestionIncidentes.Application\obj\Debug\net9.0\GestionIncidentes.Application.pdb
-C:\Users\User\Documents\Joshua Universidad\Quinto\IHC\ProyectoIHC\IHC-Proyecto\GestionIncidentes.Application\obj\Debug\net9.0\ref\GestionIncidentes.Application.dll
 C:\IHC-Proyecto\GestionIncidentes.Application\obj\Debug\net9.0\GestionIncidentes.Application.csproj.AssemblyReference.cache
 C:\IHC-Proyecto\GestionIncidentes.Application\obj\Debug\net9.0\GestionIncidentes.Application.GeneratedMSBuildEditorConfig.editorconfig
 C:\IHC-Proyecto\GestionIncidentes.Application\obj\Debug\net9.0\GestionIncidentes.Application.AssemblyInfoInputs.cache
@@ -61,3 +45,19 @@ C:\IHC-Proyecto\GestionIncidentes.Application\bin\Debug\net9.0\GestionIncidentes
 C:\IHC-Proyecto\GestionIncidentes.Application\bin\Debug\net9.0\GestionIncidentes.Domain.pdb
 C:\IHC-Proyecto\GestionIncidentes.Application\obj\Debug\net9.0\GestionI.B4BC0063.Up2Date
 C:\IHC-Proyecto\GestionIncidentes.Application\obj\Debug\net9.0\ref\GestionIncidentes.Application.dll
+C:\Users\User\Documents\Joshua Universidad\Quinto\IHC\ProyectoIHC\IHC-Proyecto\GestionIncidentes.Application\bin\Debug\net9.0\GestionIncidentes.Application.deps.json
+C:\Users\User\Documents\Joshua Universidad\Quinto\IHC\ProyectoIHC\IHC-Proyecto\GestionIncidentes.Application\bin\Debug\net9.0\GestionIncidentes.Application.dll
+C:\Users\User\Documents\Joshua Universidad\Quinto\IHC\ProyectoIHC\IHC-Proyecto\GestionIncidentes.Application\bin\Debug\net9.0\GestionIncidentes.Application.pdb
+C:\Users\User\Documents\Joshua Universidad\Quinto\IHC\ProyectoIHC\IHC-Proyecto\GestionIncidentes.Application\bin\Debug\net9.0\GestionIncidentes.Domain.dll
+C:\Users\User\Documents\Joshua Universidad\Quinto\IHC\ProyectoIHC\IHC-Proyecto\GestionIncidentes.Application\bin\Debug\net9.0\GestionIncidentes.Domain.pdb
+C:\Users\User\Documents\Joshua Universidad\Quinto\IHC\ProyectoIHC\IHC-Proyecto\GestionIncidentes.Application\obj\Debug\net9.0\GestionIncidentes.Application.csproj.AssemblyReference.cache
+C:\Users\User\Documents\Joshua Universidad\Quinto\IHC\ProyectoIHC\IHC-Proyecto\GestionIncidentes.Application\obj\Debug\net9.0\GestionIncidentes.Application.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\User\Documents\Joshua Universidad\Quinto\IHC\ProyectoIHC\IHC-Proyecto\GestionIncidentes.Application\obj\Debug\net9.0\GestionIncidentes.Application.AssemblyInfoInputs.cache
+C:\Users\User\Documents\Joshua Universidad\Quinto\IHC\ProyectoIHC\IHC-Proyecto\GestionIncidentes.Application\obj\Debug\net9.0\GestionIncidentes.Application.AssemblyInfo.cs
+C:\Users\User\Documents\Joshua Universidad\Quinto\IHC\ProyectoIHC\IHC-Proyecto\GestionIncidentes.Application\obj\Debug\net9.0\GestionIncidentes.Application.csproj.CoreCompileInputs.cache
+C:\Users\User\Documents\Joshua Universidad\Quinto\IHC\ProyectoIHC\IHC-Proyecto\GestionIncidentes.Application\obj\Debug\net9.0\GestionIncidentes.Application.sourcelink.json
+C:\Users\User\Documents\Joshua Universidad\Quinto\IHC\ProyectoIHC\IHC-Proyecto\GestionIncidentes.Application\obj\Debug\net9.0\GestionI.B4BC0063.Up2Date
+C:\Users\User\Documents\Joshua Universidad\Quinto\IHC\ProyectoIHC\IHC-Proyecto\GestionIncidentes.Application\obj\Debug\net9.0\GestionIncidentes.Application.dll
+C:\Users\User\Documents\Joshua Universidad\Quinto\IHC\ProyectoIHC\IHC-Proyecto\GestionIncidentes.Application\obj\Debug\net9.0\refint\GestionIncidentes.Application.dll
+C:\Users\User\Documents\Joshua Universidad\Quinto\IHC\ProyectoIHC\IHC-Proyecto\GestionIncidentes.Application\obj\Debug\net9.0\GestionIncidentes.Application.pdb
+C:\Users\User\Documents\Joshua Universidad\Quinto\IHC\ProyectoIHC\IHC-Proyecto\GestionIncidentes.Application\obj\Debug\net9.0\ref\GestionIncidentes.Application.dll

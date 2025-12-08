@@ -93,8 +93,42 @@ body {
 /* ============================================
    FORM
    ============================================ */
+.login-form {
+    margin-bottom: 24px;
+}
+
 .form-group {
     margin-bottom: 20px;
+}
+
+.form-group label {
+    display: block;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--text-dark);
+    margin-bottom: 8px;
+}
+
+.form-group input {
+    width: 100%;
+    padding: 12px 16px;
+    font-size: 15px;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    transition: all 0.2s ease;
+    font-family: 'Inter', sans-serif;
+    box-sizing: border-box;
+}
+
+.form-group input:focus {
+    outline: none;
+    border-color: var(--primary-blue);
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+}
+
+.form-group input:disabled {
+    background-color: #F3F4F6;
+    cursor: not-allowed;
 }
 
 .form-label {
@@ -173,7 +207,7 @@ body {
 /* ============================================
    ALERTS
    ============================================ */
-.alert {
+.alert-error {
     padding: 12px 16px;
     border-radius: 8px;
     margin-bottom: 20px;
@@ -181,12 +215,15 @@ body {
     align-items: center;
     gap: 12px;
     font-size: 14px;
-}
-
-.alert-error {
     background-color: #FEE2E2;
     color: #991B1B;
     border: 1px solid #FECACA;
+}
+
+.alert-error svg {
+    width: 20px;
+    height: 20px;
+    flex-shrink: 0;
 }
 
 .alert .material-icons {
@@ -240,9 +277,35 @@ body {
    DEMO SECTION
    ============================================ */
 .demo-section {
-    margin-top: 32px;
+    margin-top: 24px;
     padding-top: 24px;
     border-top: 1px solid var(--border-color);
+}
+
+.demo-title {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-dark);
+    margin-bottom: 12px;
+    text-align: center;
+}
+
+.demo-grid {
+    display: grid;
+    gap: 8px;
+}
+
+.demo-user {
+    padding: 10px 12px;
+    background-color: var(--background-light);
+    border-radius: 6px;
+    font-size: 13px;
+    color: var(--text-gray);
+}
+
+.demo-user strong {
+    color: var(--text-dark);
+    font-weight: 600;
 }
 
 .demo-title {

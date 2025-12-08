@@ -1,0 +1,344 @@
+@page "/admin/base-conocimientos"
+@layout AdminLayout
+@rendermode InteractiveServer
+@inject IKnowledgeRepository KnowledgeRepo
+@inject NavigationManager Navigation
+@using GestionIncidentes.Application.Interfaces
+@using GestionIncidentes.Domain.Entities
+
+<link rel="stylesheet" href="/css/admin-layout.css" />
+
+<div class="admin-content">
+  <div class="breadcrumb-container">
+    <nav class="breadcrumb">
+      <a href="/admin/dashboard">Dashboard</a>
+      <span>/</span>
+      <span>Base de Conocimientos</span>
+    </nav>
+  </div>
+
+  <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:24px">
+    <div>
+      <h1 class="page-title">Base de Conocimientos</h1>
+      <p class="page-subtitle">Gestiona soluciones y mejores prácticas técnicas</p>
+    </div>
+    <button class="btn-primary" @onclick="OpenCreateModal" style="padding:12px 24px; background:var(--color-primary); color:white; border:none; border-radius:10px; cursor:pointer">
+      <span class="material-icons" style="vertical-align:middle; margin-right:4px">add</span>
+      Nueva Entrada
+    </button>
+  </div>
+
+  <div class="filters-bar">
+    <div style="flex:1; max-width:400px">
+      <div style="position:relative">
+        <span class="material-icons" style="position:absolute; left:12px; top:50%; transform:translateY(-50%); color:var(--text-gray)">search</span>
+        <input type="text" @bind="searchTerm" @bind:event="oninput" placeholder="Buscar por título, problema o etiquetas..." 
+               style="width:100%; padding:12px 12px 12px 44px; border:2px solid var(--border-color); border-radius:10px" />
+      </div>
+    </div>
+    <select @bind="filterCategory" class="form-select" style="padding:12px; border:2px solid var(--border-color); border-radius:10px; min-width:180px">
+      <option value="">Todas las categorías</option>
+      <option value="Hardware">Hardware</option>
+      <option value="Software">Software</option>
+      <option value="Red">Red</option>
+      <option value="Sistema Operativo">Sistema Operativo</option>
+      <option value="Seguridad">Seguridad</option>
+    </select>
+    <select @bind="sortBy" class="form-select" style="padding:12px; border:2px solid var(--border-color); border-radius:10px; min-width:180px">
+      <option value="recent">Más recientes</option>
+      <option value="usage">Más utilizadas</option>
+      <option value="alphabetical">Alfabético</option>
+    </select>
+  </div>
+
+  @if(isLoading)
+  {
+    <div style="text-align:center; padding:60px">
+      <div style="color:var(--text-gray)">Cargando...</div>
+    </div>
+  }
+  else if(GetFilteredEntries().Count == 0)
+  {
+    <div class="empty-state" style="text-align:center; padding:60px">
+      <span class="material-icons" style="font-size:64px; color:var(--text-gray); opacity:0.5">search_off</span>
+      <p style="color:var(--text-gray); margin-top:16px">No se encontraron entradas</p>
+    </div>
+  }
+  else
+  {
+    <div style="display:grid; gap:16px">
+      @foreach(var entry in GetFilteredEntries())
+      {
+        <div class="knowledge-card" style="background:white; border:2px solid var(--border-color); border-radius:12px; padding:20px">
+          <div style="display:flex; justify-content:space-between; align-items:start">
+            <div style="flex:1">
+              <div style="display:flex; align-items:center; gap:12px; margin-bottom:12px">
+                <h3 style="margin:0; font-size:18px; font-weight:600">@entry.Title</h3>
+                <span class="badge" style="background:var(--color-primary-light); color:var(--color-primary); padding:4px 12px; border-radius:6px; font-size:12px; font-weight:500">
+                  @entry.Category
+                </span>
+                <span style="color:var(--text-gray); font-size:13px; display:flex; align-items:center; gap:4px">
+                  <span class="material-icons" style="font-size:16px">visibility</span>
+                  @entry.UsageCount usos
+                </span>
+              </div>
+              <div style="color:var(--text-gray); font-size:14px; margin-bottom:12px">
+                <strong>Problema:</strong> @entry.Problem
+              </div>
+              <div style="color:var(--text-dark); font-size:14px; margin-bottom:12px">
+                <strong>Solución:</strong> @entry.Solution
+              </div>
+              @if(entry.Tags.Count > 0)
+              {
+                <div style="display:flex; gap:8px; flex-wrap:wrap">
+                  @foreach(var tag in entry.Tags)
+                  {
+                    <span style="background:var(--bg-light); padding:4px 10px; border-radius:6px; font-size:12px; color:var(--text-gray)">
+                      #@tag
+                    </span>
+                  }
+                </div>
+              }
+            </div>
+            <div style="display:flex; gap:8px; margin-left:16px">
+              <button class="btn-icon" @onclick="() => OpenEditModal(entry)" title="Editar">
+                <span class="material-icons">edit</span>
+              </button>
+              <button class="btn-icon" @onclick="() => DeleteEntry(entry.Id)" title="Eliminar">
+                <span class="material-icons" style="color:var(--color-danger)">delete</span>
+              </button>
+            </div>
+          </div>
+          <div style="font-size:12px; color:var(--text-gray); margin-top:12px; padding-top:12px; border-top:1px solid var(--border-color)">
+            Creado: @entry.CreatedAt.ToString("dd/MM/yyyy HH:mm") | Actualizado: @entry.UpdatedAt.ToString("dd/MM/yyyy HH:mm")
+          </div>
+        </div>
+      }
+    </div>
+  }
+</div>
+
+@if(showModal)
+{
+  <div class="modal-overlay" @onclick="CloseModal">
+    <div class="modal-content" @onclick:stopPropagation style="max-width:700px; max-height:90vh; overflow-y:auto">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:24px">
+        <h2 style="margin:0; font-size:24px; font-weight:600">@(editingEntry == null ? "Nueva Entrada" : "Editar Entrada")</h2>
+        <button class="btn-icon" @onclick="CloseModal">
+          <span class="material-icons">close</span>
+        </button>
+      </div>
+      
+      <div style="display:grid; gap:16px">
+        <div>
+          <label style="display:block; margin-bottom:8px; font-weight:500">Título *</label>
+          <input @bind="formTitle" type="text" placeholder="Ej: Error de arranque en Windows" class="form-control" style="width:100%; padding:12px; border:2px solid var(--border-color); border-radius:10px" />
+        </div>
+        
+        <div>
+          <label style="display:block; margin-bottom:8px; font-weight:500">Categoría *</label>
+          <select @bind="formCategory" class="form-select" style="width:100%; padding:12px; border:2px solid var(--border-color); border-radius:10px">
+            <option value="">Seleccionar categoría</option>
+            <option value="Hardware">Hardware</option>
+            <option value="Software">Software</option>
+            <option value="Red">Red</option>
+            <option value="Sistema Operativo">Sistema Operativo</option>
+            <option value="Seguridad">Seguridad</option>
+          </select>
+        </div>
+        
+        <div>
+          <label style="display:block; margin-bottom:8px; font-weight:500">Descripción del Problema *</label>
+          <textarea @bind="formProblem" rows="3" placeholder="Describe el problema..." class="form-control" style="width:100%; padding:12px; border:2px solid var(--border-color); border-radius:10px; resize:vertical"></textarea>
+        </div>
+        
+        <div>
+          <label style="display:block; margin-bottom:8px; font-weight:500">Solución *</label>
+          <textarea @bind="formSolution" rows="5" placeholder="Describe la solución paso a paso..." class="form-control" style="width:100%; padding:12px; border:2px solid var(--border-color); border-radius:10px; resize:vertical"></textarea>
+        </div>
+        
+        <div>
+          <label style="display:block; margin-bottom:8px; font-weight:500">Etiquetas (separadas por comas)</label>
+          <input @bind="formTags" type="text" placeholder="Ej: windows, boot, disco" class="form-control" style="width:100%; padding:12px; border:2px solid var(--border-color); border-radius:10px" />
+        </div>
+      </div>
+      
+      <div style="display:flex; justify-content:flex-end; gap:12px; margin-top:24px; padding-top:24px; border-top:1px solid var(--border-color)">
+        <button class="btn-cancel" @onclick="CloseModal" style="padding:12px 24px; border:none; background:transparent; color:var(--text-gray); cursor:pointer">Cancelar</button>
+        <button class="btn-primary" @onclick="SaveEntry" disabled="@(!IsFormValid())" style="padding:12px 24px; background:var(--color-primary); color:white; border:none; border-radius:10px; cursor:pointer">
+          @(editingEntry == null ? "Crear" : "Guardar Cambios")
+        </button>
+      </div>
+    </div>
+  </div>
+}
+
+<style>
+.btn-icon {
+  background:transparent;
+  border:none;
+  cursor:pointer;
+  padding:8px;
+  border-radius:8px;
+  transition:background 0.2s;
+}
+.btn-icon:hover {
+  background:var(--bg-light);
+}
+.modal-overlay {
+  position:fixed;
+  top:0;
+  left:0;
+  right:0;
+  bottom:0;
+  background:rgba(0,0,0,0.5);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  z-index:1000;
+}
+.modal-content {
+  background:white;
+  border-radius:16px;
+  padding:32px;
+  box-shadow:0 20px 60px rgba(0,0,0,0.3);
+}
+</style>
+
+@code {
+  private List<KnowledgeEntry> entries = new();
+  private bool isLoading = true;
+  private string searchTerm = "";
+  private string filterCategory = "";
+  private string sortBy = "recent";
+  private bool showModal = false;
+  private KnowledgeEntry? editingEntry = null;
+  
+  private string formTitle = "";
+  private string formCategory = "";
+  private string formProblem = "";
+  private string formSolution = "";
+  private string formTags = "";
+
+  protected override async Task OnInitializedAsync()
+  {
+    await LoadEntries();
+  }
+
+  private async Task LoadEntries()
+  {
+    isLoading = true;
+    entries = await KnowledgeRepo.GetAllAsync();
+    isLoading = false;
+    StateHasChanged();
+  }
+
+  private List<KnowledgeEntry> GetFilteredEntries()
+  {
+    var filtered = entries.AsEnumerable();
+
+    if (!string.IsNullOrWhiteSpace(searchTerm))
+    {
+      var term = searchTerm.ToLower();
+      filtered = filtered.Where(e => 
+        e.Title.ToLower().Contains(term) || 
+        e.Problem.ToLower().Contains(term) || 
+        e.Solution.ToLower().Contains(term) ||
+        e.Tags.Any(t => t.ToLower().Contains(term))
+      );
+    }
+
+    if (!string.IsNullOrEmpty(filterCategory))
+    {
+      filtered = filtered.Where(e => e.Category == filterCategory);
+    }
+
+    filtered = sortBy switch
+    {
+      "usage" => filtered.OrderByDescending(e => e.UsageCount),
+      "alphabetical" => filtered.OrderBy(e => e.Title),
+      _ => filtered.OrderByDescending(e => e.CreatedAt)
+    };
+
+    return filtered.ToList();
+  }
+
+  private void OpenCreateModal()
+  {
+    editingEntry = null;
+    formTitle = "";
+    formCategory = "";
+    formProblem = "";
+    formSolution = "";
+    formTags = "";
+    showModal = true;
+  }
+
+  private void OpenEditModal(KnowledgeEntry entry)
+  {
+    editingEntry = entry;
+    formTitle = entry.Title;
+    formCategory = entry.Category;
+    formProblem = entry.Problem;
+    formSolution = entry.Solution;
+    formTags = string.Join(", ", entry.Tags);
+    showModal = true;
+  }
+
+  private void CloseModal()
+  {
+    showModal = false;
+    editingEntry = null;
+  }
+
+  private bool IsFormValid()
+  {
+    return !string.IsNullOrWhiteSpace(formTitle) &&
+           !string.IsNullOrWhiteSpace(formCategory) &&
+           !string.IsNullOrWhiteSpace(formProblem) &&
+           !string.IsNullOrWhiteSpace(formSolution);
+  }
+
+  private async Task SaveEntry()
+  {
+    if (!IsFormValid()) return;
+
+    var tags = formTags.Split(',', StringSplitOptions.RemoveEmptyEntries)
+                       .Select(t => t.Trim())
+                       .Where(t => !string.IsNullOrEmpty(t))
+                       .ToList();
+
+    if (editingEntry == null)
+    {
+      var newEntry = KnowledgeEntry.Create(
+        formTitle,
+        formProblem,
+        formSolution,
+        formCategory,
+        Guid.Parse("a1b2c3d4-e5f6-7890-abcd-ef1234567890"), // TODO: Get from auth
+        null,
+        tags
+      );
+      await KnowledgeRepo.AddAsync(newEntry);
+    }
+    else
+    {
+      editingEntry.Update(formTitle, formProblem, formSolution, formCategory, tags);
+      await KnowledgeRepo.UpdateAsync(editingEntry);
+    }
+
+    await LoadEntries();
+    CloseModal();
+  }
+
+  private async Task DeleteEntry(Guid id)
+  {
+    if (confirm("¿Estás seguro de eliminar esta entrada?"))
+    {
+      await KnowledgeRepo.DeleteAsync(id);
+      await LoadEntries();
+    }
+  }
+
+  private bool confirm(string message) => true; // TODO: Implement proper confirm dialog
+}

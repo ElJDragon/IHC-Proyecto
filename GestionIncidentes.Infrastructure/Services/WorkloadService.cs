@@ -37,6 +37,49 @@ public class WorkloadService : IWorkloadService
     public async Task<bool> CanAssignTicketAsync(Guid userId)
     {
         var workload = await GetUserWorkloadAsync(userId);
-        return workload < 5;  // regla simple (puedes cambiarla)
+        // Límite máximo de 3 tickets activos por técnico
+        return workload < 3;
+    }
+
+    public async Task<(bool CanAssign, string? AlertMessage)> ValidateAssignmentAsync(Guid userId)
+    {
+        // Verificar límite de 3 tickets
+        var currentWorkload = await GetUserWorkloadAsync(userId);
+        if (currentWorkload >= 3)
+        {
+            return (false, "Este técnico ya tiene 3 incidentes asignados (límite máximo).");
+        }
+
+        // Verificar distribución equitativa (última semana)
+        var allTechnicians = await _userRepo.GetAllAsync();
+        var technicians = allTechnicians.Where(u => u.Role == "Technician").ToList();
+        
+        if (technicians.Count == 0)
+            return (true, null);
+
+        var oneWeekAgo = DateTime.UtcNow.AddDays(-7);
+        var workloads = new Dictionary<Guid, int>();
+
+        foreach (var tech in technicians)
+        {
+            var tickets = await _ticketRepo.ListByUserAsync(tech.Id);
+            var recentTickets = tickets.Count(t => t.CreatedAt >= oneWeekAgo);
+            workloads[tech.Id] = recentTickets;
+        }
+
+        if (workloads.Count > 1)
+        {
+            var avgWorkload = workloads.Values.Average();
+            var maxWorkload = workloads.Values.Max();
+            var targetWorkload = workloads.GetValueOrDefault(userId, 0);
+
+            // Alerta si este técnico tiene 2+ incidentes más que el promedio
+            if (targetWorkload >= avgWorkload + 2)
+            {
+                return (false, $"⚠️ Este técnico ha recibido {targetWorkload} incidentes en la última semana, mientras el promedio es {avgWorkload:F1}. Se recomienda asignar a otro técnico para distribuir la carga equitativamente.");
+            }
+        }
+
+        return (true, null);
     }
 }

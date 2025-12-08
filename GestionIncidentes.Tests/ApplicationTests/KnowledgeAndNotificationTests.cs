@@ -46,7 +46,7 @@ public class KnowledgeAndNotificationTests
                     .ReturnsAsync(new List<User> { diticUser });
 
         var handler = new OnIncidentReportedHandler(mockNotifRepo.Object, mockUserRepo.Object);
-        var @event = new IncidentReported(Guid.NewGuid(), Guid.NewGuid());
+        var @event = new IncidentReported(Guid.NewGuid(), "Test Incident", Guid.NewGuid());
 
         // Act
         await handler.Handle(@event, CancellationToken.None);

@@ -16,11 +16,14 @@ public class KnowledgeEntry
     public Guid CreatedByUserId { get; set; }
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
-    public int UsageCount { get; set; } = 0; // Cuántas veces se ha consultado
+    public int UsageCount { get; set; } = 0; // Cuï¿½ntas veces se ha consultado
     public bool IsPublished { get; set; } = true;
 
-    // Relación con tickets resueltos
+    // RelaciÃ³n con tickets resueltos
     public Guid? RelatedTicketId { get; set; }
+
+    // Pasos de la soluciÃ³n
+    public List<SolutionStep> Steps { get; set; } = new();
 
     private KnowledgeEntry() { }
 

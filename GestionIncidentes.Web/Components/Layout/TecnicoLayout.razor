@@ -1,5 +1,11 @@
 @inherits LayoutComponentBase
 @using Microsoft.AspNetCore.Components.Routing
+@using Microsoft.AspNetCore.Components.Web
+@using Microsoft.AspNetCore.Components.Authorization
+@inject NavigationManager Navigation
+@inject GestionIncidentes.Web.Services.AuthService AuthService
+@inject AuthenticationStateProvider AuthStateProvider
+@inject HttpClient Http
 
 <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" />
 <link rel="stylesheet" href="/css/theme.css" />
@@ -53,15 +59,22 @@
         </div>
         <div class="navbar-right">
           <button class="icon-button"><span class="material-icons">notifications_none</span></button>
-          <div class="user-menu">
-            <div class="user-button">
-              <span class="material-icons">person</span>
-              <div class="user-info">
-                <div class="user-name">Técnico Red</div>
-                <div class="user-role">Técnico</div>
-              </div>
+          <!-- Usuario - Click para cerrar sesión -->
+          <a href="/LogoutPage" 
+             style="display: flex; align-items: center; gap: 12px; padding: 8px 16px; 
+                    background: white; border: 1px solid #e0e0e0; border-radius: 8px; 
+                    cursor: pointer; transition: all 0.3s; text-decoration: none;">
+            <div style="width: 40px; height: 40px; border-radius: 50%; 
+                        background: #1976d2; display: flex; align-items: center; 
+                        justify-content: center;">
+              <span class="material-icons" style="color: white; font-size: 24px;">person</span>
             </div>
-          </div>
+            <div class="user-info" style="display: flex; flex-direction: column; align-items: flex-start;">
+              <div class="user-name" style="font-weight: 600; font-size: 14px; color: #333;">@currentUserName</div>
+              <div class="user-role" style="font-size: 12px; color: #666;">@currentUserRole</div>
+            </div>
+            <span class="material-icons" style="color: #999; font-size: 20px;">logout</span>
+          </a>
         </div>
       </div>
     </header>
@@ -71,3 +84,22 @@
     </main>
   </div>
 </div>
+
+@code {
+    private bool showNotifications = false;
+    private string currentUserName = "Cargando...";
+    private string currentUserRole = "";
+
+    protected override async Task OnInitializedAsync()
+    {
+        currentUserName = await AuthService.GetCurrentUserNameAsync() ?? "Técnico";
+        currentUserRole = await AuthService.GetCurrentUserRoleAsync() ?? "Tecnico";
+    }
+
+    private void HandleLogout()
+    {
+        Console.WriteLine("[TecnicoLayout] HandleLogout - Redirigiendo a página de logout");
+        Navigation.NavigateTo("/LogoutPage", forceLoad: true);
+    }
+}
+

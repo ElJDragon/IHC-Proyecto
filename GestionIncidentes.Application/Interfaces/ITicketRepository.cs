@@ -17,6 +17,7 @@ namespace GestionIncidentes.Application.Interfaces
 
         // Consultas por usuario
         Task<IEnumerable<Ticket>> ListByUserAsync(Guid userId, CancellationToken ct = default); // Tickets creados por usuario
+        Task<List<Ticket>> GetByCreatedByUserIdAsync(Guid userId, CancellationToken ct = default); // Tickets creados por usuario
         Task<IEnumerable<Ticket>> ListByTechnicianAsync(Guid technicianId, CancellationToken ct = default); // Tickets asignados a técnico
 
         // Consultas por filtros

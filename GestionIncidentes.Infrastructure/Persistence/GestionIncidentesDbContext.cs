@@ -16,9 +16,19 @@ namespace GestionIncidentes.Infrastructure
         
         // ✅ Nuevas entidades para Base de Conocimiento, Reportes, Notificaciones y Auditoría
         public DbSet<KnowledgeEntry> KnowledgeEntries => Set<KnowledgeEntry>();
+        public DbSet<SolutionStep> SolutionSteps => Set<SolutionStep>();
         public DbSet<Notification> Notifications => Set<Notification>();
         public DbSet<AuditLog> AuditLogs => Set<AuditLog>();
         public DbSet<TicketReport> TicketReports => Set<TicketReport>();
+
+        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        {
+            base.OnConfiguring(optionsBuilder);
+            
+            // Suprimir advertencia de cambios pendientes en el modelo
+            optionsBuilder.ConfigureWarnings(warnings => 
+                warnings.Ignore(Microsoft.EntityFrameworkCore.Diagnostics.RelationalEventId.PendingModelChangesWarning));
+        }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -31,6 +41,7 @@ namespace GestionIncidentes.Infrastructure
             modelBuilder.Entity<Ticket>().HasKey(t => t.Id);
             modelBuilder.Entity<Incident>().HasKey(i => i.Id); // ✅ Integrante A
             modelBuilder.Entity<KnowledgeEntry>().HasKey(k => k.Id);
+            modelBuilder.Entity<SolutionStep>().HasKey(s => s.Id);
             modelBuilder.Entity<Notification>().HasKey(n => n.Id);
             modelBuilder.Entity<AuditLog>().HasKey(a => a.Id);
             modelBuilder.Entity<TicketReport>().HasKey(r => r.Id);
@@ -41,6 +52,14 @@ namespace GestionIncidentes.Infrastructure
                 .WithOne()
                 .HasForeignKey(u => u.DepartmentId)
                 .OnDelete(DeleteBehavior.Restrict);
+
+            // Ticket -> Incident (opcional para mantener compatibilidad con tickets legacy)
+            modelBuilder.Entity<Ticket>()
+                .HasOne<Incident>()
+                .WithMany()
+                .HasForeignKey(t => t.IncidentId)
+                .OnDelete(DeleteBehavior.Restrict)
+                .IsRequired(false); // Nullable para tickets legacy
 
             modelBuilder.Entity<Ticket>()
                 .HasOne<User>()
@@ -66,6 +85,12 @@ namespace GestionIncidentes.Infrastructure
                 .WithMany()
                 .HasForeignKey(k => k.CreatedByUserId)
                 .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<KnowledgeEntry>()
+                .HasMany(k => k.Steps)
+                .WithOne(s => s.KnowledgeEntry)
+                .HasForeignKey(s => s.KnowledgeEntryId)
+                .OnDelete(DeleteBehavior.Cascade);
 
             modelBuilder.Entity<Notification>()
                 .HasOne<User>()
@@ -109,6 +134,9 @@ namespace GestionIncidentes.Infrastructure
             modelBuilder.Entity<KnowledgeEntry>().Property(k => k.Solution).IsRequired();
             modelBuilder.Entity<KnowledgeEntry>().Property(k => k.Category).IsRequired();
             
+            modelBuilder.Entity<SolutionStep>().Property(s => s.Title).IsRequired();
+            modelBuilder.Entity<SolutionStep>().Property(s => s.Description).IsRequired();
+            
             modelBuilder.Entity<Notification>().Property(n => n.Title).IsRequired();
             modelBuilder.Entity<Notification>().Property(n => n.Message).IsRequired();
             modelBuilder.Entity<Notification>().Property(n => n.Type).IsRequired();
@@ -127,6 +155,9 @@ namespace GestionIncidentes.Infrastructure
 
             modelBuilder.Entity<KnowledgeEntry>()
                 .HasIndex(k => k.Category);
+
+            modelBuilder.Entity<SolutionStep>()
+                .HasIndex(s => new { s.KnowledgeEntryId, s.StepNumber });
         }
     }
 }

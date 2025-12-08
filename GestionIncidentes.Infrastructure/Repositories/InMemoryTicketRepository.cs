@@ -75,6 +75,12 @@ namespace GestionIncidentes.Infrastructure.Repositories
             return Task.FromResult<IEnumerable<Ticket>>(tickets);
         }
 
+        public Task<List<Ticket>> GetByCreatedByUserIdAsync(Guid userId, CancellationToken ct = default)
+        {
+            var tickets = _tickets.Where(t => t.CreatedByUserId == userId).ToList();
+            return Task.FromResult(tickets);
+        }
+
         public Task<IEnumerable<Ticket>> ListByTechnicianAsync(Guid technicianId, CancellationToken ct = default)
         {
             var tickets = _tickets

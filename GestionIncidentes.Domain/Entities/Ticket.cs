@@ -12,9 +12,12 @@ public class Ticket
     public string Title { get; set; } = string.Empty;
     public string Description { get; set; } = string.Empty;
 
+    // Relación con Incident (nullable para tickets creados directamente - legacy)
+    public Guid? IncidentId { get; set; } // FK al incidente original (nuevo flujo)
+
     // Usuarios relacionados
-    public Guid CreatedByUserId { get; set; } // Usuario que reportó (estudiante)
-    public Guid? AssignedToUserId { get; set; } // Técnico asignado (nullable)
+    public Guid CreatedByUserId { get; set; } // Usuario que reportó originalmente
+    public Guid? AssignedToUserId { get; set; } // Técnico asignado (nullable hasta que se asigna)
 
     // Campos de categorización
     public string Category { get; set; } = string.Empty; // hardware, software, connectivity, security

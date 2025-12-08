@@ -3,7 +3,9 @@
 @using GestionIncidentes.Domain.Entities
 @using MediatR
 @inject ITicketRepository TicketRepo
+@inject IKnowledgeRepository KnowledgeRepo
 @inject NavigationManager Navigation
+@inject IJSRuntime JS
 
 <PageTitle>Detalles del Ticket</PageTitle>
 
@@ -74,12 +76,19 @@
                     </div>
                 </div>
 
-                <div class="card">
+                <div class="card mb-3">
                     <div class="card-header bg-secondary text-white">
                         <h5><i class="bi bi-tools"></i> Acciones</h5>
                     </div>
                     <div class="card-body">
                         <div class="d-grid gap-2">
+                            <button class="btn btn-primary" @onclick="OpenKdbModal">
+                                <i class="bi bi-search"></i> Buscar en KDB
+                            </button>
+                            <button class="btn btn-outline-primary" @onclick="OpenAddToKdbModal" disabled="@(!CanAddToKdb())" title="@(CanAddToKdb() ? "Agregar solución a la base de conocimientos" : "No se puede agregar cuando ya se usó una solución de KDB")">
+                                <i class="bi bi-bookmark-plus"></i> Agregar a KDB
+                            </button>
+                            <hr />
                             <button class="btn btn-warning" @onclick="@(() => UpdateStatus("InProgress"))">
                                 <i class="bi bi-play-circle"></i> En Progreso
                             </button>
@@ -89,10 +98,159 @@
                         </div>
                     </div>
                 </div>
+
+                @if (attachedKdbItems.Count > 0)
+                {
+                    <div class="card">
+                        <div class="card-header bg-info text-white">
+                            <h5><i class="bi bi-bookmark-check"></i> Soluciones Aplicadas</h5>
+                        </div>
+                        <div class="card-body">
+                            @foreach (var item in attachedKdbItems)
+                            {
+                                <div class="alert alert-success d-flex justify-content-between align-items-start">
+                                    <div>
+                                        <strong>@item.Title</strong>
+                                        <p class="mb-0 small text-muted">@item.Category</p>
+                                    </div>
+                                    <button class="btn btn-sm btn-outline-danger" @onclick="() => RemoveKdbItem(item)">
+                                        <i class="bi bi-x"></i>
+                                    </button>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                }
             </div>
         </div>
     }
 </div>
+
+@if (showKdbModal)
+{
+    <div class="modal fade show d-block" tabindex="-1" style="background: rgba(0,0,0,0.5);">
+        <div class="modal-dialog modal-lg modal-dialog-scrollable">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title"><i class="bi bi-search"></i> Buscar en Base de Conocimientos</h5>
+                    <button type="button" class="btn-close" @onclick="CloseKdbModal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="bi bi-search"></i></span>
+                            <input type="text" class="form-control" placeholder="Buscar soluciones..." 
+                                   @bind="kdbSearchTerm" @bind:event="oninput" @bind:after="SearchKdb" />
+                        </div>
+                    </div>
+
+                    @if (isSearchingKdb)
+                    {
+                        <div class="text-center py-4">
+                            <div class="spinner-border text-primary" role="status">
+                                <span class="visually-hidden">Buscando...</span>
+                            </div>
+                        </div>
+                    }
+                    else if (kdbSearchResults.Count == 0 && !string.IsNullOrWhiteSpace(kdbSearchTerm))
+                    {
+                        <div class="alert alert-info">
+                            <i class="bi bi-info-circle"></i> No se encontraron resultados.
+                        </div>
+                    }
+                    else if (kdbSearchResults.Count == 0)
+                    {
+                        <div class="text-center text-muted py-4">
+                            <i class="bi bi-search" style="font-size: 3rem;"></i>
+                            <p class="mt-2">Ingresa un término de búsqueda</p>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="list-group">
+                            @foreach (var entry in kdbSearchResults)
+                            {
+                                <div class="list-group-item @(selectedKdbEntry?.Id == entry.Id ? "active" : "")" 
+                                     style="cursor: pointer;" @onclick="() => SelectKdbEntry(entry)">
+                                    <div class="d-flex justify-content-between align-items-start">
+                                        <div class="flex-grow-1">
+                                            <h6 class="mb-1">@entry.Title</h6>
+                                            <span class="badge bg-primary">@entry.Category</span>
+                                            <p class="mb-1 small mt-2"><strong>Problema:</strong> @entry.Problem</p>
+                                            @if (selectedKdbEntry?.Id == entry.Id)
+                                            {
+                                                <div class="mt-2 p-2 bg-light rounded">
+                                                    <strong>Solución:</strong>
+                                                    <p class="mb-0 mt-1">@entry.Solution</p>
+                                                </div>
+                                            }
+                                        </div>
+                                        <span class="badge bg-secondary">@entry.UsageCount usos</span>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    }
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" @onclick="CloseKdbModal">Cancelar</button>
+                    <button type="button" class="btn btn-primary" @onclick="AttachSelectedKdbItem" disabled="@(selectedKdbEntry == null)">
+                        <i class="bi bi-plus-circle"></i> Adjuntar Solución
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+@if (showAddToKdbModal)
+{
+    <div class="modal fade show d-block" tabindex="-1" style="background: rgba(0,0,0,0.5);">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title"><i class="bi bi-bookmark-plus"></i> Agregar a Base de Conocimientos</h5>
+                    <button type="button" class="btn-close" @onclick="CloseAddToKdbModal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">Título *</label>
+                        <input type="text" class="form-control" @bind="newKdbTitle" placeholder="Ej: Error de arranque en Windows" />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Categoría *</label>
+                        <select class="form-select" @bind="newKdbCategory">
+                            <option value="">Seleccionar categoría</option>
+                            <option value="Hardware">Hardware</option>
+                            <option value="Software">Software</option>
+                            <option value="Red">Red</option>
+                            <option value="Sistema Operativo">Sistema Operativo</option>
+                            <option value="Seguridad">Seguridad</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Descripción del Problema *</label>
+                        <textarea class="form-control" rows="3" @bind="newKdbProblem" placeholder="Describe el problema encontrado..."></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Solución Aplicada *</label>
+                        <textarea class="form-control" rows="5" @bind="newKdbSolution" placeholder="Describe la solución paso a paso..."></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Etiquetas (separadas por comas)</label>
+                        <input type="text" class="form-control" @bind="newKdbTags" placeholder="Ej: windows, boot, disco" />
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" @onclick="CloseAddToKdbModal">Cancelar</button>
+                    <button type="button" class="btn btn-primary" @onclick="SaveToKdb" disabled="@(!IsKdbFormValid())">
+                        <i class="bi bi-save"></i> Guardar en KDB
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
 
 @code {
     [Parameter]
@@ -100,6 +258,14 @@
 
     private Ticket? ticket;
     private bool isLoading = true;
+
+    // KDB Modal
+    private bool showKdbModal = false;
+    private string kdbSearchTerm = "";
+    private bool isSearchingKdb = false;
+    private List<KnowledgeEntry> kdbSearchResults = new();
+    private KnowledgeEntry? selectedKdbEntry = null;
+    private List<KnowledgeEntry> attachedKdbItems = new();
 
     protected override async Task OnInitializedAsync()
     {
@@ -138,5 +304,143 @@
             "Closed" => "bg-secondary",
             _ => "bg-secondary"
         };
+    }
+
+    // KDB Modal Methods
+    private void OpenKdbModal()
+    {
+        showKdbModal = true;
+        kdbSearchTerm = "";
+        kdbSearchResults.Clear();
+        selectedKdbEntry = null;
+    }
+
+    private void CloseKdbModal()
+    {
+        showKdbModal = false;
+    }
+
+    private async Task SearchKdb()
+    {
+        if (string.IsNullOrWhiteSpace(kdbSearchTerm) || kdbSearchTerm.Length < 2)
+        {
+            kdbSearchResults.Clear();
+            return;
+        }
+
+        isSearchingKdb = true;
+        try
+        {
+            kdbSearchResults = await KnowledgeRepo.SearchAsync(kdbSearchTerm);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error searching KDB: {ex.Message}");
+            kdbSearchResults.Clear();
+        }
+        finally
+        {
+            isSearchingKdb = false;
+        }
+    }
+
+    private void SelectKdbEntry(KnowledgeEntry entry)
+    {
+        selectedKdbEntry = selectedKdbEntry?.Id == entry.Id ? null : entry;
+    }
+
+    private async Task AttachSelectedKdbItem()
+    {
+        if (selectedKdbEntry != null && !attachedKdbItems.Any(k => k.Id == selectedKdbEntry.Id))
+        {
+            attachedKdbItems.Add(selectedKdbEntry);
+            
+            // Incrementar contador de uso
+            selectedKdbEntry.IncrementUsage();
+            await KnowledgeRepo.UpdateAsync(selectedKdbEntry);
+            
+            CloseKdbModal();
+            StateHasChanged();
+        }
+    }
+
+    private void RemoveKdbItem(KnowledgeEntry item)
+    {
+        attachedKdbItems.Remove(item);
+        StateHasChanged();
+    }
+
+    private bool CanAddToKdb()
+    {
+        // No se puede agregar a KDB si ya se usó una solución de KDB
+        return attachedKdbItems.Count == 0;
+    }
+
+    // Add to KDB Modal
+    private bool showAddToKdbModal = false;
+    private string newKdbTitle = "";
+    private string newKdbCategory = "";
+    private string newKdbProblem = "";
+    private string newKdbSolution = "";
+    private string newKdbTags = "";
+
+    private void OpenAddToKdbModal()
+    {
+        if (!CanAddToKdb()) return;
+        
+        // Pre-llenar con datos del ticket
+        newKdbTitle = ticket?.Title ?? "";
+        newKdbProblem = ticket?.Description ?? "";
+        newKdbCategory = "";
+        newKdbSolution = "";
+        newKdbTags = "";
+        
+        showAddToKdbModal = true;
+    }
+
+    private void CloseAddToKdbModal()
+    {
+        showAddToKdbModal = false;
+    }
+
+    private bool IsKdbFormValid()
+    {
+        return !string.IsNullOrWhiteSpace(newKdbTitle) &&
+               !string.IsNullOrWhiteSpace(newKdbCategory) &&
+               !string.IsNullOrWhiteSpace(newKdbProblem) &&
+               !string.IsNullOrWhiteSpace(newKdbSolution);
+    }
+
+    private async Task SaveToKdb()
+    {
+        if (!IsKdbFormValid()) return;
+
+        try
+        {
+            var tags = newKdbTags.Split(',', StringSplitOptions.RemoveEmptyEntries)
+                                 .Select(t => t.Trim())
+                                 .Where(t => !string.IsNullOrEmpty(t))
+                                 .ToList();
+
+            var newEntry = KnowledgeEntry.Create(
+                newKdbTitle,
+                newKdbProblem,
+                newKdbSolution,
+                newKdbCategory,
+                Guid.Parse("a1b2c3d4-e5f6-7890-abcd-ef1234567890"), // TODO: Get from auth
+                ticket?.Id,
+                tags
+            );
+
+            await KnowledgeRepo.AddAsync(newEntry);
+            await JS.InvokeVoidAsync("alert", "Solución agregada exitosamente a la Base de Conocimientos");
+            
+            CloseAddToKdbModal();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error saving to KDB: {ex.Message}");
+            await JS.InvokeVoidAsync("alert", "Error al guardar en la Base de Conocimientos");
+        }
     }
 }

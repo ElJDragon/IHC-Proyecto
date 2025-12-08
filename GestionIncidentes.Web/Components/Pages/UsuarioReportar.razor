@@ -2,8 +2,9 @@
 @layout UsuarioLayout
 @rendermode InteractiveServer
 @inject NavigationManager Navigation
-@inject GestionIncidentes.Web.Services.StudentReportService ReportService
-@using GestionIncidentes.Application.Models
+@inject MediatR.IMediator Mediator
+@inject IJSRuntime JSRuntime
+@using GestionIncidentes.Application.Features.Incidents.Commands
 
 <link rel="stylesheet" href="/css/pages.css" />
 <link rel="stylesheet" href="/css/usuario.css" />
@@ -22,38 +23,59 @@
       <div class="step-number">1</div>
       <div>
         <div class="section-title">Ubicación del Equipo</div>
-        <div class="section-desc">Selecciona el laboratorio y equipo donde está el problema</div>
+        <div class="section-desc">Selecciona el edificio, laboratorio y número de equipo</div>
       </div>
     </div>
-    <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px">
+    <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:16px">
       <div>
-        <label style="display:block; margin-bottom:8px; font-weight:500">Laboratorio *</label>
-        <select @bind="selectedLab" class="form-select" style="width:100%; padding:12px; border:2px solid var(--border-color); border-radius:10px">
-          <option value="">Seleccionar laboratorio</option>
-          <option value="lab1">Laboratorio 1 - Ingeniería</option>
-          <option value="lab2">Laboratorio 2 - Diseño</option>
-          <option value="lab3">Laboratorio 3 - Arquitectura</option>
+        <label style="display:block; margin-bottom:8px; font-weight:500">Edificio *</label>
+        <select @bind="selectedEdificio" @bind:after="OnEdificioChanged" class="form-select" style="width:100%; padding:12px; border:2px solid var(--border-color); border-radius:10px">
+          <option value="">Seleccionar edificio</option>
+          <option value="edificio1">Edificio 1</option>
+          <option value="edificio2">Edificio 2</option>
         </select>
       </div>
       <div>
-        <label style="display:block; margin-bottom:8px; font-weight:500">Equipo *</label>
+        <label style="display:block; margin-bottom:8px; font-weight:500">Laboratorio *</label>
+        <select @bind="selectedLab" @bind:after="OnLabChanged" class="form-select" disabled="@(selectedEdificio == "")" style="width:100%; padding:12px; border:2px solid var(--border-color); border-radius:10px">
+          <option value="">@(selectedEdificio == "" ? "Primero selecciona edificio" : "Seleccionar laboratorio")</option>
+          @if(selectedEdificio == "edificio1")
+          {
+            <option value="lab1">Laboratorio 1 (23 equipos)</option>
+            <option value="lab2">Laboratorio 2 (26 equipos)</option>
+            <option value="lab3">Laboratorio 3 (10 equipos)</option>
+            <option value="lab4">Laboratorio 4 (26 equipos)</option>
+            <option value="lab5">Laboratorio 5 (26 equipos)</option>
+            <option value="lab6">Laboratorio 6 (26 equipos)</option>
+            <option value="lab7">Laboratorio 7 (26 equipos)</option>
+            <option value="lab8">Laboratorio 8 (20 equipos)</option>
+            <option value="ctt">CTT (25 equipos)</option>
+            <option value="redes1">Redes 1 (26 equipos)</option>
+            <option value="redes2">Redes 2 (26 equipos)</option>
+            <option value="electronica">Electrónica Avanzada (14 equipos)</option>
+            <option value="maquinas">Máquinas Eléctricas (13 equipos)</option>
+          }
+          @if(selectedEdificio == "edificio2")
+          {
+            <option value="industrial1">Industrial 1 (26 equipos)</option>
+            <option value="industrial2">Industrial 2 (26 equipos)</option>
+            <option value="redes_ind">Redes Industriales (10 equipos)</option>
+            <option value="f04">F04 (26 equipos)</option>
+            <option value="automatizacion">Automatización (13 equipos)</option>
+            <option value="electronicos">Equipos Electrónicos (9 equipos)</option>
+            <option value="microprocesadores">Microprocesadores (24 equipos)</option>
+            <option value="fisica">Física (14 equipos)</option>
+            <option value="electrotecnia">Electrotecnia (20 equipos)</option>
+          }
+        </select>
+      </div>
+      <div>
+        <label style="display:block; margin-bottom:8px; font-weight:500">Equipo # *</label>
         <select @bind="selectedEquipo" class="form-select" disabled="@(selectedLab == "")" style="width:100%; padding:12px; border:2px solid var(--border-color); border-radius:10px">
-          <option value="">@(selectedLab == "" ? "Primero selecciona laboratorio" : "Seleccionar equipo")</option>
-          @if(selectedLab == "lab1")
+          <option value="">@(selectedLab == "" ? "Primero selecciona lab" : "Seleccionar equipo")</option>
+          @foreach(var equipNum in GetEquipoRange())
           {
-            <option value="PC-L1-01">PC-L1-01</option>
-            <option value="PC-L1-02">PC-L1-02</option>
-            <option value="PC-L1-03">PC-L1-03</option>
-          }
-          @if(selectedLab == "lab2")
-          {
-            <option value="PC-L2-01">PC-L2-01</option>
-            <option value="PC-L2-02">PC-L2-02</option>
-          }
-          @if(selectedLab == "lab3")
-          {
-            <option value="PC-L3-01">PC-L3-01</option>
-            <option value="PC-L3-02">PC-L3-02</option>
+            <option value="@($"{GetLabPrefix()}-{equipNum:D2}")">@equipNum</option>
           }
         </select>
       </div>
@@ -100,17 +122,34 @@
       <div style="display:flex; align-items:center; gap:12px; margin-bottom:20px">
         <div class="step-number">3</div>
         <div>
-          <div class="section-title">Detalles del Problema</div>
-          <div class="section-desc">Proporciona información sobre el error</div>
+          <div class="section-title">Tipo de Software</div>
+          <div class="section-desc">Indica el tipo de problema de software</div>
         </div>
       </div>
-      <div style="margin-bottom:16px">
-        <label style="display:block; margin-bottom:8px; font-weight:500">Nombre del Programa *</label>
-        <input @bind="nombrePrograma" type="text" placeholder="Ej: Microsoft Word, AutoCAD" class="form-control" style="width:100%; padding:12px; border:2px solid var(--border-color); border-radius:10px" />
+      <div style="display:grid; grid-template-columns:repeat(3,1fr); gap:12px; margin-bottom:16px">
+        <div class="choice-card @(tipoSoftware == "windows" ? "selected" : "")" @onclick='() => { tipoSoftware = "windows"; nombrePrograma = ""; }' style="padding:12px; cursor:pointer">
+          <span class="material-icons" style="font-size:20px; color:var(--color-primary)">window</span>
+          <div style="font-size:13px; margin-top:4px; font-weight:500">SO Windows</div>
+        </div>
+        <div class="choice-card @(tipoSoftware == "otro_so" ? "selected" : "")" @onclick='() => { tipoSoftware = "otro_so"; nombrePrograma = ""; }' style="padding:12px; cursor:pointer">
+          <span class="material-icons" style="font-size:20px; color:var(--color-primary)">computer</span>
+          <div style="font-size:13px; margin-top:4px; font-weight:500">Otro SO</div>
+        </div>
+        <div class="choice-card @(tipoSoftware == "programa" ? "selected" : "")" @onclick='() => tipoSoftware = "programa"' style="padding:12px; cursor:pointer">
+          <span class="material-icons" style="font-size:20px; color:var(--color-primary)">apps</span>
+          <div style="font-size:13px; margin-top:4px; font-weight:500">Programa</div>
+        </div>
       </div>
+      @if(tipoSoftware == "programa")
+      {
+        <div style="margin-bottom:16px">
+          <label style="display:block; margin-bottom:8px; font-weight:500">Nombre del Programa *</label>
+          <input @bind="nombrePrograma" type="text" placeholder="Ej: Microsoft Word, AutoCAD, Visual Studio" class="form-control" style="width:100%; padding:12px; border:2px solid var(--border-color); border-radius:10px" />
+        </div>
+      }
       <div>
-        <label style="display:block; margin-bottom:8px; font-weight:500">Mensaje de Error *</label>
-        <textarea @bind="mensajeError" rows="4" placeholder="Describe el mensaje de error o comportamiento..." class="form-control" style="width:100%; padding:12px; border:2px solid var(--border-color); border-radius:10px; resize:none"></textarea>
+        <label style="display:block; margin-bottom:8px; font-weight:500">Descripción del Error *</label>
+        <textarea @bind="mensajeError" rows="4" placeholder="Describe detalladamente el mensaje de error o comportamiento anormal..." class="form-control" style="width:100%; padding:12px; border:2px solid var(--border-color); border-radius:10px; resize:vertical"></textarea>
       </div>
     </div>
   }
@@ -121,19 +160,26 @@
       <div style="display:flex; align-items:center; gap:12px; margin-bottom:20px">
         <div class="step-number">3</div>
         <div>
-          <div class="section-title">Partes Afectadas</div>
-          <div class="section-desc">Selecciona las partes que presentan problemas</div>
+          <div class="section-title">Componente Afectado</div>
+          <div class="section-desc">Selecciona el componente de hardware con problemas</div>
         </div>
       </div>
-      <div style="display:grid; grid-template-columns:repeat(3,1fr); gap:12px">
+      <div style="display:grid; grid-template-columns:repeat(4,1fr); gap:12px">
         @foreach(var parte in partesHardware)
         {
-          <div class="choice-card @(partesSeleccionadas.Contains(parte) ? "selected" : "")" @onclick="() => ToggleParte(parte)" style="padding:12px">
+          <div class="choice-card @(hardwareSeleccionado == parte ? "selected" : "")" @onclick="() => hardwareSeleccionado = parte" style="padding:12px; cursor:pointer">
             <span class="material-icons" style="font-size:20px; color:var(--color-primary)">@GetParteIcon(parte)</span>
-            <div style="font-size:13px; margin-top:4px">@parte</div>
+            <div style="font-size:13px; margin-top:4px; font-weight:500">@parte</div>
           </div>
         }
       </div>
+      @if(hardwareSeleccionado == "Otro")
+      {
+        <div style="margin-top:16px">
+          <label style="display:block; margin-bottom:8px; font-weight:500">Especifica el componente *</label>
+          <input @bind="otroHardware" type="text" placeholder="Ej: Webcam, Audífonos, etc." class="form-control" style="width:100%; padding:12px; border:2px solid var(--border-color); border-radius:10px" />
+        </div>
+      }
     </div>
   }
 
@@ -151,41 +197,79 @@
 </style>
 
 @code {
+  private string selectedEdificio = "";
   private string selectedLab = "";
   private string selectedEquipo = "";
   private string tipoFalla = "";
+  private string tipoSoftware = "";
   private string nombrePrograma = "";
   private string mensajeError = "";
-  private List<string> partesHardware = new() { "Monitor", "Teclado", "Mouse", "CPU", "Bocinas", "Otro" };
-  private List<string> partesSeleccionadas = new();
+  private string hardwareSeleccionado = "";
+  private string otroHardware = "";
+  private List<string> partesHardware = new() { "Mouse", "Teclado", "Ratón", "Parlantes", "CPU", "Monitor", "Otro" };
 
-  private void ToggleParte(string parte)
+  private Dictionary<string, int> labEquipmentCount = new()
   {
-    if(partesSeleccionadas.Contains(parte))
-      partesSeleccionadas.Remove(parte);
-    else
-      partesSeleccionadas.Add(parte);
+    {"lab1", 23}, {"lab2", 26}, {"lab3", 10}, {"lab4", 26}, {"lab5", 26}, 
+    {"lab6", 26}, {"lab7", 26}, {"lab8", 20}, {"ctt", 25}, {"redes1", 26}, 
+    {"redes2", 26}, {"electronica", 14}, {"maquinas", 13}, {"industrial1", 26}, 
+    {"industrial2", 26}, {"redes_ind", 10}, {"f04", 26}, {"automatizacion", 13}, 
+    {"electronicos", 9}, {"microprocesadores", 24}, {"fisica", 14}, {"electrotecnia", 20}
+  };
+
+  private void OnEdificioChanged()
+  {
+    selectedLab = "";
+    selectedEquipo = "";
   }
+
+  private void OnLabChanged()
+  {
+    selectedEquipo = "";
+  }
+
+  private IEnumerable<int> GetEquipoRange()
+  {
+    if (string.IsNullOrEmpty(selectedLab)) return Enumerable.Empty<int>();
+    int count = labEquipmentCount.GetValueOrDefault(selectedLab, 0);
+    return Enumerable.Range(1, count);
+  }
+
+  private string GetLabPrefix() => selectedLab.ToUpper();
 
   private string GetParteIcon(string parte) => parte switch
   {
     "Monitor" => "monitor",
     "Teclado" => "keyboard",
     "Mouse" => "mouse",
+    "Ratón" => "mouse",
     "CPU" => "computer",
-    "Bocinas" => "volume_up",
+    "Parlantes" => "volume_up",
     _ => "hardware"
   };
 
   private bool IsFormValid()
   {
-    if(string.IsNullOrEmpty(selectedLab) || string.IsNullOrEmpty(selectedEquipo) || string.IsNullOrEmpty(tipoFalla))
+    if(string.IsNullOrEmpty(selectedEdificio) || string.IsNullOrEmpty(selectedLab) || string.IsNullOrEmpty(selectedEquipo) || string.IsNullOrEmpty(tipoFalla))
       return false;
+    
     if(tipoFalla == "software")
-      return !string.IsNullOrEmpty(nombrePrograma) && !string.IsNullOrEmpty(mensajeError);
+    {
+      if(string.IsNullOrEmpty(tipoSoftware) || string.IsNullOrEmpty(mensajeError))
+        return false;
+      if(tipoSoftware == "programa" && string.IsNullOrEmpty(nombrePrograma))
+        return false;
+    }
+    
     if(tipoFalla == "hardware")
-      return partesSeleccionadas.Count > 0;
-    return false;
+    {
+      if(string.IsNullOrEmpty(hardwareSeleccionado))
+        return false;
+      if(hardwareSeleccionado == "Otro" && string.IsNullOrEmpty(otroHardware))
+        return false;
+    }
+    
+    return true;
   }
 
   private void CancelReport()
@@ -199,33 +283,78 @@
 
     try
     {
-      var dto = new CreateStudentReportDto(
-        Lab: GetLabName(selectedLab),
-        EquipmentId: selectedEquipo,
-        ProblemType: tipoFalla,
-        ProgramName: tipoFalla == "software" ? nombrePrograma : null,
-        ErrorMessage: tipoFalla == "software" ? mensajeError : null,
-        AffectedParts: tipoFalla == "hardware" ? string.Join(", ", partesSeleccionadas) : null,
-        CreatedByUserId: Guid.Parse("09c6afb9-90b7-4e4f-979b-1e40dcd6b513") // TODO: Get from auth
+      // Construir título descriptivo
+      var title = $"{tipoFalla.ToUpper()}: {selectedLab} - Equipo {selectedEquipo}";
+      
+      // Construir descripción detallada
+      var description = $"**Ubicación:**\n";
+      description += $"- Edificio: {selectedEdificio}\n";
+      description += $"- Laboratorio: {GetLabFullName(selectedLab)}\n";
+      description += $"- Equipo: {selectedEquipo}\n\n";
+      description += $"**Tipo de Problema:** {tipoFalla.ToUpper()}\n\n";
+
+      if (tipoFalla == "software")
+      {
+        description += $"**Tipo de Software:** ";
+        if (tipoSoftware == "windows")
+          description += "Sistema Operativo Windows\n";
+        else if (tipoSoftware == "otro_so")
+          description += "Otro Sistema Operativo\n";
+        else
+          description += $"Programa: {nombrePrograma}\n";
+        description += $"\n**Descripción del Error:**\n{mensajeError}";
+      }
+      else if (tipoFalla == "hardware")
+      {
+        description += $"**Componente Afectado:** ";
+        description += hardwareSeleccionado == "Otro" ? otroHardware : hardwareSeleccionado;
+      }
+
+      // Crear INCIDENTE (no ticket)
+      var command = new CreateIncidentCommand(
+        Title: title,
+        Description: description
       );
 
-      var result = await ReportService.CreateReportAsync(dto);
-      if (result != null)
-      {
-        Navigation.NavigateTo("/usuario/dashboard", forceLoad: true);
-      }
+      var incidentId = await Mediator.Send(command);
+      
+      // Mostrar notificación de éxito
+      await JSRuntime.InvokeVoidAsync("alert", $"✅ Incidente reportado exitosamente.\n\nID del incidente: {incidentId}\n\nUn técnico será asignado pronto.");
+      
+      // Redirigir al dashboard
+      Navigation.NavigateTo("/usuario/dashboard", forceLoad: true);
     }
     catch (Exception ex)
     {
       Console.WriteLine($"Error submitting report: {ex.Message}");
+      await JSRuntime.InvokeVoidAsync("alert", "❌ Error al enviar el reporte. Por favor intenta nuevamente.");
     }
   }
 
-  private string GetLabName(string labCode) => labCode switch
+  private string GetLabFullName(string labCode) => labCode switch
   {
-    "lab1" => "Lab 1",
-    "lab2" => "Lab 2",
-    "lab3" => "Lab 3",
+    "lab1" => "Laboratorio 1",
+    "lab2" => "Laboratorio 2",
+    "lab3" => "Laboratorio 3",
+    "lab4" => "Laboratorio 4",
+    "lab5" => "Laboratorio 5",
+    "lab6" => "Laboratorio 6",
+    "lab7" => "Laboratorio 7",
+    "lab8" => "Laboratorio 8",
+    "ctt" => "CTT",
+    "redes1" => "Redes 1",
+    "redes2" => "Redes 2",
+    "electronica" => "Electrónica Avanzada",
+    "maquinas" => "Máquinas Eléctricas",
+    "industrial1" => "Industrial 1",
+    "industrial2" => "Industrial 2",
+    "redes_ind" => "Redes Industriales",
+    "f04" => "F04",
+    "automatizacion" => "Automatización",
+    "electronicos" => "Equipos Electrónicos",
+    "microprocesadores" => "Microprocesadores",
+    "fisica" => "Física",
+    "electrotecnia" => "Electrotecnia",
     _ => labCode
   };
 }
