@@ -3,7 +3,7 @@ namespace GestionIncidentes.Domain.Entities;
 public class SolutionStep
 {
     public Guid Id { get; set; } = Guid.NewGuid();
-    public Guid KnowledgeEntryId { get; private set; }
+    public Guid SolutionId { get; private set; }
     public int StepNumber { get; private set; }
     public string Title { get; private set; } = string.Empty;
     public string Description { get; private set; } = string.Empty;
@@ -12,19 +12,19 @@ public class SolutionStep
     public DateTime? UpdatedAt { get; private set; }
 
     // Navigation property
-    public KnowledgeEntry? KnowledgeEntry { get; private set; }
+    public Solution? Solution { get; private set; }
 
     private SolutionStep() { } // EF Core
 
     private SolutionStep(
-        Guid knowledgeEntryId,
+        Guid solutionId,
         int stepNumber,
         string title,
         string description,
         string? imageUrl = null)
     {
         Id = Guid.NewGuid();
-        KnowledgeEntryId = knowledgeEntryId;
+        SolutionId = solutionId;
         StepNumber = stepNumber;
         Title = title;
         Description = description;
@@ -33,7 +33,7 @@ public class SolutionStep
     }
 
     public static SolutionStep Create(
-        Guid knowledgeEntryId,
+        Guid solutionId,
         int stepNumber,
         string title,
         string description,
@@ -48,7 +48,7 @@ public class SolutionStep
         if (string.IsNullOrWhiteSpace(description))
             throw new ArgumentException("La descripción no puede estar vacía", nameof(description));
 
-        return new SolutionStep(knowledgeEntryId, stepNumber, title, description, imageUrl);
+        return new SolutionStep(solutionId, stepNumber, title, description, imageUrl);
     }
 
     public void Update(string title, string description, string? imageUrl = null)

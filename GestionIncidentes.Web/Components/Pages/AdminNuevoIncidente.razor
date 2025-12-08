@@ -5,6 +5,8 @@
 @inject MediatR.IMediator Mediator
 @inject IJSRuntime JSRuntime
 @using GestionIncidentes.Application.Features.Incidents.Commands
+@using GestionIncidentes.Application.Features.Tickets.Queries
+@using GestionIncidentes.Application.Features.Incidents.Dtos
 
 <link rel="stylesheet" href="/css/pages.css" />
 <link rel="stylesheet" href="/css/usuario.css" />
@@ -14,121 +16,265 @@
     <div style="width:56px; height:56px; background:#eff6ff; border-radius:12px; display:flex; align-items:center; justify-content:center; margin:0 auto 16px">
       <span class="material-icons" style="font-size:32px; color:var(--color-primary)">error_outline</span>
     </div>
-    <h1 class="page-title">Crear Nuevo Incidente</h1>
-    <p class="page-subtitle">Completa los pasos para registrar un nuevo problema técnico</p>
+    <h1 class="page-title">Reportar Problema</h1>
+    <p class="page-subtitle">Completa los pasos para reportar un problema técnico</p>
   </div>
 
-  <div class="form-section @(titulo != "" ? "active" : "")">
+  <div class="form-section @(selectedLab != "" ? "active" : "")">
     <div style="display:flex; align-items:center; gap:12px; margin-bottom:20px">
       <div class="step-number">1</div>
       <div>
-        <div class="section-title">Información Básica</div>
-        <div class="section-desc">Título y descripción del problema</div>
+        <div class="section-title">Ubicación del Equipo</div>
+        <div class="section-desc">Selecciona el edificio, laboratorio y número de equipo</div>
       </div>
     </div>
-    <div style="display:flex; flex-direction:column; gap:16px">
+    <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:16px">
       <div>
-        <label style="display:block; margin-bottom:8px; font-weight:500">Título del Incidente *</label>
-        <input type="text" @bind="titulo" placeholder="Ej: Sin conectividad en Aula 301" 
-          class="form-control" style="width:100%; padding:12px; border:2px solid var(--border-color); border-radius:10px" />
+        <label style="display:block; margin-bottom:8px; font-weight:500">Edificio *</label>
+        <select @bind="selectedEdificio" @bind:after="OnEdificioChanged" class="form-select" style="width:100%; padding:12px; border:2px solid var(--border-color); border-radius:10px">
+          <option value="">Seleccionar edificio</option>
+          <option value="edificio1">Edificio 1</option>
+          <option value="edificio2">Edificio 2</option>
+        </select>
       </div>
       <div>
-        <label style="display:block; margin-bottom:8px; font-weight:500">Descripción Detallada *</label>
-        <textarea @bind="descripcion" @bind:event="oninput" rows="5" 
-          placeholder="Describe el problema con el mayor detalle posible..." 
-          class="form-control" style="width:100%; padding:12px; border:2px solid var(--border-color); border-radius:10px; resize:vertical"></textarea>
-        <p style="font-size:12px; color:var(--text-gray); margin-top:4px">@descripcion.Length/1000 caracteres</p>
+        <label style="display:block; margin-bottom:8px; font-weight:500">Laboratorio *</label>
+        <select @bind="selectedLab" @bind:after="OnLabChanged" class="form-select" disabled="@(selectedEdificio == "")" style="width:100%; padding:12px; border:2px solid var(--border-color); border-radius:10px">
+          <option value="">@(selectedEdificio == "" ? "Primero selecciona edificio" : "Seleccionar laboratorio")</option>
+          @if(selectedEdificio == "edificio1")
+          {
+            <option value="lab1">Laboratorio 1 (23 equipos)</option>
+            <option value="lab2">Laboratorio 2 (26 equipos)</option>
+            <option value="lab3">Laboratorio 3 (10 equipos)</option>
+            <option value="lab4">Laboratorio 4 (26 equipos)</option>
+            <option value="lab5">Laboratorio 5 (26 equipos)</option>
+            <option value="lab6">Laboratorio 6 (26 equipos)</option>
+            <option value="lab7">Laboratorio 7 (26 equipos)</option>
+            <option value="lab8">Laboratorio 8 (20 equipos)</option>
+            <option value="ctt">CTT (25 equipos)</option>
+            <option value="redes1">Redes 1 (26 equipos)</option>
+            <option value="redes2">Redes 2 (26 equipos)</option>
+            <option value="electronica">Electrónica Avanzada (14 equipos)</option>
+            <option value="maquinas">Máquinas Eléctricas (13 equipos)</option>
+          }
+          @if(selectedEdificio == "edificio2")
+          {
+            <option value="industrial1">Industrial 1 (26 equipos)</option>
+            <option value="industrial2">Industrial 2 (26 equipos)</option>
+            <option value="redes_ind">Redes Industriales (10 equipos)</option>
+            <option value="f04">F04 (26 equipos)</option>
+            <option value="automatizacion">Automatización (13 equipos)</option>
+            <option value="electronicos">Equipos Electrónicos (9 equipos)</option>
+            <option value="microprocesadores">Microprocesadores (24 equipos)</option>
+            <option value="fisica">Física (14 equipos)</option>
+            <option value="electrotecnia">Electrotecnia (20 equipos)</option>
+          }
+        </select>
+      </div>
+      <div>
+        <label style="display:block; margin-bottom:8px; font-weight:500">Equipo # *</label>
+        <select @bind="selectedEquipo" class="form-select" disabled="@(selectedLab == "")" style="width:100%; padding:12px; border:2px solid var(--border-color); border-radius:10px">
+          <option value="">@(selectedLab == "" ? "Primero selecciona lab" : "Seleccionar equipo")</option>
+          @foreach(var equipNum in GetEquipoRange())
+          {
+            <option value="@($"{GetLabPrefix()}-{equipNum:D2}")">@equipNum</option>
+          }
+        </select>
       </div>
     </div>
   </div>
 
-  <div class="form-section @(categoria != "" ? "active" : "")">
+  <div class="form-section @(tipoFalla != "" ? "active" : "")">
     <div style="display:flex; align-items:center; gap:12px; margin-bottom:20px">
       <div class="step-number">2</div>
       <div>
-        <div class="section-title">Categoría y Prioridad</div>
-        <div class="section-desc">Clasifica el tipo de problema</div>
+        <div class="section-title">Tipo de Problema</div>
+        <div class="section-desc">¿El problema es de hardware o software?</div>
       </div>
     </div>
-    <div style="display:grid; grid-template-columns:repeat(4,1fr); gap:12px; margin-bottom:16px">
-      <div class="choice-card @(categoria == "hardware" ? "selected" : "")" @onclick='() => categoria = "hardware"' style="padding:16px; cursor:pointer">
-        <span class="material-icons" style="font-size:24px; color:var(--color-primary)">monitor</span>
-        <div style="font-size:14px; margin-top:8px; font-weight:500">Hardware</div>
-      </div>
-      <div class="choice-card @(categoria == "software" ? "selected" : "")" @onclick='() => categoria = "software"' style="padding:16px; cursor:pointer">
-        <span class="material-icons" style="font-size:24px; color:var(--color-primary)">apps</span>
-        <div style="font-size:14px; margin-top:8px; font-weight:500">Software</div>
-      </div>
-      <div class="choice-card @(categoria == "connectivity" ? "selected" : "")" @onclick='() => categoria = "connectivity"' style="padding:16px; cursor:pointer">
-        <span class="material-icons" style="font-size:24px; color:var(--color-primary)">wifi</span>
-        <div style="font-size:14px; margin-top:8px; font-weight:500">Conectividad</div>
-      </div>
-      <div class="choice-card @(categoria == "security" ? "selected" : "")" @onclick='() => categoria = "security"' style="padding:16px; cursor:pointer">
-        <span class="material-icons" style="font-size:24px; color:var(--color-primary)">security</span>
-        <div style="font-size:14px; margin-top:8px; font-weight:500">Seguridad</div>
-      </div>
-    </div>
-    <div>
-      <label style="display:block; margin-bottom:8px; font-weight:500">Nivel de Prioridad *</label>
-      <div style="display:grid; grid-template-columns:repeat(4,1fr); gap:12px">
-        <div class="choice-card @(prioridad == "critical" ? "selected" : "")" @onclick='() => prioridad = "critical"' style="padding:12px; cursor:pointer">
-          <div style="font-size:24px">🔴</div>
-          <div style="font-size:13px; margin-top:4px; font-weight:500">Crítica</div>
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px">
+      <div class="choice-card @(tipoFalla == "hardware" ? "selected" : "")" @onclick='() => tipoFalla = "hardware"'>
+        <div style="display:flex; align-items:center; gap:12px">
+          <div class="choice-icon">
+            <span class="material-icons">monitor</span>
+          </div>
+          <div>
+            <div style="font-weight:600">Hardware</div>
+            <div style="font-size:13px; color:var(--text-gray)">Teclado, pantalla, mouse</div>
+          </div>
         </div>
-        <div class="choice-card @(prioridad == "high" ? "selected" : "")" @onclick='() => prioridad = "high"' style="padding:12px; cursor:pointer">
-          <div style="font-size:24px">🟠</div>
-          <div style="font-size:13px; margin-top:4px; font-weight:500">Alta</div>
-        </div>
-        <div class="choice-card @(prioridad == "medium" ? "selected" : "")" @onclick='() => prioridad = "medium"' style="padding:12px; cursor:pointer">
-          <div style="font-size:24px">🟡</div>
-          <div style="font-size:13px; margin-top:4px; font-weight:500">Media</div>
-        </div>
-        <div class="choice-card @(prioridad == "low" ? "selected" : "")" @onclick='() => prioridad = "low"' style="padding:12px; cursor:pointer">
-          <div style="font-size:24px">🟢</div>
-          <div style="font-size:13px; margin-top:4px; font-weight:500">Baja</div>
+      </div>
+      <div class="choice-card @(tipoFalla == "software" ? "selected" : "")" @onclick='() => tipoFalla = "software"'>
+        <div style="display:flex; align-items:center; gap:12px">
+          <div class="choice-icon">
+            <span class="material-icons">apps</span>
+          </div>
+          <div>
+            <div style="font-weight:600">Software</div>
+            <div style="font-size:13px; color:var(--text-gray)">Programas, sistema operativo</div>
+          </div>
         </div>
       </div>
     </div>
   </div>
 
-  <div class="form-section @(tipoAfectacion != "" ? "active" : "")">
-    <div style="display:flex; align-items:center; gap:12px; margin-bottom:20px">
-      <div class="step-number">3</div>
+  @if(tipoFalla == "software")
+  {
+    <div class="form-section active" style="animation:slideDown 0.3s ease">
+      <div style="display:flex; align-items:center; gap:12px; margin-bottom:20px">
+        <div class="step-number">3</div>
+        <div>
+          <div class="section-title">Tipo de Software</div>
+          <div class="section-desc">Indica el tipo de problema de software</div>
+        </div>
+      </div>
+      <div style="display:grid; grid-template-columns:repeat(3,1fr); gap:12px; margin-bottom:16px">
+        <div class="choice-card @(tipoSoftware == "windows" ? "selected" : "")" @onclick='() => { tipoSoftware = "windows"; nombrePrograma = ""; }' style="padding:12px; cursor:pointer">
+          <span class="material-icons" style="font-size:20px; color:var(--color-primary)">window</span>
+          <div style="font-size:13px; margin-top:4px; font-weight:500">SO Windows</div>
+        </div>
+        <div class="choice-card @(tipoSoftware == "otro_so" ? "selected" : "")" @onclick='() => { tipoSoftware = "otro_so"; nombrePrograma = ""; }' style="padding:12px; cursor:pointer">
+          <span class="material-icons" style="font-size:20px; color:var(--color-primary)">computer</span>
+          <div style="font-size:13px; margin-top:4px; font-weight:500">Otro SO</div>
+        </div>
+        <div class="choice-card @(tipoSoftware == "programa" ? "selected" : "")" @onclick='() => tipoSoftware = "programa"' style="padding:12px; cursor:pointer">
+          <span class="material-icons" style="font-size:20px; color:var(--color-primary)">apps</span>
+          <div style="font-size:13px; margin-top:4px; font-weight:500">Programa</div>
+        </div>
+      </div>
+      @if(tipoSoftware == "programa")
+      {
+        <div style="margin-bottom:16px">
+          <label style="display:block; margin-bottom:8px; font-weight:500">Nombre del Programa *</label>
+          <input @bind="nombrePrograma" type="text" placeholder="Ej: Microsoft Word, AutoCAD, Visual Studio" class="form-control" style="width:100%; padding:12px; border:2px solid var(--border-color); border-radius:10px" />
+        </div>
+      }
       <div>
-        <div class="section-title">Ubicación y Alcance</div>
-        <div class="section-desc">¿Dónde ocurre el problema y a cuántos afecta?</div>
+        <label style="display:block; margin-bottom:8px; font-weight:500">Descripción del Error *</label>
+        <textarea @bind="mensajeError" rows="4" placeholder="Describe detalladamente el mensaje de error o comportamiento anormal..." class="form-control" style="width:100%; padding:12px; border:2px solid var(--border-color); border-radius:10px; resize:vertical"></textarea>
       </div>
     </div>
-    <div style="display:grid; grid-template-columns:repeat(4,1fr); gap:12px; margin-bottom:16px">
-      <div class="choice-card @(tipoAfectacion == "user" ? "selected" : "")" @onclick='() => tipoAfectacion = "user"' style="padding:16px; cursor:pointer">
-        <span class="material-icons" style="font-size:24px; color:var(--color-primary)">person</span>
-        <div style="font-size:13px; margin-top:8px; font-weight:500">Usuario Individual</div>
+  }
+
+  @if(tipoFalla == "hardware")
+  {
+    <div class="form-section active" style="animation:slideDown 0.3s ease">
+      <div style="display:flex; align-items:center; gap:12px; margin-bottom:20px">
+        <div class="step-number">3</div>
+        <div>
+          <div class="section-title">Componente Afectado</div>
+          <div class="section-desc">Selecciona el componente de hardware con problemas</div>
+        </div>
       </div>
-      <div class="choice-card @(tipoAfectacion == "classroom" ? "selected" : "")" @onclick='() => tipoAfectacion = "classroom"' style="padding:16px; cursor:pointer">
-        <span class="material-icons" style="font-size:24px; color:var(--color-primary)">meeting_room</span>
-        <div style="font-size:13px; margin-top:8px; font-weight:500">Aula/Laboratorio</div>
+      <div style="display:grid; grid-template-columns:repeat(4,1fr); gap:12px">
+        @foreach(var parte in partesHardware)
+        {
+          <div class="choice-card @(hardwareSeleccionado == parte ? "selected" : "")" @onclick="() => hardwareSeleccionado = parte" style="padding:12px; cursor:pointer">
+            <span class="material-icons" style="font-size:20px; color:var(--color-primary)">@GetParteIcon(parte)</span>
+            <div style="font-size:13px; margin-top:4px; font-weight:500">@parte</div>
+          </div>
+        }
       </div>
-      <div class="choice-card @(tipoAfectacion == "building" ? "selected" : "")" @onclick='() => tipoAfectacion = "building"' style="padding:16px; cursor:pointer">
-        <span class="material-icons" style="font-size:24px; color:var(--color-primary)">apartment</span>
-        <div style="font-size:13px; margin-top:8px; font-weight:500">Edificio Completo</div>
-      </div>
-      <div class="choice-card @(tipoAfectacion == "campus" ? "selected" : "")" @onclick='() => tipoAfectacion = "campus"' style="padding:16px; cursor:pointer">
-        <span class="material-icons" style="font-size:24px; color:var(--color-primary)">domain</span>
-        <div style="font-size:13px; margin-top:8px; font-weight:500">Campus</div>
-      </div>
+      @if(hardwareSeleccionado == "Otro")
+      {
+        <div style="margin-top:16px">
+          <label style="display:block; margin-bottom:8px; font-weight:500">Especifica el componente *</label>
+          <input @bind="otroHardware" type="text" placeholder="Ej: Webcam, Audífonos, etc." class="form-control" style="width:100%; padding:12px; border:2px solid var(--border-color); border-radius:10px" />
+        </div>
+      }
     </div>
-    <div>
-      <label style="display:block; margin-bottom:8px; font-weight:500">Detalle de Ubicación *</label>
-      <input type="text" @bind="ubicacionDetalle" placeholder="Ej: Edificio A, Piso 3, Laboratorio 5" 
-        class="form-control" style="width:100%; padding:12px; border:2px solid var(--border-color); border-radius:10px" />
+  }
+
+  @* Campo adicional OPCIONAL para Admin: Asignar Técnico directamente *@
+  @if(IsFormValid())
+  {
+    <div class="form-section active" style="animation:slideDown 0.3s ease">
+      <div style="display:flex; align-items:center; gap:12px; margin-bottom:20px">
+        <div class="step-number" style="background:#f59e0b">4</div>
+        <div>
+          <div class="section-title">Asignar Técnico (Opcional)</div>
+          <div class="section-desc">Puedes asignar un técnico directamente o dejarlo sin asignar</div>
+        </div>
+      </div>
+      
+      @if (loadingTechnicians)
+      {
+        <div style="text-align:center; padding:20px">
+          <div class="loading-spinner"></div>
+          <p style="margin-top:12px; color:var(--text-gray)">Cargando técnicos disponibles...</p>
+        </div>
+      }
+      else if (technicians != null && technicians.Any())
+      {
+        <div style="margin-bottom:16px">
+          <label style="display:flex; align-items:center; gap:8px; cursor:pointer; width:fit-content; padding:8px 12px; background:var(--color-primary-light); border-radius:8px">
+            <input type="checkbox" @bind="asignarAhora" style="width:18px; height:18px; cursor:pointer" />
+            <span style="font-weight:500; font-size:14px">Asignar técnico ahora</span>
+          </label>
+        </div>
+
+        @if (asignarAhora)
+        {
+          <div style="display:grid; gap:12px">
+            @foreach (var tech in technicians)
+            {
+              var isSelected = selectedTechnicianId == tech.TechnicianId;
+              var cardStyle = isSelected 
+                ? "border:2px solid var(--color-primary); background:var(--color-primary-light)" 
+                : "border:2px solid var(--border-color)";
+              
+              <div class="choice-card" 
+                   style="@cardStyle; cursor:pointer; padding:16px"
+                   @onclick="() => selectedTechnicianId = tech.TechnicianId">
+                <div style="display:flex; align-items:start; gap:16px">
+                  <div style="flex:1">
+                    <div style="display:flex; align-items:center; gap:8px; margin-bottom:8px">
+                      @if (isSelected)
+                      {
+                        <span class="material-icons" style="color:var(--color-primary); font-size:20px">check_circle</span>
+                      }
+                      else
+                      {
+                        <span class="material-icons" style="color:var(--text-light); font-size:20px">radio_button_unchecked</span>
+                      }
+                      <span style="font-weight:600; font-size:15px">@tech.TechnicianName</span>
+                    </div>
+                    <div style="font-size:13px; color:var(--text-gray); margin-bottom:12px">
+                      📍 @tech.Department
+                    </div>
+                    <div style="display:grid; grid-template-columns:repeat(4, 1fr); gap:12px">
+                      <div>
+                        <div style="font-size:11px; color:var(--text-gray)">En proceso</div>
+                        <div style="font-size:16px; font-weight:600; color:#f59e0b">@tech.ActiveTickets</div>
+                      </div>
+                      <div>
+                        <div style="font-size:11px; color:var(--text-gray)">Pendientes</div>
+                        <div style="font-size:16px; font-weight:600; color:#6b7280">@tech.PendingTickets</div>
+                      </div>
+                      <div>
+                        <div style="font-size:11px; color:var(--text-gray)">Resueltos Hoy</div>
+                        <div style="font-size:16px; font-weight:600; color:#10b981">@tech.ResolvedToday</div>
+                      </div>
+                      <div>
+                        <div style="font-size:11px; color:var(--text-gray)">Total</div>
+                        <div style="font-size:16px; font-weight:600">@tech.TotalResolved</div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            }
+          </div>
+        }
+      }
     </div>
-  </div>
+  }
 
   <div style="display:flex; justify-content:center; gap:16px; margin-top:32px">
-    <button class="btn-cancel" @onclick="Cancelar" style="padding:12px 24px; border:none; background:transparent; color:var(--text-gray); cursor:pointer; border-radius:8px">
+    <button class="btn-cancel" @onclick="CancelReport" style="padding:12px 24px; border:none; background:transparent; color:var(--text-gray); cursor:pointer; border-radius:8px">
       Cancelar
     </button>
-    <button class="btn-submit" disabled="@(!IsFormValid())" @onclick="CrearTicket" style="padding:12px 32px; background:var(--color-primary); color:white; border:none; border-radius:8px; font-weight:500; cursor:pointer; display:flex; align-items:center; gap:8px">
+    <button class="btn-submit" disabled="@(!IsFormValid())" @onclick="SubmitReport" style="padding:12px 32px; background:var(--color-primary); color:white; border:none; border-radius:8px; font-weight:500; cursor:pointer; display:flex; align-items:center; gap:8px">
       <span class="material-icons" style="font-size:18px">save</span>
       Crear Incidente
     </button>
@@ -143,99 +289,216 @@
 </style>
 
 @code {
-  private string titulo = "";
-  private string categoria = "";
-  private string prioridad = "";
-  private string tipoAfectacion = "";
-  private string ubicacionDetalle = "";
-  private string descripcion = "";
+  private string selectedEdificio = "";
+  private string selectedLab = "";
+  private string selectedEquipo = "";
+  private string tipoFalla = "";
+  private string tipoSoftware = "";
+  private string nombrePrograma = "";
+  private string mensajeError = "";
+  private string hardwareSeleccionado = "";
+  private string otroHardware = "";
+  private List<string> partesHardware = new() { "Mouse", "Teclado", "Ratón", "Parlantes", "CPU", "Monitor", "Otro" };
+
+  // Asignación de técnico (opcional)
+  private bool asignarAhora = false;
+  private Guid? selectedTechnicianId = null;
+  private List<TechnicianWorkloadDto> technicians = new();
+  private bool loadingTechnicians = false;
+
+  private Dictionary<string, int> labEquipmentCount = new()
+  {
+    {"lab1", 23}, {"lab2", 26}, {"lab3", 10}, {"lab4", 26}, {"lab5", 26}, 
+    {"lab6", 26}, {"lab7", 26}, {"lab8", 20}, {"ctt", 25}, {"redes1", 26}, 
+    {"redes2", 26}, {"electronica", 14}, {"maquinas", 13}, {"industrial1", 26}, 
+    {"industrial2", 26}, {"redes_ind", 10}, {"f04", 26}, {"automatizacion", 13}, 
+    {"electronicos", 9}, {"microprocesadores", 24}, {"fisica", 14}, {"electrotecnia", 20}
+  };
+
+  protected override async Task OnInitializedAsync()
+  {
+    await LoadTechnicians();
+  }
+
+  private async Task LoadTechnicians()
+  {
+    loadingTechnicians = true;
+    try
+    {
+      var query = new GetTechnicianWorkloadQuery();
+      technicians = await Mediator.Send(query);
+    }
+    catch (Exception ex)
+    {
+      Console.WriteLine($"Error loading technicians: {ex.Message}");
+    }
+    finally
+    {
+      loadingTechnicians = false;
+    }
+  }
+
+  private void OnEdificioChanged()
+  {
+    selectedLab = "";
+    selectedEquipo = "";
+  }
+
+  private void OnLabChanged()
+  {
+    selectedEquipo = "";
+  }
+
+  private IEnumerable<int> GetEquipoRange()
+  {
+    if (string.IsNullOrEmpty(selectedLab)) return Enumerable.Empty<int>();
+    int count = labEquipmentCount.GetValueOrDefault(selectedLab, 0);
+    return Enumerable.Range(1, count);
+  }
+
+  private string GetLabPrefix() => selectedLab.ToUpper();
+
+  private string GetParteIcon(string parte) => parte switch
+  {
+    "Monitor" => "monitor",
+    "Teclado" => "keyboard",
+    "Mouse" => "mouse",
+    "Ratón" => "mouse",
+    "CPU" => "computer",
+    "Parlantes" => "volume_up",
+    _ => "hardware"
+  };
 
   private bool IsFormValid()
   {
-    return !string.IsNullOrWhiteSpace(titulo) &&
-           !string.IsNullOrWhiteSpace(descripcion) &&
-           !string.IsNullOrWhiteSpace(categoria) &&
-           !string.IsNullOrWhiteSpace(prioridad) &&
-           !string.IsNullOrWhiteSpace(tipoAfectacion) &&
-           !string.IsNullOrWhiteSpace(ubicacionDetalle);
+    if(string.IsNullOrEmpty(selectedEdificio) || string.IsNullOrEmpty(selectedLab) || string.IsNullOrEmpty(selectedEquipo) || string.IsNullOrEmpty(tipoFalla))
+      return false;
+    
+    if(tipoFalla == "software")
+    {
+      if(string.IsNullOrEmpty(tipoSoftware) || string.IsNullOrEmpty(mensajeError))
+        return false;
+      if(tipoSoftware == "programa" && string.IsNullOrEmpty(nombrePrograma))
+        return false;
+    }
+    
+    if(tipoFalla == "hardware")
+    {
+      if(string.IsNullOrEmpty(hardwareSeleccionado))
+        return false;
+      if(hardwareSeleccionado == "Otro" && string.IsNullOrEmpty(otroHardware))
+        return false;
+    }
+    
+    return true;
   }
 
-  private async Task CrearTicket()
+  private void CancelReport()
+  {
+    Navigation.NavigateTo("/admin/incidentes", forceLoad: true);
+  }
+
+  private async Task SubmitReport()
   {
     if (!IsFormValid()) return;
 
     try
     {
-      // Construir descripción completa con todos los detalles
-      var fullDescription = $"**Categoría:** {GetCategoriaName(categoria)}\n";
-      fullDescription += $"**Prioridad:** {GetPrioridadName(prioridad)}\n";
-      fullDescription += $"**Tipo de Afectación:** {GetAfectacionName(tipoAfectacion)}\n";
-      fullDescription += $"**Ubicación:** {ubicacionDetalle}\n\n";
-      fullDescription += $"**Descripción del Problema:**\n{descripcion}";
+      // Construir título descriptivo
+      var title = $"{tipoFalla.ToUpper()}: {selectedLab} - Equipo {selectedEquipo}";
+      
+      // Construir descripción detallada
+      var description = $"**Ubicación:**\n";
+      description += $"- Edificio: {selectedEdificio}\n";
+      description += $"- Laboratorio: {GetLabFullName(selectedLab)}\n";
+      description += $"- Equipo: {selectedEquipo}\n\n";
+      description += $"**Tipo de Problema:** {tipoFalla.ToUpper()}\n\n";
 
-      // Crear INCIDENTE usando MediatR
-      var command = new CreateIncidentCommand(
-        Title: titulo,
-        Description: fullDescription
+      if (tipoFalla == "software")
+      {
+        description += $"**Tipo de Software:** ";
+        if (tipoSoftware == "windows")
+          description += "Sistema Operativo Windows\n";
+        else if (tipoSoftware == "otro_so")
+          description += "Otro Sistema Operativo\n";
+        else
+          description += $"Programa: {nombrePrograma}\n";
+        description += $"\n**Descripción del Error:**\n{mensajeError}";
+      }
+      else if (tipoFalla == "hardware")
+      {
+        description += $"**Componente Afectado:** ";
+        description += hardwareSeleccionado == "Otro" ? otroHardware : hardwareSeleccionado;
+      }
+
+      // Crear INCIDENTE
+      var createIncidentCommand = new CreateIncidentCommand(
+        Title: title,
+        Description: description
       );
 
-      var incidentId = await Mediator.Send(command);
+      var incidentId = await Mediator.Send(createIncidentCommand);
       
-      // Mostrar notificación de éxito
-      await JSRuntime.InvokeVoidAsync("alert", $"✅ Incidente creado exitosamente.\n\nID del incidente: {incidentId}\n\nAhora puede asignarlo a un técnico desde la lista de incidentes.");
+      // Si se seleccionó asignar técnico, asignar inmediatamente
+      if (asignarAhora && selectedTechnicianId.HasValue)
+      {
+        try
+        {
+          var assignCommand = new AssignIncidentToTechnicianCommand(
+            incidentId,
+            selectedTechnicianId.Value
+          );
+          
+          var ticketId = await Mediator.Send(assignCommand);
+          
+          await JSRuntime.InvokeVoidAsync("alert", $"✅ Incidente creado y asignado exitosamente.\n\nID del incidente: {incidentId}\nID del ticket: {ticketId}\nAsignado a: {technicians.FirstOrDefault(t => t.TechnicianId == selectedTechnicianId)?.TechnicianName}");
+        }
+        catch (Exception ex)
+        {
+          Console.WriteLine($"Error assigning technician: {ex.Message}");
+          await JSRuntime.InvokeVoidAsync("alert", $"✅ Incidente creado (ID: {incidentId})\n⚠️ Error al asignar técnico: {ex.Message}");
+        }
+      }
+      else
+      {
+        // Incidente creado sin asignar
+        await JSRuntime.InvokeVoidAsync("alert", $"✅ Incidente creado exitosamente.\n\nID del incidente: {incidentId}\n\nPuedes asignarlo a un técnico desde la lista de incidentes.");
+      }
       
       // Redirigir a la lista de incidentes
       Navigation.NavigateTo("/admin/incidentes", forceLoad: true);
     }
     catch (Exception ex)
     {
-      Console.WriteLine($"Error creating incident: {ex.Message}");
+      Console.WriteLine($"Error submitting report: {ex.Message}");
       await JSRuntime.InvokeVoidAsync("alert", "❌ Error al crear el incidente. Por favor intenta nuevamente.");
     }
   }
 
-  private void Cancelar()
+  private string GetLabFullName(string labCode) => labCode switch
   {
-    Navigation.NavigateTo("/admin/incidentes", forceLoad: true);
-  }
-
-  private string GetCategoriaName(string cat) => cat switch
-  {
-    "hardware" => "Hardware",
-    "software" => "Software",
-    "connectivity" => "Conectividad",
-    "security" => "Seguridad",
-    _ => cat
+    "lab1" => "Laboratorio 1",
+    "lab2" => "Laboratorio 2",
+    "lab3" => "Laboratorio 3",
+    "lab4" => "Laboratorio 4",
+    "lab5" => "Laboratorio 5",
+    "lab6" => "Laboratorio 6",
+    "lab7" => "Laboratorio 7",
+    "lab8" => "Laboratorio 8",
+    "ctt" => "CTT",
+    "redes1" => "Redes 1",
+    "redes2" => "Redes 2",
+    "electronica" => "Electrónica Avanzada",
+    "maquinas" => "Máquinas Eléctricas",
+    "industrial1" => "Industrial 1",
+    "industrial2" => "Industrial 2",
+    "redes_ind" => "Redes Industriales",
+    "f04" => "F04",
+    "automatizacion" => "Automatización",
+    "electronicos" => "Equipos Electrónicos",
+    "microprocesadores" => "Microprocesadores",
+    "fisica" => "Física",
+    "electrotecnia" => "Electrotecnia",
+    _ => labCode
   };
-
-  private string GetPrioridadName(string prio) => prio switch
-  {
-    "critical" => "🔴 Crítica",
-    "high" => "🟠 Alta",
-    "medium" => "🟡 Media",
-    "low" => "🟢 Baja",
-    _ => prio
-  };
-
-  private string GetAfectacionName(string afect) => afect switch
-  {
-    "user" => "Usuario Individual",
-    "classroom" => "Aula/Laboratorio",
-    "building" => "Edificio Completo",
-    "campus" => "Campus",
-    _ => afect
-  };
-}
-
-  {
-    Navigation.NavigateTo("/admin/incidentes", forceLoad: true);
-  }
-
-  public class ArticuloSugerido
-  {
-    public int Id { get; set; }
-    public string Titulo { get; set; } = "";
-    public string Categoria { get; set; } = "";
-    public int Relevancia { get; set; }
-  }
 }

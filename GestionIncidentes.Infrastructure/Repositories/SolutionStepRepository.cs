@@ -14,10 +14,10 @@ public class SolutionStepRepository : ISolutionStepRepository
         _context = context;
     }
 
-    public async Task<List<SolutionStep>> GetStepsByKnowledgeEntryIdAsync(Guid knowledgeEntryId)
+    public async Task<List<SolutionStep>> GetStepsBySolutionIdAsync(Guid solutionId)
     {
         return await _context.SolutionSteps
-            .Where(s => s.KnowledgeEntryId == knowledgeEntryId)
+            .Where(s => s.SolutionId == solutionId)
             .OrderBy(s => s.StepNumber)
             .ToListAsync();
     }
@@ -50,12 +50,12 @@ public class SolutionStepRepository : ISolutionStepRepository
         }
     }
 
-    public async Task ReorderStepsAsync(Guid knowledgeEntryId, List<(Guid StepId, int NewOrder)> reorderings)
+    public async Task ReorderStepsAsync(Guid solutionId, List<(Guid StepId, int NewOrder)> reorderings)
     {
         foreach (var (stepId, newOrder) in reorderings)
         {
             var step = await GetByIdAsync(stepId);
-            if (step != null && step.KnowledgeEntryId == knowledgeEntryId)
+            if (step != null && step.SolutionId == solutionId)
             {
                 step.UpdateStepNumber(newOrder);
             }

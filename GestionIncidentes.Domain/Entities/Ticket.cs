@@ -45,4 +45,7 @@ public class Ticket
     // Valoración
     public int? Rating { get; set; } // 1-5 estrellas
     public string? FeedbackComment { get; set; }
+    
+    // Soluciones aplicadas al ticket
+    public List<Solution> Solutions { get; set; } = new();
 }

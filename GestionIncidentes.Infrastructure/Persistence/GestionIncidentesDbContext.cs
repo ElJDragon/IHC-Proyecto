@@ -15,6 +15,7 @@ namespace GestionIncidentes.Infrastructure
         public DbSet<Incident> Incidents => Set<Incident>(); // ✅ Integrante A
         
         // ✅ Nuevas entidades para Base de Conocimiento, Reportes, Notificaciones y Auditoría
+        public DbSet<Solution> Solutions => Set<Solution>();
         public DbSet<KnowledgeEntry> KnowledgeEntries => Set<KnowledgeEntry>();
         public DbSet<SolutionStep> SolutionSteps => Set<SolutionStep>();
         public DbSet<Notification> Notifications => Set<Notification>();
@@ -40,6 +41,7 @@ namespace GestionIncidentes.Infrastructure
             modelBuilder.Entity<Department>().HasKey(d => d.Id);
             modelBuilder.Entity<Ticket>().HasKey(t => t.Id);
             modelBuilder.Entity<Incident>().HasKey(i => i.Id); // ✅ Integrante A
+            modelBuilder.Entity<Solution>().HasKey(s => s.Id);
             modelBuilder.Entity<KnowledgeEntry>().HasKey(k => k.Id);
             modelBuilder.Entity<SolutionStep>().HasKey(s => s.Id);
             modelBuilder.Entity<Notification>().HasKey(n => n.Id);
@@ -80,17 +82,41 @@ namespace GestionIncidentes.Infrastructure
                 .HasForeignKey(i => i.ReportedByUserId)
                 .OnDelete(DeleteBehavior.Restrict);
 
+            // -------------------- Flujo de Soluciones --------------------
+            // Ticket -> Solutions (1 a muchos)
+            modelBuilder.Entity<Solution>()
+                .HasOne(s => s.Ticket)
+                .WithMany(t => t.Solutions)
+                .HasForeignKey(s => s.TicketId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            // Solution -> CreatedBy (User)
+            modelBuilder.Entity<Solution>()
+                .HasOne(s => s.CreatedBy)
+                .WithMany()
+                .HasForeignKey(s => s.CreatedByUserId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            // Solution -> SolutionSteps (1 a muchos)
+            modelBuilder.Entity<SolutionStep>()
+                .HasOne(ss => ss.Solution)
+                .WithMany(s => s.Steps)
+                .HasForeignKey(ss => ss.SolutionId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            // Solution -> KnowledgeEntry (1 a 1 opcional)
+            modelBuilder.Entity<KnowledgeEntry>()
+                .HasOne(k => k.Solution)
+                .WithOne(s => s.KnowledgeEntry)
+                .HasForeignKey<KnowledgeEntry>(k => k.SolutionId)
+                .OnDelete(DeleteBehavior.SetNull)
+                .IsRequired(false);
+
             modelBuilder.Entity<KnowledgeEntry>()
                 .HasOne<User>()
                 .WithMany()
                 .HasForeignKey(k => k.CreatedByUserId)
                 .OnDelete(DeleteBehavior.Restrict);
-
-            modelBuilder.Entity<KnowledgeEntry>()
-                .HasMany(k => k.Steps)
-                .WithOne(s => s.KnowledgeEntry)
-                .HasForeignKey(s => s.KnowledgeEntryId)
-                .OnDelete(DeleteBehavior.Cascade);
 
             modelBuilder.Entity<Notification>()
                 .HasOne<User>()
@@ -129,9 +155,13 @@ namespace GestionIncidentes.Infrastructure
             modelBuilder.Entity<Incident>().Property(i => i.Description).IsRequired();
             modelBuilder.Entity<Incident>().Property(i => i.Status).IsRequired();
             
+            modelBuilder.Entity<Solution>().Property(s => s.Title).IsRequired();
+            modelBuilder.Entity<Solution>().Property(s => s.Description).IsRequired();
+            modelBuilder.Entity<Solution>().Property(s => s.Status).IsRequired();
+            
             modelBuilder.Entity<KnowledgeEntry>().Property(k => k.Title).IsRequired();
             modelBuilder.Entity<KnowledgeEntry>().Property(k => k.Problem).IsRequired();
-            modelBuilder.Entity<KnowledgeEntry>().Property(k => k.Solution).IsRequired();
+            modelBuilder.Entity<KnowledgeEntry>().Property(k => k.SolutionDescription).IsRequired();
             modelBuilder.Entity<KnowledgeEntry>().Property(k => k.Category).IsRequired();
             
             modelBuilder.Entity<SolutionStep>().Property(s => s.Title).IsRequired();
@@ -157,7 +187,7 @@ namespace GestionIncidentes.Infrastructure
                 .HasIndex(k => k.Category);
 
             modelBuilder.Entity<SolutionStep>()
-                .HasIndex(s => new { s.KnowledgeEntryId, s.StepNumber });
+                .HasIndex(s => new { s.SolutionId, s.StepNumber });
         }
     }
 }

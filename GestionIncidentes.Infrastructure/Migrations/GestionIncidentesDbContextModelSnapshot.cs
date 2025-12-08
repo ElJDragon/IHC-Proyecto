@@ -58,7 +58,7 @@ namespace GestionIncidentes.Infrastructure.Migrations
 
                     b.HasIndex("UserId", "Timestamp");
 
-                    b.ToTable("AuditLogs");
+                    b.ToTable("AuditLogs", (string)null);
                 });
 
             modelBuilder.Entity("GestionIncidentes.Domain.Entities.Department", b =>
@@ -73,7 +73,7 @@ namespace GestionIncidentes.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Departments");
+                    b.ToTable("Departments", (string)null);
                 });
 
             modelBuilder.Entity("GestionIncidentes.Domain.Entities.Incident", b =>
@@ -107,7 +107,7 @@ namespace GestionIncidentes.Infrastructure.Migrations
 
                     b.HasIndex("ReportedByUserId");
 
-                    b.ToTable("Incidents");
+                    b.ToTable("Incidents", (string)null);
                 });
 
             modelBuilder.Entity("GestionIncidentes.Domain.Entities.KnowledgeEntry", b =>
@@ -160,7 +160,7 @@ namespace GestionIncidentes.Infrastructure.Migrations
 
                     b.HasIndex("CreatedByUserId");
 
-                    b.ToTable("KnowledgeEntries");
+                    b.ToTable("KnowledgeEntries", (string)null);
                 });
 
             modelBuilder.Entity("GestionIncidentes.Domain.Entities.Notification", b =>
@@ -197,7 +197,7 @@ namespace GestionIncidentes.Infrastructure.Migrations
 
                     b.HasIndex("UserId", "IsRead");
 
-                    b.ToTable("Notifications");
+                    b.ToTable("Notifications", (string)null);
                 });
 
             modelBuilder.Entity("GestionIncidentes.Domain.Entities.Role", b =>
@@ -215,7 +215,7 @@ namespace GestionIncidentes.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Roles");
+                    b.ToTable("Roles", (string)null);
                 });
 
             modelBuilder.Entity("GestionIncidentes.Domain.Entities.SolutionStep", b =>
@@ -251,7 +251,7 @@ namespace GestionIncidentes.Infrastructure.Migrations
 
                     b.HasIndex("KnowledgeEntryId", "StepNumber");
 
-                    b.ToTable("SolutionSteps");
+                    b.ToTable("SolutionSteps", (string)null);
                 });
 
             modelBuilder.Entity("GestionIncidentes.Domain.Entities.Ticket", b =>
@@ -342,7 +342,7 @@ namespace GestionIncidentes.Infrastructure.Migrations
 
                     b.HasIndex("IncidentId");
 
-                    b.ToTable("Tickets");
+                    b.ToTable("Tickets", (string)null);
                 });
 
             modelBuilder.Entity("GestionIncidentes.Domain.Entities.TicketReport", b =>
@@ -384,7 +384,7 @@ namespace GestionIncidentes.Infrastructure.Migrations
 
                     b.HasIndex("TicketId");
 
-                    b.ToTable("TicketReports");
+                    b.ToTable("TicketReports", (string)null);
                 });
 
             modelBuilder.Entity("User", b =>
@@ -419,7 +419,7 @@ namespace GestionIncidentes.Infrastructure.Migrations
 
                     b.HasIndex("DepartmentId");
 
-                    b.ToTable("Users");
+                    b.ToTable("Users", (string)null);
                 });
 
             modelBuilder.Entity("GestionIncidentes.Domain.Entities.AuditLog", b =>

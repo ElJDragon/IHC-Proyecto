@@ -7,14 +7,24 @@ namespace GestionIncidentes.Application.Features.Knowledge.Queries;
 public class GetSolutionStepsByKnowledgeEntryQueryHandler : IRequestHandler<GetSolutionStepsByKnowledgeEntryQuery, List<SolutionStep>>
 {
     private readonly ISolutionStepRepository _repository;
+    private readonly IKnowledgeRepository _knowledgeRepository;
 
-    public GetSolutionStepsByKnowledgeEntryQueryHandler(ISolutionStepRepository repository)
+    public GetSolutionStepsByKnowledgeEntryQueryHandler(
+        ISolutionStepRepository repository,
+        IKnowledgeRepository knowledgeRepository)
     {
         _repository = repository;
+        _knowledgeRepository = knowledgeRepository;
     }
 
     public async Task<List<SolutionStep>> Handle(GetSolutionStepsByKnowledgeEntryQuery request, CancellationToken cancellationToken)
     {
-        return await _repository.GetStepsByKnowledgeEntryIdAsync(request.KnowledgeEntryId);
+        // Obtener el KnowledgeEntry para encontrar su SolutionId
+        var knowledgeEntry = await _knowledgeRepository.GetByIdAsync(request.KnowledgeEntryId);
+        
+        if (knowledgeEntry == null || !knowledgeEntry.SolutionId.HasValue)
+            return new List<SolutionStep>();
+        
+        return await _repository.GetStepsBySolutionIdAsync(knowledgeEntry.SolutionId.Value);
     }
 }

@@ -2,6 +2,7 @@
 @layout AdminLayout
 @rendermode InteractiveServer
 @inject IKnowledgeRepository KnowledgeRepo
+@inject ISolutionStepRepository SolutionStepRepo
 @inject NavigationManager Navigation
 @using GestionIncidentes.Application.Interfaces
 @using GestionIncidentes.Domain.Entities
@@ -86,8 +87,32 @@
                 <strong>Problema:</strong> @entry.Problem
               </div>
               <div style="color:var(--text-dark); font-size:14px; margin-bottom:12px">
-                <strong>Solución:</strong> @entry.Solution
+                <strong>Solución:</strong> @entry.SolutionDescription
               </div>
+              
+              @if(entry.SolutionId.HasValue && entrySteps.ContainsKey(entry.Id) && entrySteps[entry.Id].Count > 0)
+              {
+                <div style="margin-top:16px; padding:16px; background:var(--bg-light); border-radius:8px">
+                  <div style="display:flex; align-items:center; gap:8px; margin-bottom:12px">
+                    <span class="material-icons" style="color:var(--color-primary); font-size:20px">list_alt</span>
+                    <strong style="color:var(--text-dark)">Pasos de la solución:</strong>
+                  </div>
+                  <ol style="margin:0; padding-left:20px">
+                    @foreach(var step in entrySteps[entry.Id].OrderBy(s => s.StepNumber))
+                    {
+                      <li style="margin-bottom:8px; color:var(--text-dark)">
+                        <strong>@step.Title</strong>
+                        <p style="margin:4px 0 0 0; color:var(--text-gray); font-size:13px">@step.Description</p>
+                        @if(!string.IsNullOrEmpty(step.ImageUrl))
+                        {
+                          <img src="@step.ImageUrl" alt="@step.Title" style="max-width:100%; margin-top:8px; border-radius:6px" />
+                        }
+                      </li>
+                    }
+                  </ol>
+                </div>
+              }
+              
               @if(entry.Tags.Count > 0)
               {
                 <div style="display:flex; gap:8px; flex-wrap:wrap">
@@ -207,6 +232,7 @@
 
 @code {
   private List<KnowledgeEntry> entries = new();
+  private Dictionary<Guid, List<SolutionStep>> entrySteps = new();
   private bool isLoading = true;
   private string searchTerm = "";
   private string filterCategory = "";
@@ -229,6 +255,18 @@
   {
     isLoading = true;
     entries = await KnowledgeRepo.GetAllAsync();
+    
+    // Cargar los pasos de cada solución
+    entrySteps.Clear();
+    foreach(var entry in entries)
+    {
+      if(entry.SolutionId.HasValue)
+      {
+        var steps = await SolutionStepRepo.GetStepsBySolutionIdAsync(entry.SolutionId.Value);
+        entrySteps[entry.Id] = steps;
+      }
+    }
+    
     isLoading = false;
     StateHasChanged();
   }
@@ -243,7 +281,7 @@
       filtered = filtered.Where(e => 
         e.Title.ToLower().Contains(term) || 
         e.Problem.ToLower().Contains(term) || 
-        e.Solution.ToLower().Contains(term) ||
+        e.SolutionDescription.ToLower().Contains(term) ||
         e.Tags.Any(t => t.ToLower().Contains(term))
       );
     }
@@ -280,7 +318,7 @@
     formTitle = entry.Title;
     formCategory = entry.Category;
     formProblem = entry.Problem;
-    formSolution = entry.Solution;
+    formSolution = entry.SolutionDescription;
     formTags = string.Join(", ", entry.Tags);
     showModal = true;
   }

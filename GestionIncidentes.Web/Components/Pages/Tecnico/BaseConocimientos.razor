@@ -2,6 +2,7 @@
 @layout TecnicoLayout
 @rendermode InteractiveServer
 @inject IKnowledgeRepository KnowledgeRepo
+@inject ISolutionStepRepository SolutionStepRepo
 @inject NavigationManager Navigation
 @using GestionIncidentes.Application.Interfaces
 @using GestionIncidentes.Domain.Entities
@@ -86,7 +87,30 @@
                     <span class="material-icons" style="font-size:18px; color:var(--color-success)">check_circle</span>
                     <strong style="font-size:14px; color:var(--text-dark)">Solución:</strong>
                   </div>
-                  <p style="color:var(--text-dark); margin:0 0 0 26px; font-size:14px; line-height:1.6; white-space:pre-line">@entry.Solution</p>
+                  <p style="color:var(--text-dark); margin:0 0 0 26px; font-size:14px; line-height:1.6; white-space:pre-line">@entry.SolutionDescription</p>
+                  
+                  @if(entry.SolutionId.HasValue && entrySteps.ContainsKey(entry.Id) && entrySteps[entry.Id].Count > 0)
+                  {
+                    <div style="margin-top:16px; padding:16px; background:white; border-radius:8px; border:1px solid var(--border-color)">
+                      <div style="display:flex; align-items:center; gap:8px; margin-bottom:12px">
+                        <span class="material-icons" style="color:var(--color-primary); font-size:20px">format_list_numbered</span>
+                        <strong style="color:var(--text-dark)">Pasos detallados:</strong>
+                      </div>
+                      <ol style="margin:0; padding-left:20px">
+                        @foreach(var step in entrySteps[entry.Id].OrderBy(s => s.StepNumber))
+                        {
+                          <li style="margin-bottom:12px; color:var(--text-dark)">
+                            <strong>@step.Title</strong>
+                            <p style="margin:4px 0 0 0; color:var(--text-gray); font-size:13px; line-height:1.6">@step.Description</p>
+                            @if(!string.IsNullOrEmpty(step.ImageUrl))
+                            {
+                              <img src="@step.ImageUrl" alt="@step.Title" style="max-width:100%; margin-top:8px; border-radius:6px; border:1px solid var(--border-color)" />
+                            }
+                          </li>
+                        }
+                      </ol>
+                    </div>
+                  }
                 </div>
               }
               
@@ -146,6 +170,7 @@
 
 @code {
   private List<KnowledgeEntry> displayEntries = new();
+  private Dictionary<Guid, List<SolutionStep>> entrySteps = new();
   private bool isLoading = false;
   private string searchTerm = "";
   private string filterCategory = "";
@@ -160,6 +185,18 @@
   {
     isLoading = true;
     displayEntries = await KnowledgeRepo.GetAllAsync();
+    
+    // Cargar los pasos de cada solución
+    entrySteps.Clear();
+    foreach(var entry in displayEntries)
+    {
+      if(entry.SolutionId.HasValue)
+      {
+        var steps = await SolutionStepRepo.GetStepsBySolutionIdAsync(entry.SolutionId.Value);
+        entrySteps[entry.Id] = steps;
+      }
+    }
+    
     isLoading = false;
   }
 
@@ -183,6 +220,17 @@
     else if (!string.IsNullOrEmpty(filterCategory))
     {
       displayEntries = await KnowledgeRepo.GetByCategoryAsync(filterCategory);
+    }
+    
+    // Cargar los pasos de las entradas filtradas
+    entrySteps.Clear();
+    foreach(var entry in displayEntries)
+    {
+      if(entry.SolutionId.HasValue)
+      {
+        var steps = await SolutionStepRepo.GetStepsBySolutionIdAsync(entry.SolutionId.Value);
+        entrySteps[entry.Id] = steps;
+      }
     }
     
     isLoading = false;
