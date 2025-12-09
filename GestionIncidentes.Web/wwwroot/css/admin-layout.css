@@ -308,10 +308,26 @@
     color: var(--text-dark);
     text-decoration: none;
     transition: all 0.2s ease;
+    background: none;
+    border: none;
+    width: 100%;
+    text-align: left;
+    cursor: pointer;
+    font-size: 14px;
+    font-family: inherit;
 }
 
 .dropdown-item:hover {
     background-color: var(--background-light);
+}
+
+.dropdown-item.logout-btn:hover {
+    background-color: #FEE2E2;
+    color: #991B1B;
+}
+
+.dropdown-item.logout-btn:hover .material-icons {
+    color: #991B1B;
 }
 
 .dropdown-item .material-icons {

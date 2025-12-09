@@ -2,6 +2,12 @@
 @layout AdminLayout
 @rendermode InteractiveServer
 @inject NavigationManager Navigation
+@inject MediatR.IMediator Mediator
+@using GestionIncidentes.Application.Features.Tickets.Queries
+@using GestionIncidentes.Application.Features.Tickets.Dtos
+@using GestionIncidentes.Application.Interfaces
+@inject IUserRepository UserRepo
+@inject ITicketRepository TicketRepo
 
 <link rel="stylesheet" href="/css/pages.css" />
 
@@ -12,13 +18,30 @@
     <span style="margin: 0 8px">&gt;</span>
     <span>Administración</span>
     <span style="margin: 0 8px">&gt;</span>
-    <span style="color: var(--color-primary)">Historial de Incidentes</span>
+    <span style="color: var(--color-primary)">Historial de Tickets</span>
   </nav>
 
   <!-- Page Header -->
-  <div class="page-header" style="text-align: left">
-    <h1>Historial de Incidentes</h1>
-    <p>Registro completo de todos los incidentes resueltos y archivados</p>
+  <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 24px">
+    <div class="page-header" style="text-align: left; margin-bottom: 0">
+      <h1>Historial de Tickets</h1>
+      <p>Registro completo de todos los tickets asignados, resueltos y archivados</p>
+    </div>
+    
+    @if (!isLoading)
+    {
+      <button @onclick="InsertSampleData" disabled="@insertingData" style="padding: 12px 20px; background: var(--color-primary); color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 500; display: flex; align-items: center; gap: 8px; white-space: nowrap">
+        @if (insertingData)
+        {
+          <span>Insertando...</span>
+        }
+        else
+        {
+          <span class="material-icons" style="font-size: 20px">add_circle</span>
+          <span>Agregar Datos de Prueba</span>
+        }
+      </button>
+    }
   </div>
 
   <!-- Search and Filters -->
@@ -49,9 +72,22 @@
     <div class="card">
       <div style="display: flex; align-items: start; justify-content: space-between">
         <div>
-          <p style="color: var(--text-gray); font-size: 14px; margin-bottom: 8px">Total Resueltos</p>
-          <h2 style="font-size: 32px; font-weight: 600; margin: 0">342</h2>
-          <p style="color: var(--color-success); font-size: 13px; margin-top: 8px">Este mes</p>
+          <p style="color: var(--text-gray); font-size: 14px; margin-bottom: 8px">Total Tickets</p>
+          <h2 style="font-size: 32px; font-weight: 600; margin: 0">@GetFilteredTickets().Count</h2>
+          <p style="color: var(--text-gray); font-size: 13px; margin-top: 8px">Mostrando @GetFilteredTickets().Count de @ticketsWithUsers.Count</p>
+        </div>
+        <div style="width: 48px; height: 48px; background: #dbeafe; border-radius: 12px; display: flex; align-items: center; justify-content: center">
+          <span class="material-icons" style="color: #2563eb; font-size: 24px">confirmation_number</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div style="display: flex; align-items: start; justify-content: space-between">
+        <div>
+          <p style="color: var(--text-gray); font-size: 14px; margin-bottom: 8px">Resueltos</p>
+          <h2 style="font-size: 32px; font-weight: 600; margin: 0">@GetFilteredTickets().Count(t => t.Status == "Resuelto")</h2>
+          <p style="color: var(--color-success); font-size: 13px; margin-top: 8px">@GetPercentageResolved()% completado</p>
         </div>
         <div style="width: 48px; height: 48px; background: var(--color-success-bg); border-radius: 12px; display: flex; align-items: center; justify-content: center">
           <span class="material-icons" style="color: var(--color-success); font-size: 24px">check_circle</span>
@@ -62,12 +98,12 @@
     <div class="card">
       <div style="display: flex; align-items: start; justify-content: space-between">
         <div>
-          <p style="color: var(--text-gray); font-size: 14px; margin-bottom: 8px">Tiempo Promedio</p>
-          <h2 style="font-size: 32px; font-weight: 600; margin: 0">3.8h</h2>
-          <p style="color: var(--text-gray); font-size: 13px; margin-top: 8px">Resolución</p>
+          <p style="color: var(--text-gray); font-size: 14px; margin-bottom: 8px">En Proceso</p>
+          <h2 style="font-size: 32px; font-weight: 600; margin: 0">@GetFilteredTickets().Count(t => t.Status == "En Proceso" || t.Status == "En proceso")</h2>
+          <p style="color: var(--color-warning); font-size: 13px; margin-top: 8px">Tickets activos</p>
         </div>
-        <div style="width: 48px; height: 48px; background: #dbeafe; border-radius: 12px; display: flex; align-items: center; justify-content: center">
-          <span class="material-icons" style="color: #2563eb; font-size: 24px">schedule</span>
+        <div style="width: 48px; height: 48px; background: #fef3c7; border-radius: 12px; display: flex; align-items: center; justify-content: center">
+          <span class="material-icons" style="color: #d97706; font-size: 24px">pending</span>
         </div>
       </div>
     </div>
@@ -75,12 +111,12 @@
     <div class="card">
       <div style="display: flex; align-items: start; justify-content: space-between">
         <div>
-          <p style="color: var(--text-gray); font-size: 14px; margin-bottom: 8px">Satisfacción</p>
-          <h2 style="font-size: 32px; font-weight: 600; margin: 0">92%</h2>
-          <p style="color: var(--color-success); font-size: 13px; margin-top: 8px">+3% vs anterior</p>
+          <p style="color: var(--text-gray); font-size: 14px; margin-bottom: 8px">Pendientes</p>
+          <h2 style="font-size: 32px; font-weight: 600; margin: 0">@GetFilteredTickets().Count(t => t.Status == "Pendiente" || t.Status == "Open")</h2>
+          <p style="color: var(--text-gray); font-size: 13px; margin-top: 8px">Sin iniciar</p>
         </div>
-        <div style="width: 48px; height: 48px; background: var(--color-warning-bg); border-radius: 12px; display: flex; align-items: center; justify-content: center">
-          <span class="material-icons" style="color: var(--color-warning); font-size: 24px">thumb_up</span>
+        <div style="width: 48px; height: 48px; background: #fee2e2; border-radius: 12px; display: flex; align-items: center; justify-content: center">
+          <span class="material-icons" style="color: #dc2626; font-size: 24px">schedule</span>
         </div>
       </div>
     </div>
@@ -102,29 +138,52 @@
         </tr>
       </thead>
       <tbody>
-        @foreach (var item in GetFilteredHistorial())
+        @if (isLoading)
         {
           <tr>
-            <td><strong style="color: var(--color-primary)">@item.Id</strong></td>
-            <td>@item.Titulo</td>
-            <td><span class="badge badge-info">@item.Categoria</span></td>
-            <td style="color: var(--text-gray)">@item.Tecnico</td>
-            <td style="color: var(--text-gray); font-size: 13px">@item.FechaCreacion</td>
-            <td style="color: var(--text-gray); font-size: 13px">@item.FechaResolucion</td>
-            <td><span style="color: var(--color-success); font-weight: 500">@item.TiempoTotal</span></td>
-            <td>
-              <div style="display: flex; align-items: center; gap: 4px">
-                @for (int i = 0; i < item.Valoracion; i++)
-                {
-                  <span class="material-icons" style="font-size: 16px; color: #fbbf24">star</span>
-                }
-                @for (int i = item.Valoracion; i < 5; i++)
-                {
-                  <span class="material-icons" style="font-size: 16px; color: #e5e7eb">star</span>
-                }
-              </div>
+            <td colspan="8" style="text-align: center; padding: 40px">
+              <span class="material-icons" style="font-size: 48px; color: var(--text-gray); animation: spin 1s linear infinite">refresh</span>
+              <p style="margin-top: 16px; color: var(--text-gray)">Cargando historial...</p>
             </td>
           </tr>
+        }
+        else if (!GetFilteredTickets().Any())
+        {
+          <tr>
+            <td colspan="8" style="text-align: center; padding: 40px">
+              <span class="material-icons" style="font-size: 48px; color: var(--text-gray)">search_off</span>
+              <p style="margin-top: 16px; color: var(--text-gray)">No se encontraron tickets</p>
+            </td>
+          </tr>
+        }
+        else
+        {
+          @foreach (var item in GetFilteredTickets())
+          {
+            <tr style="cursor: pointer" @onclick="() => NavigateToTicketDetail(item.TicketId)">
+              <td><strong style="color: var(--color-primary)">TKT-@item.TicketId.ToString().Substring(0, 8)</strong></td>
+              <td>@item.Title</td>
+              <td><span class="badge badge-info">General</span></td>
+              <td style="color: var(--text-gray)">@(item.AssignedToUserName ?? "Sin asignar")</td>
+              <td style="color: var(--text-gray); font-size: 13px">@item.CreatedAt.ToString("yyyy-MM-dd HH:mm")</td>
+              <td style="color: var(--text-gray); font-size: 13px">
+                @if (item.Status == "Resuelto")
+                {
+                  <span style="color: var(--color-success)">Resuelto</span>
+                }
+                else
+                {
+                  <span style="color: var(--color-warning)">@item.Status</span>
+                }
+              </td>
+              <td>
+                <span style="color: var(--text-gray)">-</span>
+              </td>
+              <td>
+                <span style="color: var(--text-gray); font-size: 13px">Sin valorar</span>
+              </td>
+            </tr>
+          }
         }
       </tbody>
     </table>
@@ -134,49 +193,259 @@
 @code {
   private string searchQuery = "";
   private string filterMes = "all";
+  private List<TicketWithUserInfo> ticketsWithUsers = new();
+  private bool isLoading = true;
+  private bool insertingData = false;
 
-  private List<IncidenteHistorial> historial = new List<IncidenteHistorial>
+  protected override async Task OnInitializedAsync()
   {
-    new IncidenteHistorial { Id = "TKT-203", Titulo = "Pantalla no enciende", Categoria = "Hardware", Tecnico = "Ana Torres", FechaCreacion = "2025-11-30 08:45", FechaResolucion = "2025-11-30 11:20", TiempoTotal = "2h 35m", Valoracion = 5 },
-    new IncidenteHistorial { Id = "TKT-199", Titulo = "Monitor parpadeante", Categoria = "Hardware", Tecnico = "Luis García", FechaCreacion = "2025-11-29 09:15", FechaResolucion = "2025-11-29 12:45", TiempoTotal = "3h 30m", Valoracion = 4 },
-    new IncidenteHistorial { Id = "TKT-198", Titulo = "Licencia expirada", Categoria = "Software", Tecnico = "Carlos Méndez", FechaCreacion = "2025-11-28 15:45", FechaResolucion = "2025-11-28 17:20", TiempoTotal = "1h 35m", Valoracion = 5 },
-    new IncidenteHistorial { Id = "TKT-195", Titulo = "Teclado no responde", Categoria = "Hardware", Tecnico = "Ana Torres", FechaCreacion = "2025-11-27 10:15", FechaResolucion = "2025-11-27 14:30", TiempoTotal = "4h 15m", Valoracion = 4 },
-    new IncidenteHistorial { Id = "TKT-192", Titulo = "Impresora atascada", Categoria = "Hardware", Tecnico = "Luis García", FechaCreacion = "2025-11-26 13:20", FechaResolucion = "2025-11-26 15:45", TiempoTotal = "2h 25m", Valoracion = 5 },
-    new IncidenteHistorial { Id = "TKT-189", Titulo = "WiFi lento", Categoria = "Conectividad", Tecnico = "Carlos Méndez", FechaCreacion = "2025-11-25 08:00", FechaResolucion = "2025-11-25 16:30", TiempoTotal = "8h 30m", Valoracion = 3 },
-    new IncidenteHistorial { Id = "TKT-187", Titulo = "Software no actualiza", Categoria = "Software", Tecnico = "Ana Torres", FechaCreacion = "2025-11-24 11:45", FechaResolucion = "2025-11-24 13:15", TiempoTotal = "1h 30m", Valoracion = 5 },
-    new IncidenteHistorial { Id = "TKT-184", Titulo = "Proyector sin señal", Categoria = "Hardware", Tecnico = "Luis García", FechaCreacion = "2025-11-23 14:00", FechaResolucion = "2025-11-23 15:45", TiempoTotal = "1h 45m", Valoracion = 4 }
-  };
-
-  private List<IncidenteHistorial> GetFilteredHistorial()
-  {
-    return historial.Where(h =>
-      string.IsNullOrEmpty(searchQuery) || 
-      h.Titulo.Contains(searchQuery, StringComparison.OrdinalIgnoreCase) ||
-      h.Id.Contains(searchQuery, StringComparison.OrdinalIgnoreCase)
-    ).ToList();
+    await LoadTickets();
   }
 
-  public class IncidenteHistorial
+  private async Task InsertSampleData()
   {
-    public string Id { get; set; } = "";
-    public string Titulo { get; set; } = "";
-    public string Categoria { get; set; } = "";
-    public string Tecnico { get; set; } = "";
-    public string FechaCreacion { get; set; } = "";
-    public string FechaResolucion { get; set; } = "";
-    public string TiempoTotal { get; set; } = "";
-    public int Valoracion { get; set; }
+    try
+    {
+      insertingData = true;
+      
+      var users = await UserRepo.GetAllAsync();
+      var admins = users.Where(u => u.Role == "Administrador").ToList();
+      var tecnicos = users.Where(u => u.Role == "Tecnico").ToList();
+      var usuarios = users.Where(u => u.Role == "Usuario").ToList();
+      
+      var admin = admins.FirstOrDefault() ?? users.First();
+      var tech1 = tecnicos.ElementAtOrDefault(0) ?? users.First();
+      var tech2 = tecnicos.ElementAtOrDefault(1) ?? tech1;
+      var user1 = usuarios.FirstOrDefault() ?? users.First();
+
+      var tickets = new[]
+      {
+        new GestionIncidentes.Domain.Entities.Ticket
+        {
+          Title = "Internet no funciona en Laboratorio 301",
+          Description = "Los estudiantes no pueden acceder a internet",
+          Status = "Resuelto",
+          Priority = "Alta",
+          Category = "Conectividad",
+          CreatedAt = DateTime.UtcNow.AddDays(-5),
+          CreatedByUserId = user1.Id,
+          AssignedToUserId = tech1.Id,
+          SlaDeadline = DateTime.UtcNow.AddDays(-4),
+          Location = "Pabellón A",
+          LocationDetail = "Lab 301",
+          ProblemType = "hardware",
+          ResolvedAt = DateTime.UtcNow.AddDays(-4).AddHours(2),
+          Rating = 5
+        },
+        new GestionIncidentes.Domain.Entities.Ticket
+        {
+          Title = "Impresora HP no imprime",
+          Description = "La impresora no responde",
+          Status = "Resuelto",
+          Priority = "Media",
+          Category = "Hardware",
+          CreatedAt = DateTime.UtcNow.AddDays(-7),
+          CreatedByUserId = admin.Id,
+          AssignedToUserId = tech2.Id,
+          SlaDeadline = DateTime.UtcNow.AddDays(-6),
+          Location = "Administración",
+          ProblemType = "hardware",
+          ResolvedAt = DateTime.UtcNow.AddDays(-6).AddHours(3),
+          Rating = 5
+        },
+        new GestionIncidentes.Domain.Entities.Ticket
+        {
+          Title = "Proyector sin señal en aula 202",
+          Description = "El proyector enciende pero no muestra imagen",
+          Status = "En Proceso",
+          Priority = "Alta",
+          Category = "Hardware",
+          CreatedAt = DateTime.UtcNow.AddDays(-2),
+          CreatedByUserId = user1.Id,
+          AssignedToUserId = tech1.Id,
+          SlaDeadline = DateTime.UtcNow.AddDays(1),
+          Location = "Pabellón B",
+          LocationDetail = "Aula 202",
+          ProblemType = "hardware"
+        },
+        new GestionIncidentes.Domain.Entities.Ticket
+        {
+          Title = "AutoCAD no inicia",
+          Description = "Error de licencia al abrir AutoCAD",
+          Status = "Pendiente",
+          Priority = "Media",
+          Category = "Software",
+          CreatedAt = DateTime.UtcNow.AddDays(-1),
+          CreatedByUserId = user1.Id,
+          SlaDeadline = DateTime.UtcNow.AddDays(2),
+          Location = "Lab Arquitectura",
+          ProblemType = "software",
+          ProgramName = "AutoCAD"
+        },
+        new GestionIncidentes.Domain.Entities.Ticket
+        {
+          Title = "PC-15 muy lenta",
+          Description = "La computadora tarda mucho en iniciar",
+          Status = "Resuelto",
+          Priority = "Baja",
+          Category = "Hardware",
+          CreatedAt = DateTime.UtcNow.AddDays(-10),
+          CreatedByUserId = user1.Id,
+          AssignedToUserId = tech2.Id,
+          SlaDeadline = DateTime.UtcNow.AddDays(-8),
+          Location = "Sala Profesores",
+          ProblemType = "hardware",
+          ResolvedAt = DateTime.UtcNow.AddDays(-8).AddHours(1),
+          Rating = 4
+        }
+      };
+
+      foreach (var ticket in tickets)
+      {
+        await TicketRepo.AddAsync(ticket);
+      }
+
+      await LoadTickets();
+    }
+    catch (Exception ex)
+    {
+      Console.WriteLine($"Error insertando datos: {ex.Message}");
+    }
+    finally
+    {
+      insertingData = false;
+    }
+  }
+
+  private async Task LoadTickets()
+  {
+    try
+    {
+      isLoading = true;
+      var tickets = await Mediator.Send(new GetAllTicketsQuery());
+      Console.WriteLine($"[AdminHistorial] Tickets obtenidos: {tickets.Count}");
+      
+      // Enriquecer con información de usuarios
+      ticketsWithUsers = new List<TicketWithUserInfo>();
+      foreach (var ticket in tickets)
+      {
+        string? assignedToName = null;
+        
+        if (ticket.AssignedToUserId.HasValue)
+        {
+          var user = await UserRepo.GetByIdAsync(ticket.AssignedToUserId.Value);
+          assignedToName = user?.FullName;
+        }
+        
+        ticketsWithUsers.Add(new TicketWithUserInfo
+        {
+          TicketId = ticket.Id,
+          Title = ticket.Title,
+          Description = ticket.Description,
+          Status = ticket.Status,
+          CreatedAt = ticket.CreatedAt,
+          AssignedToUserId = ticket.AssignedToUserId,
+          AssignedToUserName = assignedToName
+        });
+      }
+    }
+    catch (Exception ex)
+    {
+      Console.WriteLine($"Error loading tickets: {ex.Message}");
+      ticketsWithUsers = new List<TicketWithUserInfo>();
+    }
+    finally
+    {
+      isLoading = false;
+    }
+  }
+
+  private List<TicketWithUserInfo> GetFilteredTickets()
+  {
+    var filtered = ticketsWithUsers.AsEnumerable();
+    
+    // Filtro de búsqueda
+    if (!string.IsNullOrEmpty(searchQuery))
+    {
+      filtered = filtered.Where(t =>
+        t.Title.Contains(searchQuery, StringComparison.OrdinalIgnoreCase) ||
+        t.TicketId.ToString().Contains(searchQuery, StringComparison.OrdinalIgnoreCase) ||
+        (t.AssignedToUserName != null && t.AssignedToUserName.Contains(searchQuery, StringComparison.OrdinalIgnoreCase))
+      );
+    }
+    
+    // Filtro de mes
+    if (filterMes != "all")
+    {
+      if (int.TryParse(filterMes, out int month))
+      {
+        filtered = filtered.Where(t => t.CreatedAt.Month == month && t.CreatedAt.Year == 2025);
+      }
+    }
+    
+    return filtered.ToList();
+  }
+
+  private int GetPercentageResolved()
+  {
+    if (ticketsWithUsers.Count == 0) return 0;
+    return (int)((double)ticketsWithUsers.Count(t => t.Status == "Resuelto") / ticketsWithUsers.Count * 100);
+  }
+
+  private void NavigateToTicketDetail(Guid ticketId)
+  {
+    // TODO: Navegar a página de detalle del ticket
+    Console.WriteLine($"Navigate to ticket detail: {ticketId}");
+  }
+
+  private class TicketWithUserInfo
+  {
+    public Guid TicketId { get; set; }
+    public string Title { get; set; } = "";
+    public string Description { get; set; } = "";
+    public string Status { get; set; } = "";
+    public DateTime CreatedAt { get; set; }
+    public Guid? AssignedToUserId { get; set; }
+    public string? AssignedToUserName { get; set; }
   }
 }
 
 <style>
-.badge-info {
+.badge {
   display: inline-block;
   padding: 4px 10px;
   border-radius: 12px;
   font-size: 12px;
   font-weight: 500;
+}
+
+.badge-info {
   background: #dbeafe;
   color: #2563eb;
+}
+
+.badge-hardware {
+  background: #fee2e2;
+  color: #dc2626;
+}
+
+.badge-software {
+  background: #dbeafe;
+  color: #2563eb;
+}
+
+.badge-connectivity {
+  background: #fef3c7;
+  color: #d97706;
+}
+
+.badge-security {
+  background: #f3e8ff;
+  color: #9333ea;
+}
+
+@@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
 }
 </style>

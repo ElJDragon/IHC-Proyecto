@@ -1,0 +1,319 @@
+@page "/admin/incidentes"
+@layout AdminLayout
+@rendermode InteractiveServer
+@inject MediatR.IMediator Mediator
+@inject IJSRuntime JSRuntime
+@using GestionIncidentes.Application.Features.Incidents.Queries
+@using GestionIncidentes.Application.Features.Incidents.Commands
+@using GestionIncidentes.Application.Features.Tickets.Queries
+
+<link rel="stylesheet" href="/css/pages.css" />
+<link rel="stylesheet" href="/css/admin.css" />
+<link rel="stylesheet" href="/css/incidents.css" />
+
+<div class="page-container">
+  <div class="page-header">
+    <div>
+      <h1 class="page-title">📋 Incidentes Reportados</h1>
+      <p class="page-subtitle">Incidentes pendientes de asignar a técnico</p>
+    </div>
+    <button class="btn-primary" @onclick="RefreshIncidents">
+      <span class="material-icons">refresh</span>
+      Actualizar
+    </button>
+  </div>
+
+  @if (isLoading)
+  {
+    <div style="text-align:center; padding:60px">
+      <div class="loading-spinner"></div>
+      <p style="margin-top:16px; color:var(--text-gray)">Cargando incidentes...</p>
+    </div>
+  }
+  else if (!incidents.Any())
+  {
+    <div class="empty-state">
+      <span class="material-icons" style="font-size:64px; color:var(--text-light)">check_circle</span>
+      <h3>No hay incidentes pendientes</h3>
+      <p>Todos los incidentes han sido asignados a técnicos</p>
+    </div>
+  }
+  else
+  {
+    <div class="stats-grid" style="margin-bottom:24px">
+      <div class="stat-card">
+        <span class="material-icons" style="color:var(--color-warning)">warning</span>
+        <div>
+          <div class="stat-value">@incidents.Count</div>
+          <div class="stat-label">Incidentes sin asignar</div>
+        </div>
+      </div>
+      <div class="stat-card">
+        <span class="material-icons" style="color:var(--color-info)">access_time</span>
+        <div>
+          <div class="stat-value">@incidents.Count(i => (DateTime.UtcNow - i.ReportedAt).TotalHours < 24)</div>
+          <div class="stat-label">Últimas 24 horas</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="table-container">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Título</th>
+            <th>Reportado por</th>
+            <th>Fecha</th>
+            <th>Antigüedad</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          @foreach (var incident in incidents)
+          {
+            var age = DateTime.UtcNow - incident.ReportedAt;
+            var ageColor = age.TotalHours > 48 ? "var(--color-error)" : age.TotalHours > 24 ? "var(--color-warning)" : "var(--text-gray)";
+            
+            <tr>
+              <td>
+                <div style="font-weight:500">@incident.Title</div>
+                <div style="font-size:13px; color:var(--text-gray); margin-top:4px">
+                  @(incident.Description.Length > 100 ? incident.Description.Substring(0, 100) + "..." : incident.Description)
+                </div>
+              </td>
+              <td>@incident.ReportedByUserName</td>
+              <td>@incident.ReportedAt.ToLocalTime().ToString("dd/MM/yyyy HH:mm")</td>
+              <td>
+                <span style="color:@ageColor; font-weight:500">
+                  @if (age.TotalHours < 1)
+                  {
+                    <text>@((int)age.TotalMinutes) min</text>
+                  }
+                  else if (age.TotalHours < 24)
+                  {
+                    <text>@((int)age.TotalHours) horas</text>
+                  }
+                  else
+                  {
+                    <text>@((int)age.TotalDays) días</text>
+                  }
+                </span>
+              </td>
+              <td>
+                <button class="btn-secondary btn-sm" @onclick="() => OpenAssignModal(incident)">
+                  <span class="material-icons">person_add</span>
+                  Asignar Técnico
+                </button>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+</div>
+
+@* Modal de Asignación *@
+@if (showAssignModal && selectedIncident != null)
+{
+  <div class="modal-overlay" @onclick="CloseAssignModal">
+    <div class="modal-content" @onclick:stopPropagation style="max-width:800px">
+      <div class="modal-header">
+        <h2>🎯 Asignar Técnico al Incidente</h2>
+        <button class="btn-icon" @onclick="CloseAssignModal">
+          <span class="material-icons">close</span>
+        </button>
+      </div>
+      
+      <div class="modal-body">
+        <div style="background:var(--bg-secondary); padding:16px; border-radius:8px; margin-bottom:24px">
+          <div style="font-weight:600; margin-bottom:8px">📋 Incidente:</div>
+          <div style="font-size:15px">@selectedIncident.Title</div>
+          <div style="font-size:13px; color:var(--text-gray); margin-top:4px">
+            Reportado por <strong>@selectedIncident.ReportedByUserName</strong> el @selectedIncident.ReportedAt.ToLocalTime().ToString("dd/MM/yyyy HH:mm")
+          </div>
+        </div>
+
+        @if (loadingTechnicians)
+        {
+          <div style="text-align:center; padding:40px">
+            <div class="loading-spinner"></div>
+            <p style="margin-top:16px">Cargando técnicos disponibles...</p>
+          </div>
+        }
+        else
+        {
+          <div style="margin-bottom:16px">
+            <h3 style="font-size:16px; margin-bottom:12px">Selecciona un Técnico:</h3>
+            <p style="font-size:13px; color:var(--text-gray); margin-bottom:16px">
+              Los técnicos están ordenados por carga de trabajo (menor a mayor)
+            </p>
+          </div>
+
+          <div style="display:grid; gap:12px">
+            @foreach (var tech in technicians)
+            {
+              var isSelected = selectedTechnicianId == tech.TechnicianId;
+              var cardStyle = isSelected 
+                ? "border:2px solid var(--color-primary); background:var(--color-primary-light)" 
+                : "border:2px solid var(--border-color)";
+              
+              <div class="choice-card" 
+                   style="@cardStyle; cursor:pointer; padding:16px"
+                   @onclick="() => selectedTechnicianId = tech.TechnicianId">
+                <div style="display:flex; align-items:start; gap:16px">
+                  <div style="flex:1">
+                    <div style="display:flex; align-items:center; gap:8px; margin-bottom:8px">
+                      @if (isSelected)
+                      {
+                        <span class="material-icons" style="color:var(--color-primary); font-size:20px">check_circle</span>
+                      }
+                      else
+                      {
+                        <span class="material-icons" style="color:var(--text-light); font-size:20px">radio_button_unchecked</span>
+                      }
+                      <span style="font-weight:600; font-size:15px">@tech.TechnicianName</span>
+                    </div>
+                    <div style="font-size:13px; color:var(--text-gray); margin-bottom:12px">
+                      📍 @tech.Department
+                    </div>
+                    <div style="display:grid; grid-template-columns:repeat(4, 1fr); gap:12px">
+                      <div>
+                        <div style="font-size:20px; font-weight:600; color:var(--color-warning)">@tech.ActiveTickets</div>
+                        <div style="font-size:11px; color:var(--text-gray)">En proceso</div>
+                      </div>
+                      <div>
+                        <div style="font-size:20px; font-weight:600; color:var(--color-info)">@tech.PendingTickets</div>
+                        <div style="font-size:11px; color:var(--text-gray)">Pendientes</div>
+                      </div>
+                      <div>
+                        <div style="font-size:20px; font-weight:600; color:var(--color-success)">@tech.ResolvedToday</div>
+                        <div style="font-size:11px; color:var(--text-gray)">Hoy</div>
+                      </div>
+                      <div>
+                        <div style="font-size:20px; font-weight:600">@tech.TotalResolved</div>
+                        <div style="font-size:11px; color:var(--text-gray)">Total</div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            }
+          </div>
+        }
+      </div>
+      
+      <div class="modal-footer">
+        <button class="btn-secondary" @onclick="CloseAssignModal">Cancelar</button>
+        <button class="btn-primary" disabled="@(selectedTechnicianId == null || assigningTicket)" @onclick="AssignTechnician">
+          @if (assigningTicket)
+          {
+            <span class="loading-spinner" style="width:16px; height:16px"></span>
+            <text>Asignando...</text>
+          }
+          else
+          {
+            <span class="material-icons">check</span>
+            <text>Crear Ticket y Asignar</text>
+          }
+        </button>
+      </div>
+    </div>
+  </div>
+}
+
+@code {
+  private bool isLoading = true;
+  private List<UnassignedIncidentDto> incidents = new();
+  
+  private bool showAssignModal = false;
+  private UnassignedIncidentDto? selectedIncident = null;
+  private bool loadingTechnicians = false;
+  private List<TechnicianWorkloadDto> technicians = new();
+  private Guid? selectedTechnicianId = null;
+  private bool assigningTicket = false;
+
+  protected override async Task OnInitializedAsync()
+  {
+    await RefreshIncidents();
+  }
+
+  private async Task RefreshIncidents()
+  {
+    isLoading = true;
+    try
+    {
+      var query = new GetUnassignedIncidentsQuery();
+      incidents = await Mediator.Send(query);
+    }
+    catch (Exception ex)
+    {
+      Console.WriteLine($"Error loading incidents: {ex.Message}");
+      await JSRuntime.InvokeVoidAsync("alert", "Error al cargar los incidentes");
+    }
+    finally
+    {
+      isLoading = false;
+    }
+  }
+
+  private async Task OpenAssignModal(UnassignedIncidentDto incident)
+  {
+    selectedIncident = incident;
+    selectedTechnicianId = null;
+    showAssignModal = true;
+    
+    loadingTechnicians = true;
+    try
+    {
+      var query = new GetTechnicianWorkloadQuery();
+      technicians = await Mediator.Send(query);
+    }
+    catch (Exception ex)
+    {
+      Console.WriteLine($"Error loading technicians: {ex.Message}");
+      await JSRuntime.InvokeVoidAsync("alert", "Error al cargar los técnicos");
+    }
+    finally
+    {
+      loadingTechnicians = false;
+    }
+  }
+
+  private void CloseAssignModal()
+  {
+    showAssignModal = false;
+    selectedIncident = null;
+    selectedTechnicianId = null;
+  }
+
+  private async Task AssignTechnician()
+  {
+    if (selectedIncident == null || selectedTechnicianId == null) return;
+
+    assigningTicket = true;
+    try
+    {
+      var command = new AssignIncidentToTechnicianCommand(
+        selectedIncident.Id,
+        selectedTechnicianId.Value
+      );
+      
+      var ticketId = await Mediator.Send(command);
+      
+      await JSRuntime.InvokeVoidAsync("alert", $"✅ Ticket creado y asignado exitosamente.\n\nID del ticket: {ticketId}");
+      
+      CloseAssignModal();
+      await RefreshIncidents();
+    }
+    catch (Exception ex)
+    {
+      Console.WriteLine($"Error assigning technician: {ex.Message}");
+      await JSRuntime.InvokeVoidAsync("alert", "❌ Error al asignar el técnico. Por favor intenta nuevamente.");
+    }
+    finally
+    {
+      assigningTicket = false;
+    }
+  }
+}

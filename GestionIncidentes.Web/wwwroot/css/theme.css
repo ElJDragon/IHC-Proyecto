@@ -422,3 +422,470 @@ select {
 .overflow-hidden {
   overflow: hidden;
 }
+
+/* ============================================
+   TEMAS DE ACCESIBILIDAD
+   ============================================ */
+
+/* Principio #1: CONSISTENCIA - Variables globales para uso consistente */
+:root {
+  /* Estados del sistema (Principio #2: Visibilidad del Estado) */
+  --state-loading: #3b82f6;
+  --state-processing: #f59e0b;
+  --state-error: #ef4444;
+  --state-success: #10b981;
+  
+  /* Semántica del Color (Principio #8) */
+  --semantic-error: #ef4444;
+  --semantic-warning: #f59e0b;
+  --semantic-success: #10b981;
+  --semantic-info: #3b82f6;
+  
+  /* Contraste de texto (Principio #11) */
+  --text-on-light: #1f2937;
+  --text-on-dark: #f9fafb;
+  --min-contrast-ratio: 4.5; /* WCAG AA standard */
+}
+
+/* Modo Oscuro */
+[data-theme="dark"] {
+  --color-primary: #60a5fa;
+  --color-primary-hover: #3b82f6;
+  --color-primary-light: #1e3a8a;
+  
+  --color-background: #111827;
+  --color-surface: #1f2937;
+  --color-border: #374151;
+  --border-color: #374151;
+  
+  --color-text-primary: #f9fafb;
+  --color-text-secondary: #d1d5db;
+  --color-text-tertiary: #9ca3af;
+  
+  --color-critical: #ef4444;
+  --color-critical-bg: #7f1d1d;
+  --color-warning: #f59e0b;
+  --color-warning-bg: #78350f;
+  --color-success: #10b981;
+  --color-success-bg: #064e3b;
+  
+  --color-bg-secondary: #374151;
+  
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.4), 0 2px 4px -1px rgba(0, 0, 0, 0.2);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.4), 0 4px 6px -2px rgba(0, 0, 0, 0.2);
+}
+
+/* Modo Daltónico - Protanopia (dificultad con rojos) */
+[data-colorblind="protanopia"] {
+  --color-critical: #9ca3af;
+  --color-critical-bg: #f3f4f6;
+  --color-warning: #fbbf24;
+  --color-success: #3b82f6;
+  --color-primary: #1e40af;
+}
+
+/* Modo Daltónico - Deuteranopia (dificultad con verdes) */
+[data-colorblind="deuteranopia"] {
+  --color-critical: #ef4444;
+  --color-warning: #f59e0b;
+  --color-success: #6366f1;
+  --color-primary: #0ea5e9;
+}
+
+/* Modo Daltónico - Tritanopia (dificultad con azules) */
+[data-colorblind="tritanopia"] {
+  --color-critical: #dc2626;
+  --color-warning: #f472b6;
+  --color-success: #14b8a6;
+  --color-primary: #22c55e;
+}
+
+/* Alto Contraste */
+[data-contrast="high"] {
+  --color-text-primary: #000000;
+  --color-text-secondary: #1a1a1a;
+  --color-border: #000000;
+  --border-color: #000000;
+}
+
+[data-contrast="high"][data-theme="dark"] {
+  --color-text-primary: #ffffff;
+  --color-text-secondary: #f0f0f0;
+  --color-background: #000000;
+  --color-surface: #0a0a0a;
+}
+
+/* Reducir animaciones */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* ============================================
+   PRINCIPIOS DE IHC IMPLEMENTADOS
+   ============================================ */
+
+/* Principio #2: VISIBILIDAD DEL ESTADO */
+.loading-spinner {
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+  border: 3px solid rgba(59, 130, 246, 0.3);
+  border-radius: 50%;
+  border-top-color: #3b82f6;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.state-indicator {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 0.75rem;
+  border-radius: 0.375rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+.state-indicator.loading {
+  background-color: #dbeafe;
+  color: #1e40af;
+}
+
+.state-indicator.processing {
+  background-color: #fef3c7;
+  color: #92400e;
+}
+
+.state-indicator.success {
+  background-color: #d1fae5;
+  color: #065f46;
+}
+
+.state-indicator.error {
+  background-color: #fee2e2;
+  color: #991b1b;
+}
+
+/* Principio #3: MEMORIA DE TRABAJO (Chunking) - Tarjetas agrupan 7±2 elementos */
+.card-group {
+  display: grid;
+  gap: 1rem;
+  max-width: 100%;
+}
+
+.card-compact {
+  border: 1px solid var(--color-border);
+  border-radius: var(--border-radius-md);
+  padding: 1rem;
+  background: var(--color-surface);
+}
+
+/* Límite visual de elementos por grupo (7±2) */
+.item-list > *:nth-child(n+8) {
+  margin-top: 1.5rem;
+  padding-top: 1.5rem;
+  border-top: 2px solid var(--color-border);
+}
+
+/* Principio #4: LEY DE PROXIMIDAD - Breadcrumbs */
+.breadcrumbs {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1rem;
+  background: var(--color-surface);
+  border-radius: var(--border-radius-md);
+  font-size: 0.875rem;
+  margin-bottom: 1rem;
+}
+
+.breadcrumb-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--color-text-secondary);
+}
+
+.breadcrumb-item.active {
+  color: var(--color-text-primary);
+  font-weight: 500;
+}
+
+.breadcrumb-separator {
+  color: var(--color-text-tertiary);
+}
+
+/* Principio #5: REGIÓN COMÚN - Agrupación visual */
+.region-group {
+  border: 2px solid var(--color-border);
+  border-radius: var(--border-radius-lg);
+  padding: 1.5rem;
+  background: var(--color-surface);
+}
+
+.region-group > * + * {
+  margin-top: 1rem;
+}
+
+/* Principio #6: WAYFINDING - Indicadores de ubicación */
+.nav-indicator {
+  position: relative;
+}
+
+.nav-indicator.active::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 4px;
+  background: var(--color-primary);
+  border-radius: 0 4px 4px 0;
+}
+
+.nav-indicator.active {
+  background: rgba(59, 130, 246, 0.1);
+  font-weight: 600;
+}
+
+/* Principio #7: FAMILIARIDAD - Iconos reconocibles con texto */
+.icon-with-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.icon-with-label .icon {
+  font-size: 1.25rem;
+  flex-shrink: 0;
+}
+
+/* Principio #8: USO DEL COLOR (Semántica) - Estados con colores y sin depender solo del color */
+.semantic-error {
+  color: var(--semantic-error);
+  background-color: #fee2e2;
+  border-left: 4px solid var(--semantic-error);
+  padding: 0.75rem 1rem;
+  border-radius: 0.375rem;
+}
+
+.semantic-error::before {
+  content: '❌ ';
+  font-weight: bold;
+}
+
+.semantic-warning {
+  color: #92400e;
+  background-color: #fef3c7;
+  border-left: 4px solid var(--semantic-warning);
+  padding: 0.75rem 1rem;
+  border-radius: 0.375rem;
+}
+
+.semantic-warning::before {
+  content: '⚠️ ';
+  font-weight: bold;
+}
+
+.semantic-success {
+  color: #065f46;
+  background-color: #d1fae5;
+  border-left: 4px solid var(--semantic-success);
+  padding: 0.75rem 1rem;
+  border-radius: 0.375rem;
+}
+
+.semantic-success::before {
+  content: '✅ ';
+  font-weight: bold;
+}
+
+.semantic-info {
+  color: #1e40af;
+  background-color: #dbeafe;
+  border-left: 4px solid var(--semantic-info);
+  padding: 0.75rem 1rem;
+  border-radius: 0.375rem;
+}
+
+.semantic-info::before {
+  content: 'ℹ️ ';
+  font-weight: bold;
+}
+
+/* Principio #9: DISEÑO DE FORMULARIOS - Placeholders y requisitos */
+.form-field {
+  margin-bottom: 1.5rem;
+}
+
+.form-field label {
+  display: block;
+  font-weight: 500;
+  margin-bottom: 0.5rem;
+  color: var(--color-text-primary);
+}
+
+.form-field .required-indicator {
+  color: var(--semantic-error);
+  font-weight: bold;
+}
+
+.form-field input,
+.form-field textarea,
+.form-field select {
+  width: 100%;
+  padding: 0.75rem;
+  border: 2px solid var(--color-border);
+  border-radius: var(--border-radius-md);
+  font-size: 1rem;
+  transition: border-color 0.2s;
+}
+
+.form-field input:focus,
+.form-field textarea:focus,
+.form-field select:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.form-field .field-hint {
+  font-size: 0.875rem;
+  color: var(--color-text-secondary);
+  margin-top: 0.25rem;
+}
+
+.form-field.error input,
+.form-field.error textarea,
+.form-field.error select {
+  border-color: var(--semantic-error);
+}
+
+.form-field .error-message {
+  font-size: 0.875rem;
+  color: var(--semantic-error);
+  margin-top: 0.25rem;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+/* Principio #10: ACCESIBILIDAD - Iconos con alternativas de texto */
+.accessible-icon {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.accessible-icon[aria-label]::after {
+  content: attr(aria-label);
+  position: absolute;
+  left: 50%;
+  top: -2rem;
+  transform: translateX(-50%);
+  background: rgba(0, 0, 0, 0.9);
+  color: white;
+  padding: 0.25rem 0.5rem;
+  border-radius: 0.25rem;
+  font-size: 0.75rem;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s;
+}
+
+.accessible-icon:hover[aria-label]::after,
+.accessible-icon:focus[aria-label]::after {
+  opacity: 1;
+}
+
+/* SVG sin etiquetas de texto - añadir role y aria-label */
+svg:not([aria-label]):not([role="presentation"]) {
+  border: 2px dashed orange;
+}
+
+/* Principio #11: CONTRASTE DE TEXTO */
+.high-contrast-text {
+  color: var(--color-text-primary);
+  font-weight: 500;
+}
+
+/* Texto sobre fondos claros */
+.text-on-light {
+  color: #1f2937;
+  font-weight: 500;
+}
+
+/* Texto sobre fondos oscuros */
+.text-on-dark {
+  color: #f9fafb;
+  font-weight: 500;
+}
+
+/* Verificación de contraste - resaltar texto con bajo contraste */
+.low-contrast-warning {
+  outline: 2px dashed #f59e0b;
+  outline-offset: 2px;
+}
+
+/* Alto contraste mejorado */
+[data-contrast="high"] {
+  --color-text-primary: #000000;
+  --color-text-secondary: #1a1a1a;
+  --color-border: #000000;
+  --border-color: #000000;
+  font-weight: 600 !important;
+}
+
+[data-contrast="high"] .form-field input,
+[data-contrast="high"] .form-field textarea,
+[data-contrast="high"] .form-field select {
+  border-width: 3px;
+}
+
+[data-contrast="high"][data-theme="dark"] {
+  --color-text-primary: #ffffff;
+  --color-text-secondary: #f0f0f0;
+  --color-background: #000000;
+  --color-surface: #0a0a0a;
+}
+
+/* ============================================
+   UTILIDADES ADICIONALES
+   ============================================ */
+
+/* Espaciado consistente (Principio #1: Consistencia) */
+.spacing-xs { margin-bottom: 0.25rem; }
+.spacing-sm { margin-bottom: 0.5rem; }
+.spacing-md { margin-bottom: 1rem; }
+.spacing-lg { margin-bottom: 1.5rem; }
+.spacing-xl { margin-bottom: 2rem; }
+
+/* Enfoque visible para navegación por teclado */
+*:focus-visible {
+  outline: 3px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+/* Mejora de legibilidad */
+.readable-content {
+  max-width: 65ch;
+  line-height: 1.6;
+  font-size: 1rem;
+}
+
+/* Transiciones suaves (respetando prefers-reduced-motion) */
+@media (prefers-reduced-motion: no-preference) {
+  .smooth-transition {
+    transition: all 0.2s ease-in-out;
+  }
+}

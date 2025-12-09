@@ -1,46 +1,3 @@
-C:\Users\User\Documents\Joshua Universidad\Quinto\IHC\Proyecto-2do-Parcial-IHC\GestionIncidentes.Infrastructure\bin\Debug\net9.0\GestionIncidentes.Infrastructure.deps.json
-C:\Users\User\Documents\Joshua Universidad\Quinto\IHC\Proyecto-2do-Parcial-IHC\GestionIncidentes.Infrastructure\bin\Debug\net9.0\GestionIncidentes.Infrastructure.dll
-C:\Users\User\Documents\Joshua Universidad\Quinto\IHC\Proyecto-2do-Parcial-IHC\GestionIncidentes.Infrastructure\bin\Debug\net9.0\GestionIncidentes.Infrastructure.pdb
-C:\Users\User\Documents\Joshua Universidad\Quinto\IHC\Proyecto-2do-Parcial-IHC\GestionIncidentes.Infrastructure\bin\Debug\net9.0\GestionIncidentes.Application.dll
-C:\Users\User\Documents\Joshua Universidad\Quinto\IHC\Proyecto-2do-Parcial-IHC\GestionIncidentes.Infrastructure\bin\Debug\net9.0\GestionIncidentes.Domain.dll
-C:\Users\User\Documents\Joshua Universidad\Quinto\IHC\Proyecto-2do-Parcial-IHC\GestionIncidentes.Infrastructure\bin\Debug\net9.0\GestionIncidentes.Application.pdb
-C:\Users\User\Documents\Joshua Universidad\Quinto\IHC\Proyecto-2do-Parcial-IHC\GestionIncidentes.Infrastructure\bin\Debug\net9.0\GestionIncidentes.Domain.pdb
-C:\Users\User\Documents\Joshua Universidad\Quinto\IHC\Proyecto-2do-Parcial-IHC\GestionIncidentes.Infrastructure\obj\Debug\net9.0\GestionIncidentes.Infrastructure.csproj.AssemblyReference.cache
-C:\Users\User\Documents\Joshua Universidad\Quinto\IHC\Proyecto-2do-Parcial-IHC\GestionIncidentes.Infrastructure\obj\Debug\net9.0\GestionIncidentes.Infrastructure.GeneratedMSBuildEditorConfig.editorconfig
-C:\Users\User\Documents\Joshua Universidad\Quinto\IHC\Proyecto-2do-Parcial-IHC\GestionIncidentes.Infrastructure\obj\Debug\net9.0\GestionIncidentes.Infrastructure.AssemblyInfoInputs.cache
-C:\Users\User\Documents\Joshua Universidad\Quinto\IHC\Proyecto-2do-Parcial-IHC\GestionIncidentes.Infrastructure\obj\Debug\net9.0\GestionIncidentes.Infrastructure.AssemblyInfo.cs
-C:\Users\User\Documents\Joshua Universidad\Quinto\IHC\Proyecto-2do-Parcial-IHC\GestionIncidentes.Infrastructure\obj\Debug\net9.0\GestionIncidentes.Infrastructure.csproj.CoreCompileInputs.cache
-C:\Users\User\Documents\Joshua Universidad\Quinto\IHC\Proyecto-2do-Parcial-IHC\GestionIncidentes.Infrastructure\obj\Debug\net9.0\GestionI.5974F21A.Up2Date
-C:\Users\User\Documents\Joshua Universidad\Quinto\IHC\Proyecto-2do-Parcial-IHC\GestionIncidentes.Infrastructure\obj\Debug\net9.0\GestionIncidentes.Infrastructure.dll
-C:\Users\User\Documents\Joshua Universidad\Quinto\IHC\Proyecto-2do-Parcial-IHC\GestionIncidentes.Infrastructure\obj\Debug\net9.0\refint\GestionIncidentes.Infrastructure.dll
-C:\Users\User\Documents\Joshua Universidad\Quinto\IHC\Proyecto-2do-Parcial-IHC\GestionIncidentes.Infrastructure\obj\Debug\net9.0\GestionIncidentes.Infrastructure.pdb
-C:\Users\User\Documents\Joshua Universidad\Quinto\IHC\Proyecto-2do-Parcial-IHC\GestionIncidentes.Infrastructure\obj\Debug\net9.0\ref\GestionIncidentes.Infrastructure.dll
-C:\Users\Lenovo Ideapad\Source\Repos\IHC-Proyecto\GestionIncidentes.Infrastructure\obj\Debug\net9.0\GestionIncidentes.Infrastructure.csproj.AssemblyReference.cache
-C:\Users\Lenovo Ideapad\Source\Repos\IHC-Proyecto\GestionIncidentes.Infrastructure\obj\Debug\net9.0\GestionIncidentes.Infrastructure.GeneratedMSBuildEditorConfig.editorconfig
-C:\Users\Lenovo Ideapad\Source\Repos\IHC-Proyecto\GestionIncidentes.Infrastructure\obj\Debug\net9.0\GestionIncidentes.Infrastructure.AssemblyInfoInputs.cache
-C:\Users\Lenovo Ideapad\Source\Repos\IHC-Proyecto\GestionIncidentes.Infrastructure\obj\Debug\net9.0\GestionIncidentes.Infrastructure.AssemblyInfo.cs
-C:\Users\Lenovo Ideapad\Source\Repos\IHC-Proyecto\GestionIncidentes.Infrastructure\obj\Debug\net9.0\GestionIncidentes.Infrastructure.csproj.CoreCompileInputs.cache
-C:\Users\Lenovo Ideapad\Source\Repos\IHC-Proyecto\GestionIncidentes.Infrastructure\obj\Debug\net9.0\GestionIncidentes.Infrastructure.sourcelink.json
-C:\Users\Lenovo Ideapad\Source\Repos\IHC-Proyecto\GestionIncidentes.Infrastructure\obj\Debug\net9.0\GestionIncidentes.Infrastructure.dll
-C:\Users\Lenovo Ideapad\Source\Repos\IHC-Proyecto\GestionIncidentes.Infrastructure\obj\Debug\net9.0\refint\GestionIncidentes.Infrastructure.dll
-C:\Users\Lenovo Ideapad\Source\Repos\IHC-Proyecto\GestionIncidentes.Infrastructure\obj\Debug\net9.0\GestionIncidentes.Infrastructure.pdb
-C:\Users\Lenovo Ideapad\Source\Repos\IHC-Proyecto\GestionIncidentes.Infrastructure\bin\Debug\net9.0\GestionIncidentes.Infrastructure.deps.json
-C:\Users\Lenovo Ideapad\Source\Repos\IHC-Proyecto\GestionIncidentes.Infrastructure\bin\Debug\net9.0\GestionIncidentes.Infrastructure.dll
-C:\Users\Lenovo Ideapad\Source\Repos\IHC-Proyecto\GestionIncidentes.Infrastructure\bin\Debug\net9.0\GestionIncidentes.Infrastructure.pdb
-C:\Users\Lenovo Ideapad\Source\Repos\IHC-Proyecto\GestionIncidentes.Infrastructure\bin\Debug\net9.0\GestionIncidentes.Application.dll
-C:\Users\Lenovo Ideapad\Source\Repos\IHC-Proyecto\GestionIncidentes.Infrastructure\bin\Debug\net9.0\GestionIncidentes.Domain.dll
-C:\Users\Lenovo Ideapad\Source\Repos\IHC-Proyecto\GestionIncidentes.Infrastructure\bin\Debug\net9.0\GestionIncidentes.Application.pdb
-C:\Users\Lenovo Ideapad\Source\Repos\IHC-Proyecto\GestionIncidentes.Infrastructure\bin\Debug\net9.0\GestionIncidentes.Domain.pdb
-C:\Users\Lenovo Ideapad\Source\Repos\IHC-Proyecto\GestionIncidentes.Infrastructure\obj\Debug\net9.0\GestionI.5974F21A.Up2Date
-C:\Users\Lenovo Ideapad\Source\Repos\IHC-Proyecto\GestionIncidentes.Infrastructure\obj\Debug\net9.0\ref\GestionIncidentes.Infrastructure.dll
-C:\Users\Lenovo Ideapad\Source\Repos\IHC-Proyecto\GestionIncidentes.Infrastructure\bin\Debug\net9.0\GestionIncidentes.Infrastructure.runtimeconfig.json
-C:\Users\Lenovo Ideapad\Source\Repos\IHC-Proyecto\GestionIncidentes.Infrastructure\obj\Debug\net9.0\GestionIncidentes.Infrastructure.genruntimeconfig.cache
-C:\Users\User\Documents\Joshua Universidad\Quinto\IHC\ProyectoIHC\IHC-Proyecto\GestionIncidentes.Infrastructure\obj\Debug\net9.0\GestionIncidentes.Infrastructure.csproj.AssemblyReference.cache
-C:\Users\User\Documents\Joshua Universidad\Quinto\IHC\ProyectoIHC\IHC-Proyecto\GestionIncidentes.Infrastructure\obj\Debug\net9.0\GestionIncidentes.Infrastructure.GeneratedMSBuildEditorConfig.editorconfig
-C:\Users\User\Documents\Joshua Universidad\Quinto\IHC\ProyectoIHC\IHC-Proyecto\GestionIncidentes.Infrastructure\obj\Debug\net9.0\GestionIncidentes.Infrastructure.AssemblyInfoInputs.cache
-C:\Users\User\Documents\Joshua Universidad\Quinto\IHC\ProyectoIHC\IHC-Proyecto\GestionIncidentes.Infrastructure\obj\Debug\net9.0\GestionIncidentes.Infrastructure.AssemblyInfo.cs
-C:\Users\User\Documents\Joshua Universidad\Quinto\IHC\ProyectoIHC\IHC-Proyecto\GestionIncidentes.Infrastructure\obj\Debug\net9.0\GestionIncidentes.Infrastructure.csproj.CoreCompileInputs.cache
-C:\Users\User\Documents\Joshua Universidad\Quinto\IHC\ProyectoIHC\IHC-Proyecto\GestionIncidentes.Infrastructure\obj\Debug\net9.0\GestionIncidentes.Infrastructure.sourcelink.json
 C:\Users\User\Documents\Joshua Universidad\Quinto\IHC\ProyectoIHC\IHC-Proyecto\GestionIncidentes.Infrastructure\bin\Debug\net9.0\GestionIncidentes.Infrastructure.deps.json
 C:\Users\User\Documents\Joshua Universidad\Quinto\IHC\ProyectoIHC\IHC-Proyecto\GestionIncidentes.Infrastructure\bin\Debug\net9.0\GestionIncidentes.Infrastructure.runtimeconfig.json
 C:\Users\User\Documents\Joshua Universidad\Quinto\IHC\ProyectoIHC\IHC-Proyecto\GestionIncidentes.Infrastructure\bin\Debug\net9.0\GestionIncidentes.Infrastructure.dll
@@ -49,29 +6,15 @@ C:\Users\User\Documents\Joshua Universidad\Quinto\IHC\ProyectoIHC\IHC-Proyecto\G
 C:\Users\User\Documents\Joshua Universidad\Quinto\IHC\ProyectoIHC\IHC-Proyecto\GestionIncidentes.Infrastructure\bin\Debug\net9.0\GestionIncidentes.Domain.dll
 C:\Users\User\Documents\Joshua Universidad\Quinto\IHC\ProyectoIHC\IHC-Proyecto\GestionIncidentes.Infrastructure\bin\Debug\net9.0\GestionIncidentes.Application.pdb
 C:\Users\User\Documents\Joshua Universidad\Quinto\IHC\ProyectoIHC\IHC-Proyecto\GestionIncidentes.Infrastructure\bin\Debug\net9.0\GestionIncidentes.Domain.pdb
+C:\Users\User\Documents\Joshua Universidad\Quinto\IHC\ProyectoIHC\IHC-Proyecto\GestionIncidentes.Infrastructure\obj\Debug\net9.0\GestionIncidentes.Infrastructure.csproj.AssemblyReference.cache
+C:\Users\User\Documents\Joshua Universidad\Quinto\IHC\ProyectoIHC\IHC-Proyecto\GestionIncidentes.Infrastructure\obj\Debug\net9.0\GestionIncidentes.Infrastructure.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\User\Documents\Joshua Universidad\Quinto\IHC\ProyectoIHC\IHC-Proyecto\GestionIncidentes.Infrastructure\obj\Debug\net9.0\GestionIncidentes.Infrastructure.AssemblyInfoInputs.cache
+C:\Users\User\Documents\Joshua Universidad\Quinto\IHC\ProyectoIHC\IHC-Proyecto\GestionIncidentes.Infrastructure\obj\Debug\net9.0\GestionIncidentes.Infrastructure.AssemblyInfo.cs
+C:\Users\User\Documents\Joshua Universidad\Quinto\IHC\ProyectoIHC\IHC-Proyecto\GestionIncidentes.Infrastructure\obj\Debug\net9.0\GestionIncidentes.Infrastructure.csproj.CoreCompileInputs.cache
+C:\Users\User\Documents\Joshua Universidad\Quinto\IHC\ProyectoIHC\IHC-Proyecto\GestionIncidentes.Infrastructure\obj\Debug\net9.0\GestionIncidentes.Infrastructure.sourcelink.json
 C:\Users\User\Documents\Joshua Universidad\Quinto\IHC\ProyectoIHC\IHC-Proyecto\GestionIncidentes.Infrastructure\obj\Debug\net9.0\GestionI.5974F21A.Up2Date
 C:\Users\User\Documents\Joshua Universidad\Quinto\IHC\ProyectoIHC\IHC-Proyecto\GestionIncidentes.Infrastructure\obj\Debug\net9.0\GestionIncidentes.Infrastructure.dll
 C:\Users\User\Documents\Joshua Universidad\Quinto\IHC\ProyectoIHC\IHC-Proyecto\GestionIncidentes.Infrastructure\obj\Debug\net9.0\refint\GestionIncidentes.Infrastructure.dll
 C:\Users\User\Documents\Joshua Universidad\Quinto\IHC\ProyectoIHC\IHC-Proyecto\GestionIncidentes.Infrastructure\obj\Debug\net9.0\GestionIncidentes.Infrastructure.pdb
 C:\Users\User\Documents\Joshua Universidad\Quinto\IHC\ProyectoIHC\IHC-Proyecto\GestionIncidentes.Infrastructure\obj\Debug\net9.0\GestionIncidentes.Infrastructure.genruntimeconfig.cache
 C:\Users\User\Documents\Joshua Universidad\Quinto\IHC\ProyectoIHC\IHC-Proyecto\GestionIncidentes.Infrastructure\obj\Debug\net9.0\ref\GestionIncidentes.Infrastructure.dll
-C:\IHC-Proyecto\GestionIncidentes.Infrastructure\obj\Debug\net9.0\GestionIncidentes.Infrastructure.dll
-C:\IHC-Proyecto\GestionIncidentes.Infrastructure\obj\Debug\net9.0\refint\GestionIncidentes.Infrastructure.dll
-C:\IHC-Proyecto\GestionIncidentes.Infrastructure\obj\Debug\net9.0\GestionIncidentes.Infrastructure.pdb
-C:\IHC-Proyecto\GestionIncidentes.Infrastructure\bin\Debug\net9.0\GestionIncidentes.Infrastructure.deps.json
-C:\IHC-Proyecto\GestionIncidentes.Infrastructure\bin\Debug\net9.0\GestionIncidentes.Infrastructure.runtimeconfig.json
-C:\IHC-Proyecto\GestionIncidentes.Infrastructure\bin\Debug\net9.0\GestionIncidentes.Infrastructure.dll
-C:\IHC-Proyecto\GestionIncidentes.Infrastructure\bin\Debug\net9.0\GestionIncidentes.Infrastructure.pdb
-C:\IHC-Proyecto\GestionIncidentes.Infrastructure\bin\Debug\net9.0\GestionIncidentes.Application.dll
-C:\IHC-Proyecto\GestionIncidentes.Infrastructure\bin\Debug\net9.0\GestionIncidentes.Domain.dll
-C:\IHC-Proyecto\GestionIncidentes.Infrastructure\bin\Debug\net9.0\GestionIncidentes.Application.pdb
-C:\IHC-Proyecto\GestionIncidentes.Infrastructure\bin\Debug\net9.0\GestionIncidentes.Domain.pdb
-C:\IHC-Proyecto\GestionIncidentes.Infrastructure\obj\Debug\net9.0\GestionIncidentes.Infrastructure.csproj.AssemblyReference.cache
-C:\IHC-Proyecto\GestionIncidentes.Infrastructure\obj\Debug\net9.0\GestionIncidentes.Infrastructure.GeneratedMSBuildEditorConfig.editorconfig
-C:\IHC-Proyecto\GestionIncidentes.Infrastructure\obj\Debug\net9.0\GestionIncidentes.Infrastructure.AssemblyInfoInputs.cache
-C:\IHC-Proyecto\GestionIncidentes.Infrastructure\obj\Debug\net9.0\GestionIncidentes.Infrastructure.AssemblyInfo.cs
-C:\IHC-Proyecto\GestionIncidentes.Infrastructure\obj\Debug\net9.0\GestionIncidentes.Infrastructure.csproj.CoreCompileInputs.cache
-C:\IHC-Proyecto\GestionIncidentes.Infrastructure\obj\Debug\net9.0\GestionIncidentes.Infrastructure.sourcelink.json
-C:\IHC-Proyecto\GestionIncidentes.Infrastructure\obj\Debug\net9.0\GestionI.5974F21A.Up2Date
-C:\IHC-Proyecto\GestionIncidentes.Infrastructure\obj\Debug\net9.0\GestionIncidentes.Infrastructure.genruntimeconfig.cache
-C:\IHC-Proyecto\GestionIncidentes.Infrastructure\obj\Debug\net9.0\ref\GestionIncidentes.Infrastructure.dll

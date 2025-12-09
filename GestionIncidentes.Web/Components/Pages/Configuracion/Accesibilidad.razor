@@ -1,0 +1,574 @@
+@page "/configuracion/accesibilidad"
+@using Microsoft.JSInterop
+@inject IJSRuntime JS
+@rendermode InteractiveServer
+
+<PageTitle>Accesibilidad - Gestión de Incidentes</PageTitle>
+
+<div class="accesibilidad-container">
+    <h2>🎨 Configuración de Accesibilidad</h2>
+    <p class="subtitle">Personaliza la apariencia de la aplicación según tus necesidades</p>
+
+    <!-- Tema -->
+    <div class="config-card">
+        <div class="card-header">
+            <h3>☀️ Modo de Tema</h3>
+            <p>Elige el tema visual que prefieras</p>
+        </div>
+        <div class="card-content">
+            <div class="theme-options">
+                <div class="theme-option @(selectedTheme == "light" ? "selected" : "")" @onclick='() => ChangeTheme("light")'>
+                    <div class="theme-preview theme-preview-light">
+                        <div class="preview-bar"></div>
+                        <div class="preview-content">
+                            <div class="preview-box"></div>
+                            <div class="preview-box"></div>
+                        </div>
+                    </div>
+                    <div class="theme-label">
+                        <span class="theme-icon">☀️</span>
+                        <span>Claro</span>
+                    </div>
+                </div>
+
+                <div class="theme-option @(selectedTheme == "dark" ? "selected" : "")" @onclick='() => ChangeTheme("dark")'>
+                    <div class="theme-preview theme-preview-dark">
+                        <div class="preview-bar"></div>
+                        <div class="preview-content">
+                            <div class="preview-box"></div>
+                            <div class="preview-box"></div>
+                        </div>
+                    </div>
+                    <div class="theme-label">
+                        <span class="theme-icon">🌙</span>
+                        <span>Oscuro</span>
+                    </div>
+                </div>
+
+                <div class="theme-option @(selectedTheme == "auto" ? "selected" : "")" @onclick='() => ChangeTheme("auto")'>
+                    <div class="theme-preview theme-preview-auto">
+                        <div class="preview-bar"></div>
+                        <div class="preview-content">
+                            <div class="preview-box"></div>
+                            <div class="preview-box"></div>
+                        </div>
+                    </div>
+                    <div class="theme-label">
+                        <span class="theme-icon">🔄</span>
+                        <span>Automático</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modo Daltónico -->
+    <div class="config-card">
+        <div class="card-header">
+            <h3>👁️ Modo Daltónico</h3>
+            <p>Ajusta los colores para diferentes tipos de daltonismo</p>
+        </div>
+        <div class="card-content">
+            <div class="colorblind-options">
+                <button class="colorblind-btn @(selectedColorblind == "normal" ? "selected" : "")" @onclick='() => ChangeColorblindMode("normal")'>
+                    <span class="color-dots">🔴 🟢 🔵</span>
+                    <span>Normal</span>
+                </button>
+                <button class="colorblind-btn @(selectedColorblind == "protanopia" ? "selected" : "")" @onclick='() => ChangeColorblindMode("protanopia")'>
+                    <span class="color-dots">⚫ 🟡 🔵</span>
+                    <span>Protanopia (rojo)</span>
+                </button>
+                <button class="colorblind-btn @(selectedColorblind == "deuteranopia" ? "selected" : "")" @onclick='() => ChangeColorblindMode("deuteranopia")'>
+                    <span class="color-dots">🔴 ⚫ 🟣</span>
+                    <span>Deuteranopia (verde)</span>
+                </button>
+                <button class="colorblind-btn @(selectedColorblind == "tritanopia" ? "selected" : "")" @onclick='() => ChangeColorblindMode("tritanopia")'>
+                    <span class="color-dots">🔴 🟢 ⚫</span>
+                    <span>Tritanopia (azul)</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Opciones Adicionales -->
+    <div class="config-card">
+        <div class="card-header">
+            <h3>⚙️ Opciones Adicionales</h3>
+        </div>
+        <div class="card-content">
+            <div class="options-list">
+                <div class="option-item">
+                    <div class="option-info">
+                        <span class="option-icon">🔍</span>
+                        <div>
+                            <div class="option-name">Aumentar tamaño de texto</div>
+                            <div class="option-desc">Hace el texto más grande y legible</div>
+                        </div>
+                    </div>
+                    <label class="toggle-switch">
+                        <input type="checkbox" @bind="increaseFontSize" @bind:after="ApplyFontSize" />
+                        <span class="toggle-slider"></span>
+                    </label>
+                </div>
+
+                <div class="option-item">
+                    <div class="option-info">
+                        <span class="option-icon">⚡</span>
+                        <div>
+                            <div class="option-name">Reducir animaciones</div>
+                            <div class="option-desc">Minimiza los efectos de movimiento</div>
+                        </div>
+                    </div>
+                    <label class="toggle-switch">
+                        <input type="checkbox" @bind="reduceAnimations" @bind:after="ApplyAnimations" />
+                        <span class="toggle-slider"></span>
+                    </label>
+                </div>
+
+                <div class="option-item">
+                    <div class="option-info">
+                        <span class="option-icon">🔲</span>
+                        <div>
+                            <div class="option-name">Alto contraste</div>
+                            <div class="option-desc">Aumenta el contraste entre elementos</div>
+                        </div>
+                    </div>
+                    <label class="toggle-switch">
+                        <input type="checkbox" @bind="highContrast" @bind:after="ApplyContrast" />
+                        <span class="toggle-slider"></span>
+                    </label>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Vista Previa -->
+    <div class="config-card">
+        <div class="card-header">
+            <h3>👀 Vista Previa</h3>
+        </div>
+        <div class="card-content">
+            <div class="preview-demo">
+                <div class="demo-ticket">
+                    <div class="demo-header">
+                        <span class="demo-status">En Progreso</span>
+                    </div>
+                    <h4>Ticket de Ejemplo</h4>
+                    <p>Esta es una vista previa de cómo se verán los elementos con tu configuración actual.</p>
+                    <button class="demo-button">Botón de Ejemplo</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Reset -->
+    <div class="reset-section">
+        <button class="btn-reset" @onclick="ResetToDefaults">
+            🔄 Restaurar valores predeterminados
+        </button>
+    </div>
+</div>
+
+<style>
+.accesibilidad-container {
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 2rem;
+}
+
+.accesibilidad-container h2 {
+    font-size: 2rem;
+    color: var(--color-text-primary);
+    margin-bottom: 0.5rem;
+}
+
+.subtitle {
+    color: var(--color-text-secondary);
+    margin-bottom: 2rem;
+}
+
+.config-card {
+    background: var(--color-surface);
+    border-radius: var(--border-radius-lg);
+    box-shadow: var(--shadow-sm);
+    margin-bottom: 1.5rem;
+}
+
+.card-header {
+    padding: 1.5rem;
+    border-bottom: 1px solid var(--color-border);
+}
+
+.card-header h3 {
+    font-size: 1.25rem;
+    color: var(--color-text-primary);
+    margin: 0 0 0.25rem;
+}
+
+.card-header p {
+    font-size: 0.875rem;
+    color: var(--color-text-secondary);
+    margin: 0;
+}
+
+.card-content {
+    padding: 1.5rem;
+}
+
+.theme-options {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+}
+
+.theme-option {
+    cursor: pointer;
+    border: 2px solid var(--color-border);
+    border-radius: var(--border-radius-md);
+    padding: 1rem;
+    transition: all 0.2s;
+}
+
+.theme-option:hover {
+    border-color: var(--color-primary);
+}
+
+.theme-option.selected {
+    border-color: var(--color-primary);
+    background: rgba(59, 130, 246, 0.05);
+}
+
+.theme-preview {
+    border-radius: var(--border-radius-sm);
+    overflow: hidden;
+    margin-bottom: 0.75rem;
+    height: 100px;
+}
+
+.theme-preview-light {
+    background: #ffffff;
+    border: 1px solid #e5e7eb;
+}
+
+.theme-preview-dark {
+    background: #1f2937;
+    border: 1px solid #374151;
+}
+
+.theme-preview-auto {
+    background: linear-gradient(to right, #ffffff 50%, #1f2937 50%);
+    border: 1px solid #9ca3af;
+}
+
+.preview-bar {
+    height: 20px;
+    background: var(--color-primary);
+}
+
+.preview-content {
+    padding: 0.75rem;
+    display: flex;
+    gap: 0.5rem;
+}
+
+.preview-box {
+    flex: 1;
+    height: 50px;
+    background: var(--color-background);
+    border-radius: 4px;
+}
+
+.theme-preview-dark .preview-box {
+    background: #374151;
+}
+
+.theme-label {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    font-weight: 500;
+}
+
+.theme-icon {
+    font-size: 1.25rem;
+}
+
+.colorblind-options {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 0.75rem;
+}
+
+.colorblind-btn {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 1rem;
+    border: 2px solid var(--color-border);
+    background: white;
+    border-radius: var(--border-radius-md);
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.colorblind-btn:hover {
+    border-color: var(--color-primary);
+}
+
+.colorblind-btn.selected {
+    border-color: var(--color-primary);
+    background: rgba(59, 130, 246, 0.05);
+}
+
+.color-dots {
+    font-size: 1.5rem;
+}
+
+.options-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.option-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem;
+    background: var(--color-background);
+    border-radius: var(--border-radius-md);
+}
+
+.option-info {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.option-icon {
+    font-size: 1.5rem;
+}
+
+.option-name {
+    font-weight: 500;
+    color: var(--color-text-primary);
+}
+
+.option-desc {
+    font-size: 0.875rem;
+    color: var(--color-text-secondary);
+}
+
+.toggle-switch {
+    position: relative;
+    width: 50px;
+    height: 26px;
+    display: inline-block;
+}
+
+.toggle-switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.toggle-slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #ccc;
+    transition: 0.4s;
+    border-radius: 26px;
+}
+
+.toggle-slider:before {
+    position: absolute;
+    content: "";
+    height: 18px;
+    width: 18px;
+    left: 4px;
+    bottom: 4px;
+    background-color: white;
+    transition: 0.4s;
+    border-radius: 50%;
+}
+
+.toggle-switch input:checked + .toggle-slider {
+    background-color: var(--color-primary);
+}
+
+.toggle-switch input:checked + .toggle-slider:before {
+    transform: translateX(24px);
+}
+
+.preview-demo {
+    display: flex;
+    justify-content: center;
+    padding: 2rem;
+    background: var(--color-background);
+    border-radius: var(--border-radius-md);
+}
+
+.demo-ticket {
+    max-width: 400px;
+    padding: 1.5rem;
+    background: var(--color-surface);
+    border-radius: var(--border-radius-md);
+    box-shadow: var(--shadow-sm);
+}
+
+.demo-header {
+    margin-bottom: 1rem;
+}
+
+.demo-status {
+    display: inline-block;
+    padding: 0.25rem 0.75rem;
+    background: var(--color-info);
+    color: white;
+    border-radius: var(--border-radius-full);
+    font-size: 0.875rem;
+    font-weight: 500;
+}
+
+.demo-ticket h4 {
+    color: var(--color-text-primary);
+    margin: 0 0 0.5rem;
+}
+
+.demo-ticket p {
+    color: var(--color-text-secondary);
+    margin: 0 0 1rem;
+    font-size: 0.875rem;
+}
+
+.demo-button {
+    padding: 0.625rem 1.25rem;
+    background: var(--color-primary);
+    color: white;
+    border: none;
+    border-radius: var(--border-radius-md);
+    cursor: pointer;
+    font-weight: 500;
+}
+
+.reset-section {
+    display: flex;
+    justify-content: center;
+    padding: 2rem 0;
+}
+
+.btn-reset {
+    padding: 0.75rem 1.5rem;
+    background: var(--color-background);
+    color: var(--color-text-primary);
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius-md);
+    cursor: pointer;
+    font-weight: 500;
+    transition: all 0.2s;
+}
+
+.btn-reset:hover {
+    background: var(--color-surface);
+}
+
+@@media (max-width: 768px) {
+    .accesibilidad-container {
+        padding: 1rem;
+    }
+
+    .theme-options, .colorblind-options {
+        grid-template-columns: 1fr;
+    }
+}
+</style>
+
+@code {
+    private string selectedTheme = "light";
+    private string selectedColorblind = "normal";
+    private bool increaseFontSize = false;
+    private bool reduceAnimations = false;
+    private bool highContrast = false;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await LoadSettings();
+            await ApplyAllSettings();
+        }
+    }
+
+    private async Task LoadSettings()
+    {
+        try
+        {
+            selectedTheme = await JS.InvokeAsync<string>("localStorage.getItem", "theme") ?? "light";
+            selectedColorblind = await JS.InvokeAsync<string>("localStorage.getItem", "colorblind") ?? "normal";
+            increaseFontSize = await JS.InvokeAsync<string>("localStorage.getItem", "increaseFontSize") == "true";
+            reduceAnimations = await JS.InvokeAsync<string>("localStorage.getItem", "reduceAnimations") == "true";
+            highContrast = await JS.InvokeAsync<string>("localStorage.getItem", "highContrast") == "true";
+            StateHasChanged();
+        }
+        catch { }
+    }
+
+    private async Task ChangeTheme(string theme)
+    {
+        selectedTheme = theme;
+        await JS.InvokeVoidAsync("localStorage.setItem", "theme", theme);
+        await JS.InvokeVoidAsync("eval", $"document.documentElement.setAttribute('data-theme', '{theme}')");
+    }
+
+    private async Task ChangeColorblindMode(string mode)
+    {
+        selectedColorblind = mode;
+        await JS.InvokeVoidAsync("localStorage.setItem", "colorblind", mode);
+        await JS.InvokeVoidAsync("eval", $"document.documentElement.setAttribute('data-colorblind', '{mode}')");
+    }
+
+    private async Task ApplyFontSize()
+    {
+        await JS.InvokeVoidAsync("localStorage.setItem", "increaseFontSize", increaseFontSize.ToString().ToLower());
+        var fontSize = increaseFontSize ? "18px" : "16px";
+        await JS.InvokeVoidAsync("eval", $"document.documentElement.style.fontSize = '{fontSize}'");
+    }
+
+    private async Task ApplyAnimations()
+    {
+        await JS.InvokeVoidAsync("localStorage.setItem", "reduceAnimations", reduceAnimations.ToString().ToLower());
+        var transition = reduceAnimations ? "none" : "all 0.2s";
+        await JS.InvokeVoidAsync("eval", $"document.documentElement.style.setProperty('--transition-speed', '{transition}')");
+    }
+
+    private async Task ApplyContrast()
+    {
+        await JS.InvokeVoidAsync("localStorage.setItem", "highContrast", highContrast.ToString().ToLower());
+        await JS.InvokeVoidAsync("eval", $"document.documentElement.setAttribute('data-contrast', '{(highContrast ? "high" : "normal")}')");
+    }
+
+    private async Task ApplyAllSettings()
+    {
+        await ChangeTheme(selectedTheme);
+        await ChangeColorblindMode(selectedColorblind);
+        await ApplyFontSize();
+        await ApplyAnimations();
+        await ApplyContrast();
+    }
+
+    private async Task ResetToDefaults()
+    {
+        selectedTheme = "light";
+        selectedColorblind = "normal";
+        increaseFontSize = false;
+        reduceAnimations = false;
+        highContrast = false;
+        await ApplyAllSettings();
+    }
+}

@@ -1,4 +1,9 @@
 @inherits LayoutComponentBase
+@using Microsoft.AspNetCore.Components.Authorization
+@inject NavigationManager Navigation
+@inject GestionIncidentes.Web.Services.AuthService AuthService
+@inject AuthenticationStateProvider AuthStateProvider
+@inject HttpClient Http
 
 <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" />
 <link rel="stylesheet" href="/css/theme.css" />
@@ -18,42 +23,42 @@
         </div>
 
         <nav class="sidebar-nav">
-            <NavLink class="nav-item" href="admin/dashboard" Match="NavLinkMatch.All">
+            <NavLink class="nav-item" href="/admin/dashboard" Match="NavLinkMatch.All">
                 <span class="material-icons">dashboard</span>
                 <span class="nav-text">Dashboard</span>
             </NavLink>
 
-            <NavLink class="nav-item" href="admin/incidentes">
+            <NavLink class="nav-item" href="/admin/incidentes">
                 <span class="material-icons">error_outline</span>
                 <span class="nav-text">Incidentes</span>
             </NavLink>
 
-            <NavLink class="nav-item" href="admin/nuevo-incidente">
+            <NavLink class="nav-item" href="/admin/nuevo-incidente">
                 <span class="material-icons">add</span>
                 <span class="nav-text">Nuevo Incidente</span>
             </NavLink>
 
-            <NavLink class="nav-item" href="admin/historial">
+            <NavLink class="nav-item" href="/admin/historial">
                 <span class="material-icons">history</span>
                 <span class="nav-text">Historial</span>
             </NavLink>
 
-            <NavLink class="nav-item" href="admin/usuarios">
+            <NavLink class="nav-item" href="/admin/usuarios">
                 <span class="material-icons">people</span>
                 <span class="nav-text">Usuarios</span>
             </NavLink>
 
-            <NavLink class="nav-item" href="admin/activos-red">
+            <NavLink class="nav-item" href="/admin/activos-red">
                 <span class="material-icons">hub</span>
                 <span class="nav-text">Activos de Red</span>
             </NavLink>
 
-            <NavLink class="nav-item" href="admin/base-conocimientos">
+            <NavLink class="nav-item" href="/admin/base-conocimientos">
                 <span class="material-icons">menu_book</span>
                 <span class="nav-text">Base de Conocimientos</span>
             </NavLink>
 
-            <NavLink class="nav-item" href="admin/configuracion">
+            <NavLink class="nav-item" href="/admin/configuracion">
                 <span class="material-icons">settings</span>
                 <span class="nav-text">Configuración</span>
             </NavLink>
@@ -89,37 +94,22 @@
                         <span class="badge">3</span>
                     </button>
 
-                    <!-- Usuario -->
-                    <div class="user-menu">
-                        <button class="user-button" @onclick="ToggleUserMenu">
-                            <div class="user-avatar">
-                                <span class="material-icons">person</span>
-                            </div>
-                            <div class="user-info">
-                                <span class="user-name">Carlos Rodr�guez</span>
-                                <span class="user-role">Admin</span>
-                            </div>
-                        </button>
-
-                        @if (showUserMenu)
-                        {
-                            <div class="user-dropdown">
-                                <a href="/profile" class="dropdown-item">
-                                    <span class="material-icons">account_circle</span>
-                                    Mi Perfil
-                                </a>
-                                <a href="/settings" class="dropdown-item">
-                                    <span class="material-icons">settings</span>
-                                    Configuraci�n
-                                </a>
-                                <hr class="dropdown-divider" />
-                                <a href="/logout" class="dropdown-item">
-                                    <span class="material-icons">logout</span>
-                                    Cerrar Sesi�n
-                                </a>
-                            </div>
-                        }
-                    </div>
+                    <!-- Usuario - Click para cerrar sesión -->
+                    <a href="/LogoutPage" 
+                       style="display: flex; align-items: center; gap: 12px; padding: 8px 16px; 
+                              background: white; border: 1px solid #e0e0e0; border-radius: 8px; 
+                              cursor: pointer; transition: all 0.3s; text-decoration: none;">
+                        <div class="user-avatar" style="width: 40px; height: 40px; border-radius: 50%; 
+                                                         background: #1976d2; display: flex; align-items: center; 
+                                                         justify-content: center;">
+                            <span class="material-icons" style="color: white; font-size: 24px;">person</span>
+                        </div>
+                        <div class="user-info" style="display: flex; flex-direction: column; align-items: flex-start;">
+                            <span class="user-name" style="font-weight: 600; font-size: 14px; color: #333;">@currentUserName</span>
+                            <span class="user-role" style="font-size: 12px; color: #666;">@currentUserRole</span>
+                        </div>
+                        <span class="material-icons" style="color: #999; font-size: 20px;">logout</span>
+                    </a>
                 </div>
             </div>
         </header>
@@ -133,23 +123,49 @@
 
 @code {
     private bool sidebarCollapsed = false;
-    private bool showUserMenu = false;
     private bool showNotifications = false;
+    private string currentUserName = "Cargando...";
+    private string currentUserRole = "";
+
+    protected override async Task OnInitializedAsync()
+    {
+        currentUserName = await AuthService.GetCurrentUserNameAsync() ?? "Usuario";
+        currentUserRole = await AuthService.GetCurrentUserRoleAsync() ?? "Admin";
+    }
 
     private void ToggleSidebar()
     {
         sidebarCollapsed = !sidebarCollapsed;
     }
 
-    private void ToggleUserMenu()
-    {
-        showUserMenu = !showUserMenu;
-        showNotifications = false;
-    }
-
     private void ToggleNotifications()
     {
         showNotifications = !showNotifications;
-        showUserMenu = false;
+    }
+
+    private void HandleLogout()
+    {
+        Console.WriteLine("========================================");
+        Console.WriteLine("[AdminLayout] HandleLogout - INICIADO");
+        Console.WriteLine("[AdminLayout] Botón de logout clickeado");
+        Console.WriteLine("========================================");
+        
+        try
+        {
+            Console.WriteLine("[AdminLayout] Intentando navegar a /LogoutPage");
+            Console.WriteLine($"[AdminLayout] URL actual: {Navigation.Uri}");
+            
+            Navigation.NavigateTo("/LogoutPage", forceLoad: true);
+            
+            Console.WriteLine("[AdminLayout] NavigateTo ejecutado exitosamente");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"[AdminLayout] ERROR en HandleLogout: {ex.GetType().Name}");
+            Console.WriteLine($"[AdminLayout] Mensaje: {ex.Message}");
+            Console.WriteLine($"[AdminLayout] StackTrace: {ex.StackTrace}");
+        }
+        
+        Console.WriteLine("[AdminLayout] HandleLogout - FINALIZADO");
     }
 }

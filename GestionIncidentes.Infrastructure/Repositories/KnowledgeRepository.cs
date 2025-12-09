@@ -25,7 +25,7 @@ public class KnowledgeRepository : IKnowledgeRepository
             .Where(k => k.IsPublished &&
                        (k.Title.ToLower().Contains(term) ||
                         k.Problem.ToLower().Contains(term) ||
-                        k.Solution.ToLower().Contains(term) ||
+                        k.SolutionDescription.ToLower().Contains(term) ||
                         k.Tags.Any(t => t.ToLower().Contains(term))))
             .OrderByDescending(k => k.UsageCount)
             .ToListAsync();

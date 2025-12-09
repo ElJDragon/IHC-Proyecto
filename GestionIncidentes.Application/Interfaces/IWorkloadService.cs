@@ -11,6 +11,7 @@ namespace GestionIncidentes.Application.Interfaces;
         Task<int> GetUserWorkloadAsync(Guid userId);
         Task RecalculateWorkloadAsync(Guid userId);
         Task<bool> CanAssignTicketAsync(Guid userId);
+        Task<(bool CanAssign, string? AlertMessage)> ValidateAssignmentAsync(Guid userId);
     }
 
 

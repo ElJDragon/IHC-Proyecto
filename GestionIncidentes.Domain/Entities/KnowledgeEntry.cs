@@ -10,24 +10,28 @@ public class KnowledgeEntry
     public Guid Id { get; set; } = Guid.NewGuid();
     public string Title { get; set; } = string.Empty;
     public string Problem { get; set; } = string.Empty;
-    public string Solution { get; set; } = string.Empty;
+    public string SolutionDescription { get; set; } = string.Empty; // Descripci贸n textual de la soluci贸n
     public string Category { get; set; } = string.Empty; // Software, Hardware, Red, etc.
     public List<string> Tags { get; set; } = new();
     public Guid CreatedByUserId { get; set; }
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
-    public int UsageCount { get; set; } = 0; // Cu醤tas veces se ha consultado
+    public int UsageCount { get; set; } = 0; // Cu谩ntas veces se ha consultado
     public bool IsPublished { get; set; } = true;
 
-    // Relaci髇 con tickets resueltos
+    // Relaci贸n con tickets resueltos (legacy - mantener por compatibilidad)
     public Guid? RelatedTicketId { get; set; }
+    
+    // Relaci贸n con la soluci贸n promocionada (nuevo flujo)
+    public Guid? SolutionId { get; set; }
+    public Solution? Solution { get; set; }
 
     private KnowledgeEntry() { }
 
     public static KnowledgeEntry Create(
         string title,
         string problem,
-        string solution,
+        string solutionDescription,
         string category,
         Guid createdByUserId,
         Guid? relatedTicketId = null,
@@ -37,7 +41,7 @@ public class KnowledgeEntry
         {
             Title = title,
             Problem = problem,
-            Solution = solution,
+            SolutionDescription = solutionDescription,
             Category = category,
             CreatedByUserId = createdByUserId,
             RelatedTicketId = relatedTicketId,
@@ -45,11 +49,11 @@ public class KnowledgeEntry
         };
     }
 
-    public void Update(string title, string problem, string solution, string category, List<string>? tags = null)
+    public void Update(string title, string problem, string solutionDescription, string category, List<string>? tags = null)
     {
         Title = title;
         Problem = problem;
-        Solution = solution;
+        SolutionDescription = solutionDescription;
         Category = category;
         if (tags != null) Tags = tags;
         UpdatedAt = DateTime.UtcNow;

@@ -58,7 +58,7 @@ namespace GestionIncidentes.Infrastructure.Migrations
 
                     b.HasIndex("UserId", "Timestamp");
 
-                    b.ToTable("AuditLogs");
+                    b.ToTable("AuditLogs", (string)null);
                 });
 
             modelBuilder.Entity("GestionIncidentes.Domain.Entities.Department", b =>
@@ -73,7 +73,41 @@ namespace GestionIncidentes.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Departments");
+                    b.ToTable("Departments", (string)null);
+                });
+
+            modelBuilder.Entity("GestionIncidentes.Domain.Entities.Incident", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid?>("AssignedTicketId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<DateTime>("ReportedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid>("ReportedByUserId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ReportedByUserId");
+
+                    b.ToTable("Incidents", (string)null);
                 });
 
             modelBuilder.Entity("GestionIncidentes.Domain.Entities.KnowledgeEntry", b =>
@@ -126,7 +160,7 @@ namespace GestionIncidentes.Infrastructure.Migrations
 
                     b.HasIndex("CreatedByUserId");
 
-                    b.ToTable("KnowledgeEntries");
+                    b.ToTable("KnowledgeEntries", (string)null);
                 });
 
             modelBuilder.Entity("GestionIncidentes.Domain.Entities.Notification", b =>
@@ -163,7 +197,7 @@ namespace GestionIncidentes.Infrastructure.Migrations
 
                     b.HasIndex("UserId", "IsRead");
 
-                    b.ToTable("Notifications");
+                    b.ToTable("Notifications", (string)null);
                 });
 
             modelBuilder.Entity("GestionIncidentes.Domain.Entities.Role", b =>
@@ -181,7 +215,43 @@ namespace GestionIncidentes.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Roles");
+                    b.ToTable("Roles", (string)null);
+                });
+
+            modelBuilder.Entity("GestionIncidentes.Domain.Entities.SolutionStep", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("ImageUrl")
+                        .HasColumnType("text");
+
+                    b.Property<Guid>("KnowledgeEntryId")
+                        .HasColumnType("uuid");
+
+                    b.Property<int>("StepNumber")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("KnowledgeEntryId", "StepNumber");
+
+                    b.ToTable("SolutionSteps", (string)null);
                 });
 
             modelBuilder.Entity("GestionIncidentes.Domain.Entities.Ticket", b =>
@@ -222,6 +292,9 @@ namespace GestionIncidentes.Infrastructure.Migrations
 
                     b.Property<string>("FeedbackComment")
                         .HasColumnType("text");
+
+                    b.Property<Guid?>("IncidentId")
+                        .HasColumnType("uuid");
 
                     b.Property<string>("Location")
                         .IsRequired()
@@ -267,7 +340,9 @@ namespace GestionIncidentes.Infrastructure.Migrations
 
                     b.HasIndex("CreatedByUserId");
 
-                    b.ToTable("Tickets");
+                    b.HasIndex("IncidentId");
+
+                    b.ToTable("Tickets", (string)null);
                 });
 
             modelBuilder.Entity("GestionIncidentes.Domain.Entities.TicketReport", b =>
@@ -309,7 +384,7 @@ namespace GestionIncidentes.Infrastructure.Migrations
 
                     b.HasIndex("TicketId");
 
-                    b.ToTable("TicketReports");
+                    b.ToTable("TicketReports", (string)null);
                 });
 
             modelBuilder.Entity("User", b =>
@@ -344,7 +419,7 @@ namespace GestionIncidentes.Infrastructure.Migrations
 
                     b.HasIndex("DepartmentId");
 
-                    b.ToTable("Users");
+                    b.ToTable("Users", (string)null);
                 });
 
             modelBuilder.Entity("GestionIncidentes.Domain.Entities.AuditLog", b =>
@@ -352,6 +427,15 @@ namespace GestionIncidentes.Infrastructure.Migrations
                     b.HasOne("User", null)
                         .WithMany()
                         .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("GestionIncidentes.Domain.Entities.Incident", b =>
+                {
+                    b.HasOne("User", null)
+                        .WithMany()
+                        .HasForeignKey("ReportedByUserId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
                 });
@@ -374,6 +458,17 @@ namespace GestionIncidentes.Infrastructure.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("GestionIncidentes.Domain.Entities.SolutionStep", b =>
+                {
+                    b.HasOne("GestionIncidentes.Domain.Entities.KnowledgeEntry", "KnowledgeEntry")
+                        .WithMany("Steps")
+                        .HasForeignKey("KnowledgeEntryId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("KnowledgeEntry");
+                });
+
             modelBuilder.Entity("GestionIncidentes.Domain.Entities.Ticket", b =>
                 {
                     b.HasOne("User", null)
@@ -386,6 +481,11 @@ namespace GestionIncidentes.Infrastructure.Migrations
                         .HasForeignKey("CreatedByUserId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
+
+                    b.HasOne("GestionIncidentes.Domain.Entities.Incident", null)
+                        .WithMany()
+                        .HasForeignKey("IncidentId")
+                        .OnDelete(DeleteBehavior.Restrict);
                 });
 
             modelBuilder.Entity("GestionIncidentes.Domain.Entities.TicketReport", b =>
@@ -415,6 +515,11 @@ namespace GestionIncidentes.Infrastructure.Migrations
             modelBuilder.Entity("GestionIncidentes.Domain.Entities.Department", b =>
                 {
                     b.Navigation("Users");
+                });
+
+            modelBuilder.Entity("GestionIncidentes.Domain.Entities.KnowledgeEntry", b =>
+                {
+                    b.Navigation("Steps");
                 });
 #pragma warning restore 612, 618
         }

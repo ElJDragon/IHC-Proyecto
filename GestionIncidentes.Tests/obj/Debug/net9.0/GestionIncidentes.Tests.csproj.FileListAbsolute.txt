@@ -102,8 +102,28 @@ C:\Users\User\Documents\Joshua Universidad\Quinto\IHC\Proyecto-2do-Parcial-IHC\G
 C:\Users\User\Documents\Joshua Universidad\Quinto\IHC\Proyecto-2do-Parcial-IHC\GestionIncidentes.Tests\obj\Debug\net9.0\GestionIncidentes.Tests.pdb
 C:\Users\User\Documents\Joshua Universidad\Quinto\IHC\Proyecto-2do-Parcial-IHC\GestionIncidentes.Tests\obj\Debug\net9.0\GestionIncidentes.Tests.genruntimeconfig.cache
 C:\Users\User\Documents\Joshua Universidad\Quinto\IHC\Proyecto-2do-Parcial-IHC\GestionIncidentes.Tests\obj\Debug\net9.0\ref\GestionIncidentes.Tests.dll
+<<<<<<< HEAD
+=======
+C:\IHC-Proyecto\GestionIncidentes.Tests\obj\Debug\net9.0\GestionIncidentes.Tests.dll
+C:\IHC-Proyecto\GestionIncidentes.Tests\obj\Debug\net9.0\refint\GestionIncidentes.Tests.dll
+C:\IHC-Proyecto\GestionIncidentes.Tests\obj\Debug\net9.0\GestionIncidentes.Tests.pdb
+C:\IHC-Proyecto\GestionIncidentes.Tests\bin\Debug\net9.0\.msCoverageSourceRootsMapping_GestionIncidentes.Tests
+C:\IHC-Proyecto\GestionIncidentes.Tests\bin\Debug\net9.0\CoverletSourceRootsMapping_GestionIncidentes.Tests
+C:\IHC-Proyecto\GestionIncidentes.Tests\obj\Debug\net9.0\GestionIncidentes.Tests.csproj.AssemblyReference.cache
+C:\IHC-Proyecto\GestionIncidentes.Tests\obj\Debug\net9.0\GestionIncidentes.Tests.GeneratedMSBuildEditorConfig.editorconfig
+C:\IHC-Proyecto\GestionIncidentes.Tests\obj\Debug\net9.0\GestionIncidentes.Tests.AssemblyInfoInputs.cache
+C:\IHC-Proyecto\GestionIncidentes.Tests\obj\Debug\net9.0\GestionIncidentes.Tests.AssemblyInfo.cs
+C:\IHC-Proyecto\GestionIncidentes.Tests\obj\Debug\net9.0\GestionIncidentes.Tests.csproj.CoreCompileInputs.cache
+C:\IHC-Proyecto\GestionIncidentes.Tests\obj\Debug\net9.0\GestionIncidentes.Tests.sourcelink.json
+>>>>>>> feature/incidentes
 C:\Users\User\Documents\Joshua Universidad\Quinto\IHC\ProyectoIHC\IHC-Proyecto\GestionIncidentes.Tests\bin\Debug\net9.0\.msCoverageSourceRootsMapping_GestionIncidentes.Tests
 C:\Users\User\Documents\Joshua Universidad\Quinto\IHC\ProyectoIHC\IHC-Proyecto\GestionIncidentes.Tests\bin\Debug\net9.0\CoverletSourceRootsMapping_GestionIncidentes.Tests
+C:\Users\User\Documents\Joshua Universidad\Quinto\IHC\ProyectoIHC\IHC-Proyecto\GestionIncidentes.Tests\obj\Debug\net9.0\GestionIncidentes.Tests.csproj.AssemblyReference.cache
+C:\Users\User\Documents\Joshua Universidad\Quinto\IHC\ProyectoIHC\IHC-Proyecto\GestionIncidentes.Tests\obj\Debug\net9.0\GestionIncidentes.Tests.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\User\Documents\Joshua Universidad\Quinto\IHC\ProyectoIHC\IHC-Proyecto\GestionIncidentes.Tests\obj\Debug\net9.0\GestionIncidentes.Tests.AssemblyInfoInputs.cache
+C:\Users\User\Documents\Joshua Universidad\Quinto\IHC\ProyectoIHC\IHC-Proyecto\GestionIncidentes.Tests\obj\Debug\net9.0\GestionIncidentes.Tests.AssemblyInfo.cs
+C:\Users\User\Documents\Joshua Universidad\Quinto\IHC\ProyectoIHC\IHC-Proyecto\GestionIncidentes.Tests\obj\Debug\net9.0\GestionIncidentes.Tests.csproj.CoreCompileInputs.cache
+C:\Users\User\Documents\Joshua Universidad\Quinto\IHC\ProyectoIHC\IHC-Proyecto\GestionIncidentes.Tests\obj\Debug\net9.0\GestionIncidentes.Tests.sourcelink.json
 C:\Users\User\Documents\Joshua Universidad\Quinto\IHC\ProyectoIHC\IHC-Proyecto\GestionIncidentes.Tests\bin\Debug\net9.0\testhost.dll
 C:\Users\User\Documents\Joshua Universidad\Quinto\IHC\ProyectoIHC\IHC-Proyecto\GestionIncidentes.Tests\bin\Debug\net9.0\testhost.exe
 C:\Users\User\Documents\Joshua Universidad\Quinto\IHC\ProyectoIHC\IHC-Proyecto\GestionIncidentes.Tests\bin\Debug\net9.0\xunit.runner.visualstudio.testadapter.dll
@@ -210,44 +230,9 @@ C:\Users\User\Documents\Joshua Universidad\Quinto\IHC\ProyectoIHC\IHC-Proyecto\G
 C:\Users\User\Documents\Joshua Universidad\Quinto\IHC\ProyectoIHC\IHC-Proyecto\GestionIncidentes.Tests\bin\Debug\net9.0\GestionIncidentes.Domain.dll
 C:\Users\User\Documents\Joshua Universidad\Quinto\IHC\ProyectoIHC\IHC-Proyecto\GestionIncidentes.Tests\bin\Debug\net9.0\GestionIncidentes.Domain.pdb
 C:\Users\User\Documents\Joshua Universidad\Quinto\IHC\ProyectoIHC\IHC-Proyecto\GestionIncidentes.Tests\bin\Debug\net9.0\GestionIncidentes.Application.pdb
-C:\Users\User\Documents\Joshua Universidad\Quinto\IHC\ProyectoIHC\IHC-Proyecto\GestionIncidentes.Tests\obj\Debug\net9.0\GestionIncidentes.Tests.csproj.AssemblyReference.cache
-C:\Users\User\Documents\Joshua Universidad\Quinto\IHC\ProyectoIHC\IHC-Proyecto\GestionIncidentes.Tests\obj\Debug\net9.0\GestionIncidentes.Tests.GeneratedMSBuildEditorConfig.editorconfig
-C:\Users\User\Documents\Joshua Universidad\Quinto\IHC\ProyectoIHC\IHC-Proyecto\GestionIncidentes.Tests\obj\Debug\net9.0\GestionIncidentes.Tests.AssemblyInfoInputs.cache
-C:\Users\User\Documents\Joshua Universidad\Quinto\IHC\ProyectoIHC\IHC-Proyecto\GestionIncidentes.Tests\obj\Debug\net9.0\GestionIncidentes.Tests.AssemblyInfo.cs
-C:\Users\User\Documents\Joshua Universidad\Quinto\IHC\ProyectoIHC\IHC-Proyecto\GestionIncidentes.Tests\obj\Debug\net9.0\GestionIncidentes.Tests.csproj.CoreCompileInputs.cache
-C:\Users\User\Documents\Joshua Universidad\Quinto\IHC\ProyectoIHC\IHC-Proyecto\GestionIncidentes.Tests\obj\Debug\net9.0\GestionIncidentes.Tests.sourcelink.json
 C:\Users\User\Documents\Joshua Universidad\Quinto\IHC\ProyectoIHC\IHC-Proyecto\GestionIncidentes.Tests\obj\Debug\net9.0\GestionI.F049C51B.Up2Date
 C:\Users\User\Documents\Joshua Universidad\Quinto\IHC\ProyectoIHC\IHC-Proyecto\GestionIncidentes.Tests\obj\Debug\net9.0\GestionIncidentes.Tests.dll
 C:\Users\User\Documents\Joshua Universidad\Quinto\IHC\ProyectoIHC\IHC-Proyecto\GestionIncidentes.Tests\obj\Debug\net9.0\refint\GestionIncidentes.Tests.dll
 C:\Users\User\Documents\Joshua Universidad\Quinto\IHC\ProyectoIHC\IHC-Proyecto\GestionIncidentes.Tests\obj\Debug\net9.0\GestionIncidentes.Tests.pdb
 C:\Users\User\Documents\Joshua Universidad\Quinto\IHC\ProyectoIHC\IHC-Proyecto\GestionIncidentes.Tests\obj\Debug\net9.0\GestionIncidentes.Tests.genruntimeconfig.cache
 C:\Users\User\Documents\Joshua Universidad\Quinto\IHC\ProyectoIHC\IHC-Proyecto\GestionIncidentes.Tests\obj\Debug\net9.0\ref\GestionIncidentes.Tests.dll
-<<<<<<< HEAD
-=======
-C:\Users\User\Documents\Joshua Universidad\Quinto\IHC\ProyectoIHC\IHC-Proyecto\GestionIncidentes.Tests\bin\Debug\net9.0\.msCoverageSourceRootsMapping_GestionIncidentes.Tests
-C:\Users\User\Documents\Joshua Universidad\Quinto\IHC\ProyectoIHC\IHC-Proyecto\GestionIncidentes.Tests\bin\Debug\net9.0\CoverletSourceRootsMapping_GestionIncidentes.Tests
-C:\Users\User\Documents\Joshua Universidad\Quinto\IHC\ProyectoIHC\IHC-Proyecto\GestionIncidentes.Tests\bin\Debug\net9.0\FluentValidation.dll
-C:\Users\User\Documents\Joshua Universidad\Quinto\IHC\ProyectoIHC\IHC-Proyecto\GestionIncidentes.Tests\bin\Debug\net9.0\MediatR.dll
-C:\Users\User\Documents\Joshua Universidad\Quinto\IHC\ProyectoIHC\IHC-Proyecto\GestionIncidentes.Tests\bin\Debug\net9.0\MediatR.Contracts.dll
-C:\Users\User\Documents\Joshua Universidad\Quinto\IHC\ProyectoIHC\IHC-Proyecto\GestionIncidentes.Tests\bin\Debug\net9.0\Microsoft.Extensions.DependencyInjection.Abstractions.dll
-C:\Users\User\Documents\Joshua Universidad\Quinto\IHC\ProyectoIHC\IHC-Proyecto\GestionIncidentes.Tests\bin\Debug\net9.0\Microsoft.Extensions.Logging.Abstractions.dll
-C:\Users\User\Documents\Joshua Universidad\Quinto\IHC\ProyectoIHC\IHC-Proyecto\GestionIncidentes.Tests\bin\Debug\net9.0\Microsoft.IdentityModel.Abstractions.dll
-C:\Users\User\Documents\Joshua Universidad\Quinto\IHC\ProyectoIHC\IHC-Proyecto\GestionIncidentes.Tests\bin\Debug\net9.0\Microsoft.IdentityModel.JsonWebTokens.dll
-C:\Users\User\Documents\Joshua Universidad\Quinto\IHC\ProyectoIHC\IHC-Proyecto\GestionIncidentes.Tests\bin\Debug\net9.0\Microsoft.IdentityModel.Logging.dll
-C:\Users\User\Documents\Joshua Universidad\Quinto\IHC\ProyectoIHC\IHC-Proyecto\GestionIncidentes.Tests\bin\Debug\net9.0\Microsoft.IdentityModel.Tokens.dll
-C:\Users\User\Documents\Joshua Universidad\Quinto\IHC\ProyectoIHC\IHC-Proyecto\GestionIncidentes.Tests\bin\Debug\net9.0\GestionIncidentes.Application.dll
-C:\Users\User\Documents\Joshua Universidad\Quinto\IHC\ProyectoIHC\IHC-Proyecto\GestionIncidentes.Tests\bin\Debug\net9.0\GestionIncidentes.Domain.dll
-C:\Users\User\Documents\Joshua Universidad\Quinto\IHC\ProyectoIHC\IHC-Proyecto\GestionIncidentes.Tests\bin\Debug\net9.0\GestionIncidentes.Domain.pdb
-C:\Users\User\Documents\Joshua Universidad\Quinto\IHC\ProyectoIHC\IHC-Proyecto\GestionIncidentes.Tests\bin\Debug\net9.0\GestionIncidentes.Application.pdb
-C:\IHC-Proyecto\GestionIncidentes.Tests\obj\Debug\net9.0\GestionIncidentes.Tests.dll
-C:\IHC-Proyecto\GestionIncidentes.Tests\obj\Debug\net9.0\refint\GestionIncidentes.Tests.dll
-C:\IHC-Proyecto\GestionIncidentes.Tests\obj\Debug\net9.0\GestionIncidentes.Tests.pdb
-C:\IHC-Proyecto\GestionIncidentes.Tests\bin\Debug\net9.0\.msCoverageSourceRootsMapping_GestionIncidentes.Tests
-C:\IHC-Proyecto\GestionIncidentes.Tests\bin\Debug\net9.0\CoverletSourceRootsMapping_GestionIncidentes.Tests
-C:\IHC-Proyecto\GestionIncidentes.Tests\obj\Debug\net9.0\GestionIncidentes.Tests.csproj.AssemblyReference.cache
-C:\IHC-Proyecto\GestionIncidentes.Tests\obj\Debug\net9.0\GestionIncidentes.Tests.GeneratedMSBuildEditorConfig.editorconfig
-C:\IHC-Proyecto\GestionIncidentes.Tests\obj\Debug\net9.0\GestionIncidentes.Tests.AssemblyInfoInputs.cache
-C:\IHC-Proyecto\GestionIncidentes.Tests\obj\Debug\net9.0\GestionIncidentes.Tests.AssemblyInfo.cs
-C:\IHC-Proyecto\GestionIncidentes.Tests\obj\Debug\net9.0\GestionIncidentes.Tests.csproj.CoreCompileInputs.cache
-C:\IHC-Proyecto\GestionIncidentes.Tests\obj\Debug\net9.0\GestionIncidentes.Tests.sourcelink.json
->>>>>>> feature/incidentes

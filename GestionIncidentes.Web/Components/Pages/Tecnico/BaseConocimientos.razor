@@ -1,0 +1,271 @@
+@page "/tecnico/base-conocimientos"
+@layout TecnicoLayout
+@rendermode InteractiveServer
+@inject IKnowledgeRepository KnowledgeRepo
+@inject ISolutionStepRepository SolutionStepRepo
+@inject NavigationManager Navigation
+@using GestionIncidentes.Application.Interfaces
+@using GestionIncidentes.Domain.Entities
+
+<link rel="stylesheet" href="/css/layout.css" />
+
+<div style="max-width:1400px; margin:0 auto; padding:24px">
+  <div style="margin-bottom:24px">
+    <h1 style="font-size:28px; font-weight:600; color:var(--text-dark); margin:0 0 8px 0">Base de Conocimientos</h1>
+    <p style="color:var(--text-gray); margin:0">Busca soluciones a problemas técnicos comunes</p>
+  </div>
+
+  <div class="filters-bar" style="background:white; border:2px solid var(--border-color); border-radius:12px; padding:16px; margin-bottom:24px">
+    <div style="flex:1; max-width:500px">
+      <div style="position:relative">
+        <span class="material-icons" style="position:absolute; left:12px; top:50%; transform:translateY(-50%); color:var(--text-gray)">search</span>
+        <input type="text" @bind="searchTerm" @bind:event="oninput" @bind:after="SearchEntries" placeholder="Buscar soluciones, problemas o etiquetas..." 
+               style="width:100%; padding:12px 12px 12px 44px; border:2px solid var(--border-color); border-radius:10px; font-size:15px" />
+      </div>
+    </div>
+    <select @bind="filterCategory" @bind:after="SearchEntries" class="form-select" style="padding:12px; border:2px solid var(--border-color); border-radius:10px; min-width:200px">
+      <option value="">Todas las categorías</option>
+      <option value="Hardware">Hardware</option>
+      <option value="Software">Software</option>
+      <option value="Red">Red</option>
+      <option value="Sistema Operativo">Sistema Operativo</option>
+      <option value="Seguridad">Seguridad</option>
+    </select>
+  </div>
+
+  @if(isLoading)
+  {
+    <div style="text-align:center; padding:80px">
+      <div style="width:48px; height:48px; border:4px solid var(--border-color); border-top-color:var(--color-primary); border-radius:50%; animation:spin 1s linear infinite; margin:0 auto"></div>
+      <p style="color:var(--text-gray); margin-top:16px">Buscando soluciones...</p>
+    </div>
+  }
+  else if(displayEntries.Count == 0 && !string.IsNullOrWhiteSpace(searchTerm))
+  {
+    <div class="empty-state" style="text-align:center; padding:80px; background:white; border:2px solid var(--border-color); border-radius:12px">
+      <span class="material-icons" style="font-size:80px; color:var(--text-gray); opacity:0.4">search_off</span>
+      <h3 style="color:var(--text-dark); margin:16px 0 8px 0">No se encontraron resultados</h3>
+      <p style="color:var(--text-gray); margin:0">Intenta con otros términos de búsqueda</p>
+    </div>
+  }
+  else if(displayEntries.Count == 0)
+  {
+    <div class="empty-state" style="text-align:center; padding:80px; background:white; border:2px solid var(--border-color); border-radius:12px">
+      <span class="material-icons" style="font-size:80px; color:var(--text-gray); opacity:0.4">library_books</span>
+      <h3 style="color:var(--text-dark); margin:16px 0 8px 0">No hay entradas disponibles</h3>
+      <p style="color:var(--text-gray); margin:0">La base de conocimientos está vacía</p>
+    </div>
+  }
+  else
+  {
+    <div style="display:grid; gap:16px">
+      @foreach(var entry in displayEntries)
+      {
+        <div class="knowledge-card" style="background:white; border:2px solid var(--border-color); border-radius:12px; padding:24px; transition:all 0.2s; cursor:pointer" 
+             @onclick="() => ToggleEntry(entry.Id)">
+          <div style="display:flex; justify-content:space-between; align-items:start">
+            <div style="flex:1">
+              <div style="display:flex; align-items:center; gap:12px; margin-bottom:12px">
+                <h3 style="margin:0; font-size:18px; font-weight:600; color:var(--text-dark)">@entry.Title</h3>
+                <span class="badge" style="background:var(--color-primary-light); color:var(--color-primary); padding:4px 12px; border-radius:6px; font-size:12px; font-weight:500">
+                  @entry.Category
+                </span>
+              </div>
+              
+              <div style="margin-bottom:12px">
+                <div style="display:flex; align-items:center; gap:8px; margin-bottom:8px">
+                  <span class="material-icons" style="font-size:18px; color:var(--color-danger)">error_outline</span>
+                  <strong style="font-size:14px; color:var(--text-dark)">Problema:</strong>
+                </div>
+                <p style="color:var(--text-gray); margin:0 0 0 26px; font-size:14px; line-height:1.6">@entry.Problem</p>
+              </div>
+              
+              @if(expandedEntryId == entry.Id)
+              {
+                <div style="margin-bottom:16px; padding:16px; background:var(--bg-light); border-radius:10px; animation:slideDown 0.3s ease">
+                  <div style="display:flex; align-items:center; gap:8px; margin-bottom:8px">
+                    <span class="material-icons" style="font-size:18px; color:var(--color-success)">check_circle</span>
+                    <strong style="font-size:14px; color:var(--text-dark)">Solución:</strong>
+                  </div>
+                  <p style="color:var(--text-dark); margin:0 0 0 26px; font-size:14px; line-height:1.6; white-space:pre-line">@entry.SolutionDescription</p>
+                  
+                  @if(entry.SolutionId.HasValue && entrySteps.ContainsKey(entry.Id) && entrySteps[entry.Id].Count > 0)
+                  {
+                    <div style="margin-top:16px; padding:16px; background:white; border-radius:8px; border:1px solid var(--border-color)">
+                      <div style="display:flex; align-items:center; gap:8px; margin-bottom:12px">
+                        <span class="material-icons" style="color:var(--color-primary); font-size:20px">format_list_numbered</span>
+                        <strong style="color:var(--text-dark)">Pasos detallados:</strong>
+                      </div>
+                      <ol style="margin:0; padding-left:20px">
+                        @foreach(var step in entrySteps[entry.Id].OrderBy(s => s.StepNumber))
+                        {
+                          <li style="margin-bottom:12px; color:var(--text-dark)">
+                            <strong>@step.Title</strong>
+                            <p style="margin:4px 0 0 0; color:var(--text-gray); font-size:13px; line-height:1.6">@step.Description</p>
+                            @if(!string.IsNullOrEmpty(step.ImageUrl))
+                            {
+                              <img src="@step.ImageUrl" alt="@step.Title" style="max-width:100%; margin-top:8px; border-radius:6px; border:1px solid var(--border-color)" />
+                            }
+                          </li>
+                        }
+                      </ol>
+                    </div>
+                  }
+                </div>
+              }
+              
+              @if(entry.Tags.Count > 0)
+              {
+                <div style="display:flex; gap:8px; flex-wrap:wrap; margin-bottom:12px">
+                  @foreach(var tag in entry.Tags)
+                  {
+                    <span style="background:var(--bg-light); padding:4px 10px; border-radius:6px; font-size:12px; color:var(--text-gray)">
+                      #@tag
+                    </span>
+                  }
+                </div>
+              }
+              
+              <div style="display:flex; align-items:center; gap:16px; font-size:13px; color:var(--text-gray)">
+                <span style="display:flex; align-items:center; gap:4px">
+                  <span class="material-icons" style="font-size:16px">visibility</span>
+                  @entry.UsageCount consultas
+                </span>
+                <span style="display:flex; align-items:center; gap:4px">
+                  <span class="material-icons" style="font-size:16px">schedule</span>
+                  Actualizado @GetTimeAgo(entry.UpdatedAt)
+                </span>
+              </div>
+            </div>
+            
+            <button class="btn-icon" @onclick:stopPropagation @onclick="() => ToggleEntry(entry.Id)" 
+                    style="background:var(--bg-light); border:none; padding:10px; border-radius:8px; cursor:pointer; transition:all 0.2s">
+              <span class="material-icons" style="color:var(--text-dark); transition:transform 0.3s; transform:rotate(@(expandedEntryId == entry.Id ? "180deg" : "0deg"))">
+                expand_more
+              </span>
+            </button>
+          </div>
+        </div>
+      }
+    </div>
+  }
+</div>
+
+<style>
+@@keyframes slideDown {
+  from { opacity:0; transform:translateY(-10px); }
+  to { opacity:1; transform:translateY(0); }
+}
+@@keyframes spin {
+  to { transform:rotate(360deg); }
+}
+.knowledge-card:hover {
+  border-color:var(--color-primary);
+  box-shadow:0 4px 12px rgba(59, 130, 246, 0.1);
+}
+.btn-icon:hover {
+  background:var(--color-primary-light) !important;
+}
+</style>
+
+@code {
+  private List<KnowledgeEntry> displayEntries = new();
+  private Dictionary<Guid, List<SolutionStep>> entrySteps = new();
+  private bool isLoading = false;
+  private string searchTerm = "";
+  private string filterCategory = "";
+  private Guid? expandedEntryId = null;
+
+  protected override async Task OnInitializedAsync()
+  {
+    await LoadAllEntries();
+  }
+
+  private async Task LoadAllEntries()
+  {
+    isLoading = true;
+    displayEntries = await KnowledgeRepo.GetAllAsync();
+    
+    // Cargar los pasos de cada solución
+    entrySteps.Clear();
+    foreach(var entry in displayEntries)
+    {
+      if(entry.SolutionId.HasValue)
+      {
+        var steps = await SolutionStepRepo.GetStepsBySolutionIdAsync(entry.SolutionId.Value);
+        entrySteps[entry.Id] = steps;
+      }
+    }
+    
+    isLoading = false;
+  }
+
+  private async Task SearchEntries()
+  {
+    isLoading = true;
+    
+    if (string.IsNullOrWhiteSpace(searchTerm) && string.IsNullOrEmpty(filterCategory))
+    {
+      displayEntries = await KnowledgeRepo.GetAllAsync();
+    }
+    else if (!string.IsNullOrWhiteSpace(searchTerm))
+    {
+      displayEntries = await KnowledgeRepo.SearchAsync(searchTerm);
+      
+      if (!string.IsNullOrEmpty(filterCategory))
+      {
+        displayEntries = displayEntries.Where(e => e.Category == filterCategory).ToList();
+      }
+    }
+    else if (!string.IsNullOrEmpty(filterCategory))
+    {
+      displayEntries = await KnowledgeRepo.GetByCategoryAsync(filterCategory);
+    }
+    
+    // Cargar los pasos de las entradas filtradas
+    entrySteps.Clear();
+    foreach(var entry in displayEntries)
+    {
+      if(entry.SolutionId.HasValue)
+      {
+        var steps = await SolutionStepRepo.GetStepsBySolutionIdAsync(entry.SolutionId.Value);
+        entrySteps[entry.Id] = steps;
+      }
+    }
+    
+    isLoading = false;
+  }
+
+  private void ToggleEntry(Guid entryId)
+  {
+    if (expandedEntryId == entryId)
+    {
+      expandedEntryId = null;
+    }
+    else
+    {
+      expandedEntryId = entryId;
+      IncrementUsageCount(entryId);
+    }
+  }
+
+  private async void IncrementUsageCount(Guid entryId)
+  {
+    var entry = displayEntries.FirstOrDefault(e => e.Id == entryId);
+    if (entry != null)
+    {
+      entry.IncrementUsage();
+      await KnowledgeRepo.UpdateAsync(entry);
+    }
+  }
+
+  private string GetTimeAgo(DateTime date)
+  {
+    var span = DateTime.UtcNow - date;
+    if (span.TotalDays >= 365) return $"hace {(int)(span.TotalDays / 365)} año(s)";
+    if (span.TotalDays >= 30) return $"hace {(int)(span.TotalDays / 30)} mes(es)";
+    if (span.TotalDays >= 1) return $"hace {(int)span.TotalDays} día(s)";
+    if (span.TotalHours >= 1) return $"hace {(int)span.TotalHours} hora(s)";
+    return "hace unos minutos";
+  }
+}

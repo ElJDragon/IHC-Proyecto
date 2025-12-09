@@ -1,6 +1,9 @@
 @page "/login"
 @layout EmptyLayout
 @inject NavigationManager Navigation
+@inject HttpClient Http
+@inject GestionIncidentes.Web.Services.AuthService AuthService
+@inject Microsoft.AspNetCore.Components.Authorization.AuthenticationStateProvider AuthStateProvider
 @rendermode InteractiveServer
 
 <link rel="stylesheet" href="css/login.css" />
@@ -12,46 +15,199 @@
                 <span class="brand-icon">SI</span>
             </div>
             <h1 class="login-title">Sistema de Incidentes</h1>
-            <p class="login-subtitle">Universidad</p>
+            <p class="login-subtitle">Universidad Técnica de Ambato</p>
         </div>
 
+        @if (!string.IsNullOrEmpty(errorMessage))
+        {
+            <div class="alert-error">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <line x1="12" y1="8" x2="12" y2="12"></line>
+                    <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                </svg>
+                <span>@errorMessage</span>
+            </div>
+        }
+
+        <form class="login-form" @onsubmit="HandleLogin">
+            <div class="form-group">
+                <label for="email">Correo Institucional</label>
+                <input 
+                    type="email" 
+                    id="email" 
+                    @bind="email" 
+                    placeholder="ejemplo@uta.edu.ec"
+                    required
+                    disabled="@isLoading" />
+            </div>
+
+            <div class="form-group">
+                <label for="password">Contraseña</label>
+                <input 
+                    type="password" 
+                    id="password" 
+                    @bind="password" 
+                    placeholder="••••••••"
+                    required
+                    disabled="@isLoading" />
+            </div>
+
+            <button type="submit" class="btn-login" disabled="@isLoading">
+                @if (isLoading)
+                {
+                    <span>Iniciando sesión...</span>
+                }
+                else
+                {
+                    <span>Iniciar Sesión</span>
+                }
+            </button>
+        </form>
+
         <div class="demo-section">
-            <div class="demo-title">Selecciona tu perfil</div>
-            <div class="demo-buttons">
-                <button type="button" class="demo-btn admin-btn" @onclick="GoToAdmin">
-                    <span class="demo-role">Administrador</span>
-                    <span class="demo-badge">Admin</span>
-                </button>
-                <button type="button" class="demo-btn tech-btn" @onclick="GoToTecnico">
-                    <span class="demo-role">Tecnico</span>
-                    <span class="demo-badge">Technician</span>
-                </button>
-                <button type="button" class="demo-btn user-btn" @onclick="GoToUsuario">
-                    <span class="demo-role">Usuario Regular</span>
-                    <span class="demo-badge">User</span>
-                </button>
+            <div class="demo-title">Usuarios de prueba</div>
+            <div class="demo-grid">
+                <div class="demo-user">
+                    <strong>Admin:</strong> Admin@uta.edu.ec / Admin123
+                </div>
+                <div class="demo-user">
+                    <strong>Técnico 1:</strong> Tec1@uta.edu.ec / 123456
+                </div>
+                <div class="demo-user">
+                    <strong>Técnico 2:</strong> Tec2@uta.edu.ec / 654321
+                </div>
+                <div class="demo-user">
+                    <strong>Usuario 1:</strong> User1@uta.edu.ec / 12456
+                </div>
+                <div class="demo-user">
+                    <strong>Usuario 2:</strong> User2@uta.edu.ec / 654321
+                </div>
             </div>
         </div>
 
         <div class="login-footer">
-            <p>Necesitas ayuda Contacta a <a href="mailto:soporte@universidad.edu">soporte@universidad.edu</a></p>
+            <p>¿Necesitas ayuda? Contacta a <a href="mailto:soporte@uta.edu.ec">soporte@uta.edu.ec</a></p>
         </div>
     </div>
 </div>
 
 @code {
-    private void GoToAdmin()
+    private string email = "";
+    private string password = "";
+    private string errorMessage = "";
+    private bool isLoading = false;
+    private bool hasCheckedAuth = false;
+
+    protected override async Task OnInitializedAsync()
     {
-        Navigation.NavigateTo("/admin/dashboard", forceLoad: true);
+        Console.WriteLine("[Login] OnInitializedAsync - INICIANDO");
+        
+        // Prevenir múltiples verificaciones
+        if (hasCheckedAuth)
+        {
+            Console.WriteLine("[Login] OnInitializedAsync - Ya verificado, saliendo");
+            return;
+        }
+        hasCheckedAuth = true;
+
+        Console.WriteLine("[Login] OnInitializedAsync - Verificando si ya está autenticado");
+        // Si ya está autenticado, redirigir al dashboard correspondiente
+        if (await AuthService.IsAuthenticatedAsync())
+        {
+            Console.WriteLine("[Login] OnInitializedAsync - Usuario YA autenticado, redirigiendo");
+            var role = await AuthService.GetCurrentUserRoleAsync();
+            Console.WriteLine($"[Login] OnInitializedAsync - Rol obtenido: {role}");
+            RedirectToDashboard(role ?? "Usuario");
+        }
+        else
+        {
+            Console.WriteLine("[Login] OnInitializedAsync - Usuario NO autenticado, mostrando login");
+        }
     }
 
-    private void GoToTecnico()
+    private async Task HandleLogin()
     {
-        Navigation.NavigateTo("/tecnico/dashboard", forceLoad: true);
+        Console.WriteLine("[Login] HandleLogin - INICIANDO proceso de login");
+        errorMessage = "";
+        isLoading = true;
+
+        try
+        {
+            var loginRequest = new { email = email.Trim(), password = password };
+            Console.WriteLine($"[Login] HandleLogin - Email: {email.Trim()}");
+            
+            // Construir URL absoluta
+            var baseUri = Navigation.ToAbsoluteUri("/").ToString().TrimEnd('/');
+            var loginUrl = $"{baseUri}/api/auth/login";
+            Console.WriteLine($"[Login] HandleLogin - URL de login: {loginUrl}");
+            
+            Console.WriteLine("[Login] HandleLogin - Enviando petición POST al servidor");
+            var response = await Http.PostAsJsonAsync(loginUrl, loginRequest);
+            Console.WriteLine($"[Login] HandleLogin - Respuesta recibida - Status: {response.StatusCode}");
+            
+            if (response.IsSuccessStatusCode)
+            {
+                Console.WriteLine("[Login] HandleLogin - Login EXITOSO, leyendo respuesta");
+                var result = await response.Content.ReadFromJsonAsync<LoginResponse>();
+                Console.WriteLine($"[Login] HandleLogin - Usuario: {result?.userName}, Rol: {result?.role}");
+                
+                // Notificar al AuthenticationStateProvider que el estado cambió
+                Console.WriteLine("[Login] HandleLogin - Notificando cambio de estado al AuthStateProvider");
+                if (AuthStateProvider is GestionIncidentes.Web.Auth.CustomAuthenticationStateProvider customProvider)
+                {
+                    customProvider.NotifyAuthenticationStateChanged();
+                    Console.WriteLine("[Login] HandleLogin - Notificación enviada exitosamente");
+                }
+                else
+                {
+                    Console.WriteLine("[Login] HandleLogin - ERROR: AuthStateProvider no es del tipo CustomAuthenticationStateProvider");
+                }
+
+                // Esperar un momento para asegurar que la autenticación se procese
+                Console.WriteLine("[Login] HandleLogin - Esperando 200ms para que se procese la autenticación");
+                await Task.Delay(200);
+
+                // Redirigir según rol
+                Console.WriteLine($"[Login] HandleLogin - Redirigiendo a: {result!.redirectUrl}");
+                Navigation.NavigateTo(result!.redirectUrl, forceLoad: true);
+            }
+            else
+            {
+                Console.WriteLine($"[Login] HandleLogin - Login FALLIDO - Status: {response.StatusCode}");
+                var error = await response.Content.ReadFromJsonAsync<ErrorResponse>();
+                errorMessage = error?.message ?? "Credenciales incorrectas";
+                Console.WriteLine($"[Login] HandleLogin - Mensaje de error: {errorMessage}");
+                isLoading = false;
+            }
+        }
+        catch (Exception ex)
+        {
+            errorMessage = "Error al iniciar sesión. Por favor intente nuevamente.";
+            Console.WriteLine($"[Login] HandleLogin - EXCEPCIÓN: {ex.Message}");
+            Console.WriteLine($"[Login] HandleLogin - Stack: {ex.StackTrace}");
+            isLoading = false;
+        }
     }
 
-    private void GoToUsuario()
+    private void RedirectToDashboard(string role)
     {
-        Navigation.NavigateTo("/usuario/reportar", forceLoad: true);
+        switch (role.ToLower())
+        {
+            case "admin":
+            case "administrador":
+                Navigation.NavigateTo("/admin/dashboard", forceLoad: true);
+                break;
+            case "tecnico":
+            case "técnico":
+                Navigation.NavigateTo("/tecnico/dashboard", forceLoad: true);
+                break;
+            default:
+                Navigation.NavigateTo("/usuario/dashboard", forceLoad: true);
+                break;
+        }
     }
+
+    private record LoginResponse(bool success, Guid userId, string userName, string role, string redirectUrl);
+    private record ErrorResponse(string message);
 }

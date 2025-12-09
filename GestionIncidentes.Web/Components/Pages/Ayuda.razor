@@ -1,0 +1,579 @@
+@page "/ayuda"
+@rendermode InteractiveServer
+
+<PageTitle>Ayuda y Tutoriales - Gestión de Incidentes</PageTitle>
+
+<div class="ayuda-container">
+    <div class="page-header">
+        <h2>📚 Centro de Ayuda</h2>
+        <p class="subtitle">Encuentra respuestas y aprende a usar el sistema</p>
+    </div>
+
+    <!-- Buscador -->
+    <div class="search-section">
+        <input type="text" @bind="searchTerm" @bind:event="oninput" @onkeyup="SearchHelp" placeholder="🔍 Buscar en la ayuda..." class="search-input" />
+    </div>
+
+    <!-- Tabs por Rol -->
+    <div class="tabs-container">
+        <button class="tab-btn @(selectedRole == "general" ? "active" : "")" @onclick='() => selectedRole = "general"'>
+            📖 General
+        </button>
+        <button class="tab-btn @(selectedRole == "usuario" ? "active" : "")" @onclick='() => selectedRole = "usuario"'>
+            👤 Estudiante/Usuario
+        </button>
+        <button class="tab-btn @(selectedRole == "tecnico" ? "active" : "")" @onclick='() => selectedRole = "tecnico"'>
+            🔧 Técnico
+        </button>
+        <button class="tab-btn @(selectedRole == "admin" ? "active" : "")" @onclick='() => selectedRole = "admin"'>
+            👑 Administrador
+        </button>
+    </div>
+
+    <!-- Contenido General -->
+    @if (selectedRole == "general")
+    {
+        <div class="help-content">
+            <div class="help-card">
+                <h3>🎯 ¿Qué es el Sistema de Gestión de Incidentes?</h3>
+                <p>
+                    Es una plataforma centralizada para reportar, gestionar y resolver incidentes tecnológicos
+                    en la universidad. Permite a estudiantes reportar problemas, técnicos gestionarlos y
+                    administradores supervisar todo el proceso.
+                </p>
+            </div>
+
+            <div class="help-card">
+                <h3>👥 Roles del Sistema</h3>
+                <ul class="role-list">
+                    <li>
+                        <strong>👤 Usuario/Estudiante:</strong> Puede reportar incidentes, ver el estado de sus reportes y
+                        consultar la base de conocimientos.
+                    </li>
+                    <li>
+                        <strong>🔧 Técnico:</strong> Atiende y resuelve los tickets asignados, puede actualizar estado,
+                        añadir comentarios y crear soluciones en la base de conocimientos.
+                    </li>
+                    <li>
+                        <strong>👑 Administrador:</strong> Supervisa todo el sistema, gestiona usuarios, analiza métricas,
+                        administra la base de conocimientos y configura el sistema.
+                    </li>
+                </ul>
+            </div>
+
+            <div class="faq-section">
+                <h3>❓ Preguntas Frecuentes</h3>
+                
+                <div class="faq-item" @onclick='() => ToggleFAQ("faq1")'>
+                    <div class="faq-question">
+                        <span>¿Cómo recupero mi contraseña?</span>
+                        <span class="faq-icon">@(expandedFAQs.Contains("faq1") ? "▼" : "▶")</span>
+                    </div>
+                    @if (expandedFAQs.Contains("faq1"))
+                    {
+                        <div class="faq-answer">
+                            Contacta al administrador del sistema o al departamento de TI para restablecer tu contraseña.
+                            Por seguridad, este proceso requiere verificación de identidad.
+                        </div>
+                    }
+                </div>
+
+                <div class="faq-item" @onclick='() => ToggleFAQ("faq2")'>
+                    <div class="faq-question">
+                        <span>¿Qué navegadores están soportados?</span>
+                        <span class="faq-icon">@(expandedFAQs.Contains("faq2") ? "▼" : "▶")</span>
+                    </div>
+                    @if (expandedFAQs.Contains("faq2"))
+                    {
+                        <div class="faq-answer">
+                            El sistema funciona mejor en versiones recientes de Chrome, Firefox, Edge y Safari.
+                            Recomendamos mantener tu navegador actualizado para una mejor experiencia.
+                        </div>
+                    }
+                </div>
+
+                <div class="faq-item" @onclick='() => ToggleFAQ("faq3")'>
+                    <div class="faq-question">
+                        <span>¿Cómo activo el modo oscuro?</span>
+                        <span class="faq-icon">@(expandedFAQs.Contains("faq3") ? "▼" : "▶")</span>
+                    </div>
+                    @if (expandedFAQs.Contains("faq3"))
+                    {
+                        <div class="faq-answer">
+                            Ve a <a href="/perfil">Mi Perfil</a> → Configuración → Accesibilidad. Ahí encontrarás
+                            opciones de tema (Claro/Oscuro/Automático) y otras configuraciones de accesibilidad.
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    }
+
+    <!-- Contenido Usuario -->
+    @if (selectedRole == "usuario")
+    {
+        <div class="help-content">
+            <div class="tutorial-card">
+                <h3>📝 Cómo Reportar un Incidente</h3>
+                <ol class="tutorial-steps">
+                    <li>
+                        <strong>Accede al formulario:</strong> Ve a "Usuario" → "Reportar Incidente" en el menú.
+                    </li>
+                    <li>
+                        <strong>Completa la información:</strong>
+                        <ul>
+                            <li>Título: Breve descripción del problema</li>
+                            <li>Categoría: Hardware, Software o Red</li>
+                            <li>Prioridad: Crítica, Alta, Media o Baja</li>
+                            <li>Ubicación: Edificio, laboratorio y equipo específico</li>
+                            <li>Descripción detallada del problema</li>
+                        </ul>
+                    </li>
+                    <li>
+                        <strong>Envía el reporte:</strong> Haz clic en "Enviar Reporte". Recibirás un número de ticket.
+                    </li>
+                    <li>
+                        <strong>Seguimiento:</strong> Puedes ver el estado en "Mis Reportes".
+                    </li>
+                </ol>
+            </div>
+
+            <div class="tutorial-card">
+                <h3>🔍 Consultar la Base de Conocimientos</h3>
+                <p>Antes de reportar, busca si existe una solución en la base de conocimientos:</p>
+                <ul>
+                    <li>Ve a "Base de Conocimientos" → "Buscar Soluciones"</li>
+                    <li>Usa palabras clave relacionadas con tu problema</li>
+                    <li>Filtra por categoría si es necesario</li>
+                    <li>Sigue las instrucciones paso a paso</li>
+                </ul>
+            </div>
+
+            <div class="tips-card">
+                <h3>💡 Consejos para un Buen Reporte</h3>
+                <ul>
+                    <li>✅ Sé específico: Describe exactamente qué no funciona</li>
+                    <li>✅ Incluye detalles: Mensajes de error, comportamiento inesperado</li>
+                    <li>✅ Ubica el problema: Laboratorio, número de equipo</li>
+                    <li>✅ Selecciona la prioridad correcta: Crítico = sistema caído, Bajo = molestia menor</li>
+                    <li>❌ Evita reportes duplicados: Busca primero en tus reportes activos</li>
+                </ul>
+            </div>
+        </div>
+    }
+
+    <!-- Contenido Técnico -->
+    @if (selectedRole == "tecnico")
+    {
+        <div class="help-content">
+            <div class="tutorial-card">
+                <h3>🎫 Gestión de Tickets</h3>
+                <ol class="tutorial-steps">
+                    <li>
+                        <strong>Ver tickets asignados:</strong> En "Dashboard Técnico" verás tus tickets pendientes.
+                    </li>
+                    <li>
+                        <strong>Actualizar estado:</strong>
+                        <ul>
+                            <li>Abierto → En Progreso cuando comiences a trabajar</li>
+                            <li>En Progreso → Resuelto cuando termines</li>
+                        </ul>
+                    </li>
+                    <li>
+                        <strong>Documentar solución:</strong> Añade comentarios y pasos de resolución.
+                    </li>
+                    <li>
+                        <strong>Cerrar ticket:</strong> Marca como resuelto con descripción de la solución.
+                    </li>
+                </ol>
+            </div>
+
+            <div class="tutorial-card">
+                <h3>📚 Crear Artículos en Base de Conocimientos</h3>
+                <p>Cuando resuelvas problemas comunes, documéntalos:</p>
+                <ol>
+                    <li>Ve a "Base de Conocimientos" → "Administrar"</li>
+                    <li>Haz clic en "Crear Artículo"</li>
+                    <li>Completa:
+                        <ul>
+                            <li>Título descriptivo</li>
+                            <li>Categoría adecuada</li>
+                            <li>Descripción del problema</li>
+                            <li>Pasos de solución numerados</li>
+                        </ul>
+                    </li>
+                    <li>Guarda y publica</li>
+                </ol>
+            </div>
+
+            <div class="tips-card">
+                <h3>⚡ Mejores Prácticas</h3>
+                <ul>
+                    <li>✅ Responde rápidamente a tickets críticos</li>
+                    <li>✅ Mantén actualizados los estados de los tickets</li>
+                    <li>✅ Documenta soluciones para problemas recurrentes</li>
+                    <li>✅ Usa la base de conocimientos para soluciones rápidas</li>
+                    <li>✅ Comunícate con el usuario si necesitas más información</li>
+                </ul>
+            </div>
+        </div>
+    }
+
+    <!-- Contenido Admin -->
+    @if (selectedRole == "admin")
+    {
+        <div class="help-content">
+            <div class="tutorial-card">
+                <h3>👥 Gestión de Usuarios</h3>
+                <ul>
+                    <li><strong>Ver usuarios:</strong> "Admin" → "Gestión de Usuarios"</li>
+                    <li><strong>Filtrar:</strong> Por rol, departamento o nombre</li>
+                    <li><strong>Ver métricas:</strong> Desempeño de técnicos (tickets resueltos, tiempo promedio)</li>
+                    <li><strong>Analizar carga:</strong> Distribución de trabajo entre técnicos</li>
+                </ul>
+            </div>
+
+            <div class="tutorial-card">
+                <h3>📊 Dashboard y Métricas</h3>
+                <p>Supervisa el estado general del sistema:</p>
+                <ul>
+                    <li><strong>Tickets totales:</strong> Cuántos hay abiertos, en progreso, resueltos</li>
+                    <li><strong>Tiempos de resolución:</strong> Promedio y por prioridad</li>
+                    <li><strong>Distribución por categoría:</strong> Hardware, Software, Red</li>
+                    <li><strong>Rendimiento por técnico:</strong> Productividad y calidad</li>
+                    <li><strong>Tendencias:</strong> Gráficas de evolución temporal</li>
+                </ul>
+            </div>
+
+            <div class="tutorial-card">
+                <h3>📚 Base de Conocimientos</h3>
+                <p>Como administrador puedes:</p>
+                <ul>
+                    <li>Crear, editar y eliminar artículos</li>
+                    <li>Revisar y aprobar artículos de técnicos</li>
+                    <li>Organizar por categorías</li>
+                    <li>Archivar artículos obsoletos</li>
+                </ul>
+            </div>
+
+            <div class="tips-card">
+                <h3>🎯 Recomendaciones</h3>
+                <ul>
+                    <li>✅ Revisa el dashboard diariamente</li>
+                    <li>✅ Equilibra la carga entre técnicos</li>
+                    <li>✅ Identifica patrones en incidentes recurrentes</li>
+                    <li>✅ Mantén actualizada la base de conocimientos</li>
+                    <li>✅ Analiza métricas para mejorar procesos</li>
+                </ul>
+            </div>
+        </div>
+    }
+
+    <!-- Soporte Adicional -->
+    <div class="support-section">
+        <h3>📞 ¿Necesitas más ayuda?</h3>
+        <div class="support-cards">
+            <div class="support-card">
+                <div class="support-icon">📧</div>
+                <h4>Email</h4>
+                <p>soporte@universidad.edu</p>
+            </div>
+            <div class="support-card">
+                <div class="support-icon">📱</div>
+                <h4>Teléfono</h4>
+                <p>+51 123 456 789</p>
+            </div>
+            <div class="support-card">
+                <div class="support-icon">🏢</div>
+                <h4>Oficina</h4>
+                <p>Edificio Central, Piso 2</p>
+            </div>
+            <div class="support-card">
+                <div class="support-icon">⏰</div>
+                <h4>Horario</h4>
+                <p>Lun - Vie: 8:00 AM - 6:00 PM</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.ayuda-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem;
+}
+
+.page-header {
+    margin-bottom: 2rem;
+}
+
+.page-header h2 {
+    font-size: 2rem;
+    color: var(--color-text-primary);
+    margin: 0 0 0.5rem;
+}
+
+.subtitle {
+    color: var(--color-text-secondary);
+    margin: 0;
+}
+
+.search-section {
+    margin-bottom: 2rem;
+}
+
+.search-input {
+    width: 100%;
+    padding: 1rem;
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius-md);
+    font-size: 1rem;
+}
+
+.search-input:focus {
+    outline: none;
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.tabs-container {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 2rem;
+    border-bottom: 2px solid var(--color-border);
+}
+
+.tab-btn {
+    padding: 0.875rem 1.5rem;
+    border: none;
+    background: transparent;
+    color: var(--color-text-secondary);
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+    border-bottom: 3px solid transparent;
+    margin-bottom: -2px;
+}
+
+.tab-btn:hover {
+    color: var(--color-primary);
+}
+
+.tab-btn.active {
+    color: var(--color-primary);
+    border-bottom-color: var(--color-primary);
+}
+
+.help-content {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.help-card, .tutorial-card, .tips-card {
+    background: var(--color-surface);
+    padding: 2rem;
+    border-radius: var(--border-radius-lg);
+    box-shadow: var(--shadow-sm);
+}
+
+.help-card h3, .tutorial-card h3, .tips-card h3 {
+    color: var(--color-text-primary);
+    margin: 0 0 1rem;
+    font-size: 1.25rem;
+}
+
+.help-card p, .tutorial-card p {
+    color: var(--color-text-secondary);
+    line-height: 1.6;
+    margin: 0;
+}
+
+.role-list, .tutorial-steps, .tips-card ul, .tutorial-card ul {
+    margin: 1rem 0 0;
+    padding-left: 1.5rem;
+}
+
+.role-list li, .tips-card li, .tutorial-card li {
+    margin-bottom: 0.75rem;
+    color: var(--color-text-secondary);
+    line-height: 1.6;
+}
+
+.tutorial-steps {
+    counter-reset: step-counter;
+    list-style: none;
+    padding-left: 0;
+}
+
+.tutorial-steps > li {
+    counter-increment: step-counter;
+    position: relative;
+    padding-left: 3rem;
+    margin-bottom: 1.5rem;
+}
+
+.tutorial-steps > li::before {
+    content: counter(step-counter);
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 2rem;
+    height: 2rem;
+    background: var(--color-primary);
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+}
+
+.tutorial-steps ul {
+    margin-top: 0.5rem;
+}
+
+.tips-card {
+    background: linear-gradient(135deg, #FEF3C7 0%, #FDE68A 100%);
+    border-left: 4px solid #F59E0B;
+}
+
+.faq-section {
+    background: var(--color-surface);
+    padding: 2rem;
+    border-radius: var(--border-radius-lg);
+    box-shadow: var(--shadow-sm);
+}
+
+.faq-section h3 {
+    margin: 0 0 1.5rem;
+    color: var(--color-text-primary);
+}
+
+.faq-item {
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius-md);
+    margin-bottom: 0.75rem;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.faq-item:hover {
+    border-color: var(--color-primary);
+}
+
+.faq-question {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem;
+    font-weight: 500;
+    color: var(--color-text-primary);
+}
+
+.faq-icon {
+    color: var(--color-primary);
+    font-size: 0.875rem;
+}
+
+.faq-answer {
+    padding: 0 1rem 1rem;
+    color: var(--color-text-secondary);
+    line-height: 1.6;
+}
+
+.faq-answer a {
+    color: var(--color-primary);
+    text-decoration: none;
+}
+
+.faq-answer a:hover {
+    text-decoration: underline;
+}
+
+.support-section {
+    margin-top: 3rem;
+    padding-top: 3rem;
+    border-top: 2px solid var(--color-border);
+}
+
+.support-section h3 {
+    text-align: center;
+    font-size: 1.5rem;
+    color: var(--color-text-primary);
+    margin-bottom: 2rem;
+}
+
+.support-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1.5rem;
+}
+
+.support-card {
+    background: var(--color-surface);
+    padding: 1.5rem;
+    border-radius: var(--border-radius-lg);
+    box-shadow: var(--shadow-sm);
+    text-align: center;
+}
+
+.support-icon {
+    font-size: 2.5rem;
+    margin-bottom: 0.75rem;
+}
+
+.support-card h4 {
+    color: var(--color-text-primary);
+    margin: 0 0 0.5rem;
+}
+
+.support-card p {
+    color: var(--color-text-secondary);
+    margin: 0;
+    font-size: 0.875rem;
+}
+
+@@media (max-width: 768px) {
+    .ayuda-container {
+        padding: 1rem;
+    }
+
+    .tabs-container {
+        overflow-x: auto;
+        flex-wrap: nowrap;
+    }
+
+    .tab-btn {
+        white-space: nowrap;
+    }
+
+    .support-cards {
+        grid-template-columns: 1fr;
+    }
+}
+</style>
+
+@code {
+    private string searchTerm = string.Empty;
+    private string selectedRole = "general";
+    private List<string> expandedFAQs = new();
+
+    private void SearchHelp()
+    {
+        // Aquí se podría implementar lógica de búsqueda
+    }
+
+    private void ToggleFAQ(string faqId)
+    {
+        if (expandedFAQs.Contains(faqId))
+        {
+            expandedFAQs.Remove(faqId);
+        }
+        else
+        {
+            expandedFAQs.Add(faqId);
+        }
+    }
+}

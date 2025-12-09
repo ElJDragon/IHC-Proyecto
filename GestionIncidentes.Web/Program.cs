@@ -9,6 +9,7 @@ using GestionIncidentes.Infrastructure.Services;
 using GestionIncidentes.Web.Auth;
 using GestionIncidentes.Web.Features.Users.Handlers;
 using MediatR;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
@@ -72,6 +73,10 @@ builder.Services.AddRazorPages();
 // ✅ Autenticación en cascada para Blazor
 builder.Services.AddCascadingAuthenticationState();
 
+// ✅ Custom Authentication State Provider
+builder.Services.AddScoped<Microsoft.AspNetCore.Components.Authorization.AuthenticationStateProvider, 
+    GestionIncidentes.Web.Auth.CustomAuthenticationStateProvider>();
+
 // Agregar soporte para sesión
 builder.Services.AddDistributedMemoryCache();
 builder.Services.AddSession(options =>
@@ -93,15 +98,29 @@ builder.Services.AddCors(options =>
         .AllowAnyOrigin());
 });
 
-// JWT Authentication
-var key = Encoding.ASCII.GetBytes("EstaClaveTieneExactamente32Bytes!!");
+// ✅ Cookie Authentication para Blazor (Admin, Tecnico, Usuario)
 builder.Services.AddAuthentication(options =>
 {
-    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+    options.DefaultAuthenticateScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = CookieAuthenticationDefaults.AuthenticationScheme;
 })
-.AddJwtBearer(options =>
+.AddCookie(CookieAuthenticationDefaults.AuthenticationScheme, options =>
 {
+    options.Cookie.Name = "GestionIncidentes.Auth";
+    options.LoginPath = "/LoginPage";
+    options.LogoutPath = "/logout";
+    options.AccessDeniedPath = "/acceso-denegado";
+    options.ExpireTimeSpan = TimeSpan.FromHours(8);
+    options.SlidingExpiration = true;
+    options.Cookie.HttpOnly = true;
+    options.Cookie.SecurePolicy = CookieSecurePolicy.SameAsRequest;
+    options.Cookie.SameSite = SameSiteMode.Strict;
+})
+// JWT para API endpoints
+.AddJwtBearer(JwtBearerDefaults.AuthenticationScheme, options =>
+{
+    var key = Encoding.ASCII.GetBytes("EstaClaveTieneExactamente32Bytes!!");
     options.RequireHttpsMetadata = false;
     options.SaveToken = true;
     options.TokenValidationParameters = new TokenValidationParameters
@@ -113,6 +132,8 @@ builder.Services.AddAuthentication(options =>
         RoleClaimType = ClaimTypes.Role
     };
 });
+
+builder.Services.AddAuthorization();
 
 // MediatR - Registrar todos los assemblies con handlers y event handlers
 builder.Services.AddMediatR(cfg =>
@@ -144,6 +165,7 @@ builder.Services.AddScoped<IIncidentRepository, IncidentRepository>();
 
 // ✅ Nuevos repositorios para Integración C
 builder.Services.AddScoped<IKnowledgeRepository, KnowledgeRepository>();
+builder.Services.AddScoped<ISolutionStepRepository, SolutionStepRepository>();
 builder.Services.AddScoped<INotificationRepository, NotificationRepository>();
 builder.Services.AddScoped<IAuditLogRepository, AuditLogRepository>();
 builder.Services.AddScoped<ITicketReportRepository, TicketReportRepository>();
@@ -152,6 +174,10 @@ builder.Services.AddScoped<ITicketReportRepository, TicketReportRepository>();
 builder.Services.AddScoped<IWorkloadService, WorkloadService>();
 builder.Services.AddScoped<NotificationService>();
 builder.Services.AddScoped<ReportFormatter>();
+builder.Services.AddScoped<GestionIncidentes.Web.Services.AuthService>();
+
+// ✅ HttpClient para llamadas internas (login, etc.)
+builder.Services.AddHttpClient();
 
 // ✅ Servicios HTTP para comunicación Frontend-Backend
 builder.Services.AddHttpClient<GestionIncidentes.Web.Services.AdminTicketService>(client =>
@@ -212,7 +238,7 @@ var app = builder.Build();
 
 // Aplicar migraciones y seed de datos automáticamente al iniciar
 // COMENTADO: Usa el script SQL en lugar de migraciones automáticas
-/*
+
 using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<GestionIncidentesDbContext>();
@@ -221,7 +247,6 @@ using (var scope = app.Services.CreateScope())
     // Seed de datos de prueba
     await GestionIncidentes.Infrastructure.Data.DbSeeder.SeedAsync(db);
 }
-*/
 
 // Middleware
 if (app.Environment.IsDevelopment())
@@ -237,7 +262,33 @@ else
 }
 
 app.UseHttpsRedirection();
+
+// Middleware personalizado para redirigir a archivos HTML estáticos
+app.Use(async (context, next) =>
+{
+    var path = context.Request.Path.Value;
+    
+    // Si la ruta termina sin extensión y existe un archivo .html correspondiente
+    if (!string.IsNullOrEmpty(path) && !path.Contains('.'))
+    {
+        var htmlPath = $"{path}.html";
+        var filePath = Path.Combine(app.Environment.WebRootPath, htmlPath.TrimStart('/'));
+        
+        if (File.Exists(filePath))
+        {
+            context.Request.Path = htmlPath;
+        }
+    }
+    
+    await next();
+});
+
 app.UseStaticFiles();
+app.UseDefaultFiles(new DefaultFilesOptions
+{
+    DefaultFileNames = new List<string> { "index.html", "default.html" }
+});
+
 app.UseRouting();
 app.UseCors();
 

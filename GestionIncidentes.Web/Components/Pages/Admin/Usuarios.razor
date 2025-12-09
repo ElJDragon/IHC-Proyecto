@@ -1,0 +1,506 @@
+@page "/admin/usuarios"
+@layout AdminLayout
+@using GestionIncidentes.Domain.Entities
+@using GestionIncidentes.Application.Interfaces
+@rendermode InteractiveServer
+
+<PageTitle>Gestión de Usuarios - Admin</PageTitle>
+
+<link rel="stylesheet" href="/css/pages.css" />
+
+<div>
+    <!-- Breadcrumbs -->
+    <nav style="margin-bottom: 24px; color: var(--text-gray); font-size: 14px">
+        <span>Inicio</span>
+        <span style="margin: 0 8px">&gt;</span>
+        <span>Administración</span>
+        <span style="margin: 0 8px">&gt;</span>
+        <span style="color: var(--color-primary)">Gestión de Usuarios</span>
+    </nav>
+
+    <!-- Page Header -->
+    <div style="margin-bottom: 24px">
+        <h1>👥 Gestión de Usuarios</h1>
+        <p style="color: var(--text-gray); margin-top: 4px">Administra usuarios del sistema</p>
+    </div>
+
+    <!-- Filtros -->
+    <div class="card" style="margin-bottom: 24px; padding: 20px">
+        <div style="display: flex; gap: 16px; flex-wrap: wrap; align-items: center">
+            <div style="flex: 1; min-width: 250px; position: relative">
+                <span class="material-icons" style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--text-gray); font-size: 20px">search</span>
+                <input type="text" @bind="searchTerm" @bind:event="oninput" @onkeyup="FilterUsers" 
+                       placeholder="Buscar por nombre o email..." 
+                       style="width: 100%; padding: 10px 10px 10px 40px; border: 1px solid var(--border-light); border-radius: 8px; font-size: 14px" />
+            </div>
+            <select @bind="selectedRole" @bind:after="FilterUsers" 
+                    style="padding: 10px 32px 10px 12px; border: 1px solid var(--border-light); border-radius: 8px; font-size: 14px; background: white; cursor: pointer">
+                <option value="">Todos los roles</option>
+                <option value="Administrador">Administrador</option>
+                <option value="Tecnico">Técnico</option>
+                <option value="Usuario">Usuario</option>
+            </select>
+            <select @bind="selectedDepartment" @bind:after="FilterUsers" 
+                    style="padding: 10px 32px 10px 12px; border: 1px solid var(--border-light); border-radius: 8px; font-size: 14px; background: white; cursor: pointer">
+                <option value="">Todos los departamentos</option>
+                @foreach (var dept in departments)
+                {
+                    <option value="@dept.Id">@dept.Name</option>
+                }
+            </select>
+        </div>
+    </div>
+
+    <!-- Tabla de Usuarios -->
+    @if (isLoading)
+    {
+        <div class="card" style="padding: 40px; text-align: center">
+            <div class="spinner" style="margin: 0 auto 16px"></div>
+            <p style="color: var(--text-gray)">Cargando usuarios...</p>
+        </div>
+    }
+    else if (filteredUsers.Any())
+    {
+        <div class="card" style="padding: 0; overflow: hidden">
+            <table style="width: 100%; border-collapse: collapse">
+                <thead style="background: var(--color-bg-light); border-bottom: 1px solid var(--border-light)">
+                    <tr>
+                        <th style="padding: 16px; text-align: left; font-weight: 600; color: var(--text-dark); font-size: 14px; text-transform: uppercase; letter-spacing: 0.5px">Usuario</th>
+                        <th style="padding: 16px; text-align: left; font-weight: 600; color: var(--text-dark); font-size: 14px; text-transform: uppercase; letter-spacing: 0.5px">Rol</th>
+                        <th style="padding: 16px; text-align: left; font-weight: 600; color: var(--text-dark); font-size: 14px; text-transform: uppercase; letter-spacing: 0.5px">Departamento</th>
+                        <th style="padding: 16px; text-align: left; font-weight: 600; color: var(--text-dark); font-size: 14px; text-transform: uppercase; letter-spacing: 0.5px">Carga de Trabajo</th>
+                        <th style="padding: 16px; text-align: left; font-weight: 600; color: var(--text-dark); font-size: 14px; text-transform: uppercase; letter-spacing: 0.5px">Métricas</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var user in filteredUsers)
+                    {
+                        <tr style="border-bottom: 1px solid var(--border-light); transition: background 0.2s" 
+                            onmouseover="this.style.background='var(--color-bg-light)'" 
+                            onmouseout="this.style.background='white'">
+                            <td style="padding: 16px">
+                                <div style="display: flex; align-items: center; gap: 12px">
+                                    <div style="width: 40px; height: 40px; background: var(--color-primary); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: 600; font-size: 14px">
+                                        @GetUserInitials(user.FullName)
+                                    </div>
+                                    <div>
+                                        <div style="font-weight: 500; color: var(--text-dark)">@user.FullName</div>
+                                        <div style="font-size: 13px; color: var(--text-gray); margin-top: 2px">@user.Email</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td style="padding: 16px">
+                                <span style="display: inline-flex; align-items: center; gap: 6px; padding: 6px 12px; border-radius: 20px; font-size: 13px; font-weight: 500; @GetRoleStyle(user.Role)">
+                                    @GetRoleIcon(user.Role) @user.Role
+                                </span>
+                            </td>
+                            <td style="padding: 16px; color: var(--text-dark)">@GetDepartmentName(user.DepartmentId)</td>
+                            <td style="padding: 16px">
+                                <span style="display: inline-flex; align-items: center; gap: 6px; padding: 6px 12px; background: var(--color-bg-light); border-radius: 6px; font-size: 13px; font-weight: 500; color: var(--text-dark)">
+                                    <span class="material-icons" style="font-size: 16px">assignment</span>
+                                    @user.Workload tickets
+                                </span>
+                            </td>
+                            <td style="padding: 16px">
+                                @if (user.Role == "Tecnico" && userMetrics.ContainsKey(user.Id))
+                                {
+                                    var metrics = userMetrics[user.Id];
+                                    <div style="display: flex; flex-direction: column; gap: 6px">
+                                        <div style="display: flex; align-items: center; gap: 8px; font-size: 13px">
+                                            <span class="material-icons" style="font-size: 16px; color: var(--color-success)">check_circle</span>
+                                            <span style="color: var(--text-gray)">Resueltos:</span>
+                                            <span style="font-weight: 500; color: var(--text-dark)">@metrics.TicketsResolved</span>
+                                        </div>
+                                        <div style="display: flex; align-items: center; gap: 8px; font-size: 13px">
+                                            <span class="material-icons" style="font-size: 16px; color: var(--color-info)">schedule</span>
+                                            <span style="color: var(--text-gray)">Promedio:</span>
+                                            <span style="font-weight: 500; color: var(--text-dark)">@metrics.AvgResolutionTime</span>
+                                        </div>
+                                        <div style="display: flex; align-items: center; gap: 8px; font-size: 13px">
+                                            <span class="material-icons" style="font-size: 16px; color: var(--color-warning)">star</span>
+                                            <span style="color: var(--text-gray)">Rating:</span>
+                                            <span style="font-weight: 500; color: var(--text-dark)">@metrics.Rating.ToString("F1")</span>
+                                        </div>
+                                    </div>
+                                }
+                                else
+                                {
+                                    <span style="color: var(--text-gray); font-size: 13px">N/A</span>
+                                }
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+    else
+    {
+        <div class="card" style="padding: 48px 24px; text-align: center">
+            <div style="font-size: 64px; margin-bottom: 16px">👥</div>
+            <h3 style="color: var(--text-dark); margin-bottom: 8px; font-weight: 600">No se encontraron usuarios</h3>
+            <p style="color: var(--text-gray); margin: 0">Ajusta los filtros para ver más resultados</p>
+        </div>
+    }
+</div>
+
+<style>
+.usuarios-container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 2rem;
+}
+
+.page-header {
+    margin-bottom: 2rem;
+}
+
+.page-header h2 {
+    font-size: 2rem;
+    color: var(--color-text-primary);
+    margin: 0 0 0.5rem;
+}
+
+.subtitle {
+    color: var(--color-text-secondary);
+    margin: 0;
+}
+
+.filters-section {
+    background: var(--color-surface);
+    padding: 1.5rem;
+    border-radius: var(--border-radius-lg);
+    box-shadow: var(--shadow-sm);
+    margin-bottom: 2rem;
+}
+
+.search-box {
+    margin-bottom: 1rem;
+}
+
+.search-input {
+    width: 100%;
+    padding: 0.875rem;
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius-md);
+    font-size: 1rem;
+}
+
+.search-input:focus {
+    outline: none;
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.filter-row {
+    display: flex;
+    gap: 1rem;
+}
+
+.filter-select {
+    flex: 1;
+    padding: 0.75rem;
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius-md);
+    font-size: 0.875rem;
+    background: white;
+}
+
+.filter-select:focus {
+    outline: none;
+    border-color: var(--color-primary);
+}
+
+.table-container {
+    background: var(--color-surface);
+    border-radius: var(--border-radius-lg);
+    box-shadow: var(--shadow-sm);
+    overflow: hidden;
+}
+
+.users-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.users-table thead {
+    background: var(--color-background);
+}
+
+.users-table th {
+    padding: 1rem;
+    text-align: left;
+    font-weight: 600;
+    color: var(--color-text-primary);
+    font-size: 0.875rem;
+}
+
+.users-table td {
+    padding: 1rem;
+    border-top: 1px solid var(--color-border);
+}
+
+.users-table tbody tr:hover {
+    background: var(--color-background);
+}
+
+.user-cell {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.user-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: var(--color-primary);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    font-size: 0.875rem;
+}
+
+.user-name {
+    font-weight: 500;
+    color: var(--color-text-primary);
+}
+
+.user-email {
+    font-size: 0.875rem;
+    color: var(--color-text-secondary);
+}
+
+.role-badge {
+    display: inline-block;
+    padding: 0.375rem 0.875rem;
+    border-radius: var(--border-radius-full);
+    font-size: 0.875rem;
+    font-weight: 500;
+}
+
+.role-administrador {
+    background: #FEF3C7;
+    color: #92400E;
+}
+
+.role-tecnico {
+    background: #DBEAFE;
+    color: #1E40AF;
+}
+
+.role-usuario {
+    background: #E5E7EB;
+    color: #374151;
+}
+
+.workload {
+    font-weight: 500;
+    color: var(--color-text-primary);
+}
+
+.metrics-cell {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.metric-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.813rem;
+}
+
+.metric-label {
+    color: var(--color-text-secondary);
+}
+
+.metric-value {
+    font-weight: 500;
+    color: var(--color-text-primary);
+}
+
+.text-secondary {
+    color: var(--color-text-secondary);
+}
+
+.loading {
+    text-align: center;
+    padding: 3rem;
+    color: var(--color-text-secondary);
+    font-size: 1.125rem;
+}
+
+.empty-state {
+    text-align: center;
+    padding: 4rem 2rem;
+}
+
+.empty-icon {
+    font-size: 4rem;
+    margin-bottom: 1rem;
+}
+
+.empty-state h3 {
+    font-size: 1.5rem;
+    color: var(--color-text-primary);
+    margin: 0 0 0.5rem;
+}
+
+.empty-state p {
+    color: var(--color-text-secondary);
+    margin: 0;
+}
+
+@@media (max-width: 768px) {
+    .usuarios-container {
+        padding: 1rem;
+    }
+
+    .filter-row {
+        flex-direction: column;
+    }
+
+    .table-container {
+        overflow-x: auto;
+    }
+
+    .users-table {
+        min-width: 800px;
+    }
+}
+</style>
+
+@code {
+    [Inject] private IUserRepository UserRepo { get; set; } = default!;
+    [Inject] private IDepartmentRepository DepartmentRepo { get; set; } = default!;
+    [Inject] private ITicketRepository TicketRepo { get; set; } = default!;
+
+    private List<User> allUsers = new();
+    private List<User> filteredUsers = new();
+    private List<Department> departments = new();
+    private Dictionary<Guid, UserMetrics> userMetrics = new();
+
+    private string searchTerm = string.Empty;
+    private string selectedRole = string.Empty;
+    private string selectedDepartment = string.Empty;
+    private bool isLoading = true;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadData();
+    }
+
+    private async Task LoadData()
+    {
+        isLoading = true;
+        try
+        {
+            allUsers = (await UserRepo.ListAllAsync()).ToList();
+            departments = (await DepartmentRepo.ListAsync()).ToList();
+            await LoadUserMetrics();
+            filteredUsers = allUsers;
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+
+    private async Task LoadUserMetrics()
+    {
+        userMetrics.Clear();
+        foreach (var user in allUsers.Where(u => u.Role == "Tecnico"))
+        {
+            var tickets = (await TicketRepo.ListByTechnicianAsync(user.Id)).ToList();
+            var resolved = tickets.Where(t => t.Status == "Resuelto" && t.ResolvedAt.HasValue).ToList();
+
+            var metrics = new UserMetrics
+            {
+                TicketsResolved = resolved.Count,
+                AvgResolutionTime = resolved.Any()
+                    ? FormatTimeSpan(TimeSpan.FromHours(resolved.Average(t => (t.ResolvedAt!.Value - t.CreatedAt).TotalHours)))
+                    : "N/A",
+                Rating = resolved.Any() ? 4.5 : 0
+            };
+
+            userMetrics[user.Id] = metrics;
+        }
+    }
+
+    private void FilterUsers()
+    {
+        filteredUsers = allUsers;
+
+        if (!string.IsNullOrWhiteSpace(searchTerm))
+        {
+            var search = searchTerm.ToLower();
+            filteredUsers = filteredUsers.Where(u =>
+                u.FullName.ToLower().Contains(search) ||
+                u.Email.ToLower().Contains(search)
+            ).ToList();
+        }
+
+        if (!string.IsNullOrEmpty(selectedRole))
+        {
+            filteredUsers = filteredUsers.Where(u => u.Role == selectedRole).ToList();
+        }
+
+        if (!string.IsNullOrEmpty(selectedDepartment) && Guid.TryParse(selectedDepartment, out var deptId))
+        {
+            filteredUsers = filteredUsers.Where(u => u.DepartmentId == deptId).ToList();
+        }
+    }
+
+    private string GetUserInitials(string name)
+    {
+        var parts = name.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+        if (parts.Length >= 2)
+            return $"{parts[0][0]}{parts[1][0]}".ToUpper();
+        return name.Length >= 2 ? name.Substring(0, 2).ToUpper() : name.ToUpper();
+    }
+
+    private string GetRoleIcon(string role)
+    {
+        return role switch
+        {
+            "Administrador" => "👑",
+            "Tecnico" => "🔧",
+            "Usuario" => "👤",
+            _ => "❓"
+        };
+    }
+
+    private string GetRoleStyle(string role)
+    {
+        return role switch
+        {
+            "Administrador" => "background: #fef3c7; color: #92400e",
+            "Tecnico" => "background: #dbeafe; color: #1e40af",
+            "Usuario" => "background: #f3e8ff; color: #6b21a8",
+            _ => "background: var(--color-bg-light); color: var(--text-gray)"
+        };
+    }
+
+    private string GetDepartmentName(Guid deptId)
+    {
+        return departments.FirstOrDefault(d => d.Id == deptId)?.Name ?? "N/A";
+    }
+
+    private string FormatTimeSpan(TimeSpan ts)
+    {
+        if (ts.TotalHours < 24)
+            return $"{(int)ts.TotalHours}h";
+        return $"{(int)ts.TotalDays}d";
+    }
+
+    private class UserMetrics
+    {
+        public int TicketsResolved { get; set; }
+        public string AvgResolutionTime { get; set; } = string.Empty;
+        public double Rating { get; set; }
+    }
+}

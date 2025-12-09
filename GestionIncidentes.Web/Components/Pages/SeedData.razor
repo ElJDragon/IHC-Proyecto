@@ -1,0 +1,258 @@
+@page "/seed-data"
+@rendermode InteractiveServer
+@inject GestionIncidentes.Application.Interfaces.ITicketRepository TicketRepo
+@inject GestionIncidentes.Application.Interfaces.IUserRepository UserRepo
+@inject NavigationManager Nav
+
+<PageTitle>Insertar Datos de Prueba</PageTitle>
+
+<div style="max-width: 800px; margin: 0 auto; padding: 40px 20px">
+    <h3>Insertar Datos de Prueba</h3>
+    <p style="color: var(--text-gray); margin-bottom: 24px">Esta página te permite insertar 10 tickets de ejemplo en la base de datos para probar el sistema.</p>
+
+@if (message != null)
+{
+    <div style="padding: 16px; background: @(success ? "#d1fae5" : "#fee2e2"); border-radius: 8px; margin: 16px 0">
+        <p style="margin: 0; color: @(success ? "#065f46" : "#991b1b")">@message</p>
+    </div>
+}
+
+<button @onclick="InsertSampleData" disabled="@isLoading" style="padding: 12px 24px; background: var(--color-primary); color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 500">
+    @if (isLoading)
+    {
+        <span>Insertando...</span>
+    }
+    else
+    {
+        <span>Insertar 10 Tickets de Ejemplo</span>
+    }
+</button>
+
+<button @onclick="NavigateToHistorial" style="padding: 12px 24px; background: white; color: var(--color-primary); border: 1px solid var(--color-primary); border-radius: 8px; cursor: pointer; font-weight: 500; margin-left: 12px">
+    Ir a Historial
+</button>
+</div>
+
+@code {
+    private bool isLoading = false;
+    private string? message = null;
+    private bool success = false;
+
+    private void NavigateToHistorial()
+    {
+        Nav.NavigateTo("/admin/historial");
+    }
+
+    private async Task InsertSampleData()
+    {
+        try
+        {
+            isLoading = true;
+            message = null;
+            
+            // Obtener usuarios existentes
+            var users = await UserRepo.GetAllAsync();
+            var admins = users.Where(u => u.Role == "Administrador").ToList();
+            var tecnicos = users.Where(u => u.Role == "Tecnico").ToList();
+            var usuarios = users.Where(u => u.Role == "Usuario").ToList();
+
+            if (!users.Any())
+            {
+                message = "❌ No hay usuarios en la base de datos. Primero debes crear usuarios.";
+                success = false;
+                return;
+            }
+
+            var admin = admins.FirstOrDefault() ?? users.First();
+            var tech1 = tecnicos.ElementAtOrDefault(0) ?? users.First();
+            var tech2 = tecnicos.ElementAtOrDefault(1) ?? tech1;
+            var user1 = usuarios.FirstOrDefault() ?? users.First();
+
+            // Crear tickets de ejemplo
+            var tickets = new[]
+            {
+                new GestionIncidentes.Domain.Entities.Ticket
+                {
+                    Title = "Internet no funciona en Laboratorio 301",
+                    Description = "Los estudiantes no pueden acceder a internet en el laboratorio de computación 301",
+                    Status = "Resuelto",
+                    Priority = "Alta",
+                    Category = "Conectividad",
+                    CreatedAt = DateTime.UtcNow.AddDays(-5),
+                    CreatedByUserId = user1.Id,
+                    AssignedToUserId = tech1.Id,
+                    SlaDeadline = DateTime.UtcNow.AddDays(-4),
+                    Location = "Pabellón A",
+                    LocationDetail = "Laboratorio 301",
+                    ProblemType = "hardware",
+                    ResolvedAt = DateTime.UtcNow.AddDays(-4).AddHours(2),
+                    Rating = 5
+                },
+                new GestionIncidentes.Domain.Entities.Ticket
+                {
+                    Title = "Impresora HP LaserJet no imprime",
+                    Description = "La impresora del área administrativa no responde",
+                    Status = "Resuelto",
+                    Priority = "Media",
+                    Category = "Hardware",
+                    CreatedAt = DateTime.UtcNow.AddDays(-7),
+                    CreatedByUserId = admin.Id,
+                    AssignedToUserId = tech2.Id,
+                    SlaDeadline = DateTime.UtcNow.AddDays(-6),
+                    Location = "Administración",
+                    LocationDetail = "Oficina 105",
+                    ProblemType = "hardware",
+                    ResolvedAt = DateTime.UtcNow.AddDays(-6).AddHours(3),
+                    Rating = 5
+                },
+                new GestionIncidentes.Domain.Entities.Ticket
+                {
+                    Title = "Proyector no muestra señal en aula 202",
+                    Description = "El proyector del aula 202 enciende pero no muestra imagen",
+                    Status = "En Proceso",
+                    Priority = "Alta",
+                    Category = "Hardware",
+                    CreatedAt = DateTime.UtcNow.AddDays(-2),
+                    CreatedByUserId = user1.Id,
+                    AssignedToUserId = tech1.Id,
+                    SlaDeadline = DateTime.UtcNow.AddDays(1),
+                    Location = "Pabellón B",
+                    LocationDetail = "Aula 202",
+                    ProblemType = "hardware"
+                },
+                new GestionIncidentes.Domain.Entities.Ticket
+                {
+                    Title = "AutoCAD 2024 no inicia correctamente",
+                    Description = "Al intentar abrir AutoCAD aparece un error de licencia",
+                    Status = "Pendiente",
+                    Priority = "Media",
+                    Category = "Software",
+                    CreatedAt = DateTime.UtcNow.AddDays(-1),
+                    CreatedByUserId = user1.Id,
+                    SlaDeadline = DateTime.UtcNow.AddDays(2),
+                    Location = "Laboratorio de Arquitectura",
+                    LocationDetail = "Lab Diseño",
+                    ProblemType = "software",
+                    ProgramName = "AutoCAD 2024"
+                },
+                new GestionIncidentes.Domain.Entities.Ticket
+                {
+                    Title = "Computadora PC-15 muy lenta",
+                    Description = "La computadora tarda mucho en iniciar y abrir programas",
+                    Status = "Resuelto",
+                    Priority = "Baja",
+                    Category = "Hardware",
+                    CreatedAt = DateTime.UtcNow.AddDays(-10),
+                    CreatedByUserId = user1.Id,
+                    AssignedToUserId = tech2.Id,
+                    SlaDeadline = DateTime.UtcNow.AddDays(-8),
+                    Location = "Sala de Profesores",
+                    LocationDetail = "Pabellón C",
+                    ProblemType = "hardware",
+                    ResolvedAt = DateTime.UtcNow.AddDays(-8).AddHours(1),
+                    Rating = 4
+                },
+                new GestionIncidentes.Domain.Entities.Ticket
+                {
+                    Title = "No puedo subir archivos a Moodle",
+                    Description = "Al intentar subir tareas aparece error de tamaño de archivo",
+                    Status = "En Proceso",
+                    Priority = "Media",
+                    Category = "Software",
+                    CreatedAt = DateTime.UtcNow.AddDays(-3),
+                    CreatedByUserId = user1.Id,
+                    AssignedToUserId = tech1.Id,
+                    SlaDeadline = DateTime.UtcNow.AddDays(1),
+                    Location = "Virtual",
+                    LocationDetail = "Plataforma Moodle",
+                    ProblemType = "software",
+                    ProgramName = "Moodle",
+                    ErrorMessage = "File size exceeds maximum"
+                },
+                new GestionIncidentes.Domain.Entities.Ticket
+                {
+                    Title = "Teclado inalámbrico no responde",
+                    Description = "El teclado de la estación 08 no funciona",
+                    Status = "Pendiente",
+                    Priority = "Media",
+                    Category = "Hardware",
+                    CreatedAt = DateTime.UtcNow.AddHours(-1),
+                    CreatedByUserId = user1.Id,
+                    SlaDeadline = DateTime.UtcNow.AddDays(3),
+                    Location = "Laboratorio 402",
+                    LocationDetail = "Estación 08",
+                    ProblemType = "hardware"
+                },
+                new GestionIncidentes.Domain.Entities.Ticket
+                {
+                    Title = "Señal WiFi intermitente en biblioteca",
+                    Description = "La conexión WiFi se cae cada 10 minutos",
+                    Status = "Resuelto",
+                    Priority = "Alta",
+                    Category = "Conectividad",
+                    CreatedAt = DateTime.UtcNow.AddDays(-6),
+                    CreatedByUserId = admin.Id,
+                    AssignedToUserId = tech2.Id,
+                    SlaDeadline = DateTime.UtcNow.AddDays(-5),
+                    Location = "Biblioteca Central",
+                    LocationDetail = "Planta Alta",
+                    ProblemType = "hardware",
+                    ResolvedAt = DateTime.UtcNow.AddDays(-5).AddHours(4),
+                    Rating = 5
+                },
+                new GestionIncidentes.Domain.Entities.Ticket
+                {
+                    Title = "Microsoft Excel no permite guardar",
+                    Description = "Al intentar guardar documentos en Excel aparece error",
+                    Status = "En Proceso",
+                    Priority = "Alta",
+                    Category = "Software",
+                    CreatedAt = DateTime.UtcNow.AddHours(-4),
+                    CreatedByUserId = user1.Id,
+                    AssignedToUserId = tech1.Id,
+                    SlaDeadline = DateTime.UtcNow.AddDays(2),
+                    Location = "Oficinas Administrativas",
+                    LocationDetail = "Finanzas",
+                    ProblemType = "software",
+                    ProgramName = "Microsoft Excel",
+                    ErrorMessage = "Permission denied"
+                },
+                new GestionIncidentes.Domain.Entities.Ticket
+                {
+                    Title = "Monitor parpadea constantemente",
+                    Description = "El monitor de la PC-23 parpadea y se ve mal",
+                    Status = "Resuelto",
+                    Priority = "Media",
+                    Category = "Hardware",
+                    CreatedAt = DateTime.UtcNow.AddDays(-8),
+                    CreatedByUserId = user1.Id,
+                    AssignedToUserId = tech2.Id,
+                    SlaDeadline = DateTime.UtcNow.AddDays(-7),
+                    Location = "Laboratorio Multimedia",
+                    LocationDetail = "PC-23",
+                    ProblemType = "hardware",
+                    ResolvedAt = DateTime.UtcNow.AddDays(-6).AddHours(5),
+                    Rating = 5
+                }
+            };
+
+            // Insertar tickets
+            foreach (var ticket in tickets)
+            {
+                await TicketRepo.AddAsync(ticket);
+            }
+
+            message = $"✅ Se insertaron {tickets.Length} tickets de ejemplo correctamente";
+            success = true;
+        }
+        catch (Exception ex)
+        {
+            message = $"❌ Error: {ex.Message}";
+            success = false;
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+}
