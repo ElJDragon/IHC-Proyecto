@@ -170,7 +170,7 @@
 
     private void SelectTicket(Guid ticketId)
     {
-        Console.WriteLine($"Selected ticket: {ticketId}");
+        Navigation.NavigateTo($"/tecnico/resolver-ticket/{ticketId}");
     }
 
     private string GetStatusClass(string status) => status switch

@@ -1,0 +1,833 @@
+@page "/tecnico/resolver-ticket/{ticketId:guid}"
+@layout TecnicoLayout
+@rendermode InteractiveServer
+@inject IJSRuntime JS
+@inject NavigationManager Navigation
+@inject HttpClient Http
+@using GestionIncidentes.Application.Models
+
+<link rel="stylesheet" href="/css/pages.css" />
+
+<div class="page-shell">
+    @if (loading)
+    {
+        <div style="text-align:center; padding:40px">Cargando ticket...</div>
+    }
+    else if (ticket == null)
+    {
+        <div style="text-align:center; padding:40px">
+            <p>Ticket no encontrado</p>
+            <button class="btn-primary" @onclick='() => Navigation.NavigateTo("/tecnico/dashboard")'>Volver</button>
+        </div>
+    }
+    else
+    {
+        <!-- Header -->
+        <div class="page-header">
+            <div style="display:flex; align-items:center; gap:12px">
+                <button class="btn-secondary" @onclick='() => Navigation.NavigateTo("/tecnico/dashboard")'>
+                    <span class="material-icons">arrow_back</span>
+                </button>
+                <div>
+                    <h1 class="page-title">Resolver Ticket #@ticket.TicketNumber</h1>
+                    <p class="page-subtitle">Completa la solución y marca como resuelto</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Detalles del Ticket -->
+        <div class="card" style="margin-bottom:24px">
+            <h3 style="margin:0 0 16px 0; font-size:18px; font-weight:600; display:flex; align-items:center; gap:8px">
+                <span class="material-icons" style="color:var(--color-primary)">info</span>
+                Información del Ticket
+            </h3>
+            
+            <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap:16px">
+                <div>
+                    <label style="font-size:12px; color:var(--text-gray); display:block; margin-bottom:4px">Estado</label>
+                    <span class="badge @GetStatusClass(ticket.Status)">@ticket.Status</span>
+                </div>
+                <div>
+                    <label style="font-size:12px; color:var(--text-gray); display:block; margin-bottom:4px">Prioridad</label>
+                    <strong>@ticket.Priority</strong>
+                </div>
+                <div>
+                    <label style="font-size:12px; color:var(--text-gray); display:block; margin-bottom:4px">Categoría</label>
+                    <span>@ticket.Category</span>
+                </div>
+                <div>
+                    <label style="font-size:12px; color:var(--text-gray); display:block; margin-bottom:4px">Fecha Creación</label>
+                    <span>@ticket.CreatedAt.ToString("dd/MM/yyyy HH:mm")</span>
+                </div>
+            </div>
+
+            <hr style="margin:20px 0; border:none; border-top:1px solid var(--border-color)"/>
+
+            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:24px">
+                <div>
+                    <label style="font-size:12px; color:var(--text-gray); display:block; margin-bottom:4px">Ubicación</label>
+                    <p style="margin:0"><strong>@ticket.Location</strong></p>
+                    <p style="margin:4px 0 0 0; font-size:14px; color:var(--text-gray)">@ticket.LocationDetail</p>
+                </div>
+                <div>
+                    <label style="font-size:12px; color:var(--text-gray); display:block; margin-bottom:4px">Tipo de Problema</label>
+                    <p style="margin:0">@ticket.ProblemType</p>
+                    @if (!string.IsNullOrEmpty(ticket.ProgramName))
+                    {
+                        <p style="margin:4px 0 0 0; font-size:14px">Programa: <strong>@ticket.ProgramName</strong></p>
+                    }
+                    @if (!string.IsNullOrEmpty(ticket.AffectedParts))
+                    {
+                        <p style="margin:4px 0 0 0; font-size:14px">Componente: <strong>@ticket.AffectedParts</strong></p>
+                    }
+                </div>
+            </div>
+
+            <hr style="margin:20px 0; border:none; border-top:1px solid var(--border-color)"/>
+
+            <div>
+                <label style="font-size:12px; color:var(--text-gray); display:block; margin-bottom:4px">Descripción del Problema</label>
+                <p style="margin:0; line-height:1.6">@ticket.Description</p>
+                @if (!string.IsNullOrEmpty(ticket.ErrorMessage))
+                {
+                    <div style="margin-top:12px; padding:12px; background:#fee; border-left:4px solid #dc2626; border-radius:6px">
+                        <strong style="font-size:13px; color:#991b1b">Mensaje de Error:</strong>
+                        <p style="margin:4px 0 0 0; font-size:13px; color:#7f1d1d; font-family:monospace">@ticket.ErrorMessage</p>
+                    </div>
+                }
+            </div>
+
+            <hr style="margin:20px 0; border:none; border-top:1px solid var(--border-color)"/>
+
+            <div>
+                <label style="font-size:12px; color:var(--text-gray); display:block; margin-bottom:4px">Reportado por</label>
+                <p style="margin:0">@ticket.CreatedByName</p>
+            </div>
+        </div>
+
+        <!-- Botones de Acción -->
+        <div class="card">
+            <h3 style="margin:0 0 16px 0; font-size:18px; font-weight:600">Acciones</h3>
+            <div style="display:flex; gap:12px; flex-wrap:wrap">
+                <button class="btn-primary" @onclick="OpenResolveModal" style="display:flex; align-items:center; gap:8px">
+                    <span class="material-icons">check_circle</span>
+                    <span>Resolver Ticket</span>
+                </button>
+                <button class="btn-secondary" @onclick="OpenKnowledgeSearchModal" style="display:flex; align-items:center; gap:8px">
+                    <span class="material-icons">search</span>
+                    <span>Buscar en Base de Conocimiento</span>
+                </button>
+            </div>
+        </div>
+    }
+
+    <!-- Modal: Resolver Ticket -->
+    @if (showResolveModal)
+    {
+        <div class="modal-overlay" @onclick="CloseResolveModal">
+            <div class="modal-content-large" @onclick:stopPropagation="true">
+                <div class="modal-header">
+                    <h3>Resolver Ticket #@ticket?.TicketNumber</h3>
+                    <button class="btn-icon" @onclick="CloseResolveModal">
+                        <span class="material-icons">close</span>
+                    </button>
+                </div>
+
+                <div class="modal-body" style="max-height:70vh; overflow-y:auto">
+                    <!-- Título de la Solución -->
+                    <div class="form-group">
+                        <label>Título de la Solución *</label>
+                        <input type="text" @bind="solutionTitle" placeholder="Ej: Reinstalación de drivers de red" class="form-input" />
+                    </div>
+
+                    <!-- Descripción General -->
+                    <div class="form-group">
+                        <label>Descripción General *</label>
+                        <textarea @bind="solutionDescription" rows="3" placeholder="Resume cómo se resolvió el problema" class="form-input" readonly="@useKnowledgeEntry"></textarea>
+                    </div>
+
+                    @if (useKnowledgeEntry && selectedKnowledgeEntry != null)
+                    {
+                        <!-- Usando solución de Knowledge Base -->
+                        <div style="padding:16px; background:var(--color-success-light); border-left:4px solid var(--color-success); border-radius:8px; margin-bottom:20px">
+                            <div style="display:flex; align-items:start; gap:12px">
+                                <span class="material-icons" style="color:var(--color-success); font-size:32px">library_books</span>
+                                <div style="flex:1">
+                                    <h4 style="margin:0 0 8px 0; color:var(--color-success)">📚 Usando solución de la Base de Conocimiento</h4>
+                                    <p style="margin:0 0 4px 0; font-size:14px"><strong>Título:</strong> @selectedKnowledgeEntry.Title</p>
+                                    <p style="margin:0 0 4px 0; font-size:14px"><strong>Categoría:</strong> @selectedKnowledgeEntry.Category</p>
+                                    <p style="margin:0 0 12px 0; font-size:13px; color:var(--text-gray)">Esta solución ha sido usada @selectedKnowledgeEntry.UsageCount veces exitosamente.</p>
+                                    <button class="btn-secondary" @onclick="ClearKnowledgeEntry" style="font-size:13px">
+                                        <span class="material-icons" style="font-size:16px">close</span>
+                                        <span>Quitar y crear solución manual</span>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <hr style="margin:20px 0; border:none; border-top:1px solid var(--border-color)"/>
+
+                        <!-- Pasos de la Solución de KB (Solo lectura) -->
+                        <div>
+                            <h4 style="margin:0 0 12px 0; font-size:16px">Pasos de la Solución (De la Base de Conocimiento)</h4>
+                            
+                            @if (selectedKnowledgeEntry.Steps != null && selectedKnowledgeEntry.Steps.Any())
+                            {
+                                @foreach (var step in selectedKnowledgeEntry.Steps.OrderBy(s => s.StepNumber))
+                                {
+                                    <div class="step-card" style="background:#f9fafb; border:1px solid #e5e7eb">
+                                        <div style="display:flex; align-items:start; gap:12px">
+                                            <div style="width:32px; height:32px; background:var(--color-success); color:white; border-radius:50%; display:flex; align-items:center; justify-content:center; font-weight:600; flex-shrink:0">
+                                                @step.StepNumber
+                                            </div>
+                                            <div style="flex:1">
+                                                <h5 style="margin:0 0 6px 0; font-size:15px; font-weight:600">@step.Title</h5>
+                                                <p style="margin:0; font-size:14px; color:var(--text-gray); line-height:1.6">@step.Description</p>
+                                            </div>
+                                            <span class="material-icons" style="color:var(--color-success); font-size:20px">check_circle</span>
+                                        </div>
+                                    </div>
+                                }
+                            }
+                            else
+                            {
+                                <div style="text-align:center; padding:20px; color:var(--text-gray); background:#f9fafb; border-radius:8px">
+                                    <span class="material-icons" style="font-size:40px; opacity:0.3">info</span>
+                                    <p style="margin:8px 0 0 0">Esta entrada no tiene pasos detallados registrados.</p>
+                                </div>
+                            }
+                        </div>
+                    }
+                    else
+                    {
+                        <!-- Opción: Añadir a Knowledge Base (solo si NO estamos usando KB) -->
+                        <div class="form-group">
+                            <label style="display:flex; align-items:center; gap:8px; cursor:pointer">
+                                <input type="checkbox" @bind="addToKnowledgeBase" style="width:18px; height:18px" />
+                                <span style="font-weight:600">Añadir esta solución a la Base de Conocimiento</span>
+                            </label>
+                            <p style="font-size:13px; color:var(--text-gray); margin:4px 0 0 26px">
+                                Esta solución estará disponible para resolver futuros problemas similares
+                            </p>
+                        </div>
+
+                        <hr style="margin:20px 0; border:none; border-top:1px solid var(--border-color)"/>
+
+                        <!-- Pasos de la Solución -->
+                        <div>
+                            <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:12px">
+                                <h4 style="margin:0; font-size:16px">Pasos de la Solución</h4>
+                                <button class="btn-secondary" @onclick="AddStep" style="display:flex; align-items:center; gap:4px">
+                                    <span class="material-icons" style="font-size:18px">add</span>
+                                    <span>Añadir Paso</span>
+                                </button>
+                            </div>
+
+                            @foreach (var step in solutionSteps.OrderBy(s => s.StepNumber))
+                            {
+                                <div class="step-card">
+                                    <div style="display:flex; align-items:start; gap:12px">
+                                        <div style="width:32px; height:32px; background:var(--color-primary); color:white; border-radius:50%; display:flex; align-items:center; justify-content:center; font-weight:600; flex-shrink:0">
+                                            @step.StepNumber
+                                        </div>
+                                        <div style="flex:1">
+                                            <input type="text" @bind="step.Title" placeholder="Título del paso" class="form-input" style="margin-bottom:8px" />
+                                            <textarea @bind="step.Description" rows="2" placeholder="Descripción detallada del paso" class="form-input"></textarea>
+                                        </div>
+                                        <button class="btn-icon" @onclick="() => RemoveStep(step.StepNumber)" title="Eliminar paso">
+                                            <span class="material-icons" style="color:var(--color-danger)">delete</span>
+                                        </button>
+                                    </div>
+                                </div>
+                            }
+
+                            @if (!solutionSteps.Any())
+                            {
+                                <div style="text-align:center; padding:24px; color:var(--text-gray); border:2px dashed var(--border-color); border-radius:8px">
+                                    <span class="material-icons" style="font-size:48px; opacity:0.3">list_alt</span>
+                                    <p style="margin:8px 0 0 0">No hay pasos agregados. Añade al menos un paso para continuar.</p>
+                                </div>
+                            }
+                        </div>
+                    }
+
+                    @if (!string.IsNullOrEmpty(errorMessage))
+                    {
+                        <div class="alert-error" style="margin-top:16px">
+                            <span class="material-icons">error</span>
+                            <span>@errorMessage</span>
+                        </div>
+                    }
+                </div>
+
+                <div class="modal-footer">
+                    <button class="btn-secondary" @onclick="CloseResolveModal" disabled="@isSubmitting">Cancelar</button>
+                    <button class="btn-primary" @onclick="SubmitSolution" disabled="@isSubmitting">
+                        @if (isSubmitting)
+                        {
+                            <span class="material-icons spinner">hourglass_empty</span>
+                            <span>Guardando...</span>
+                        }
+                        else
+                        {
+                            <span class="material-icons">save</span>
+                            <span>Guardar y Resolver</span>
+                        }
+                    </button>
+                </div>
+            </div>
+        </div>
+    }
+
+    <!-- Modal: Buscar en Knowledge Base -->
+    @if (showKnowledgeSearchModal)
+    {
+        <div class="modal-overlay" @onclick="CloseKnowledgeSearchModal">
+            <div class="modal-content-large" @onclick:stopPropagation="true">
+                <div class="modal-header">
+                    <h3>Base de Conocimiento</h3>
+                    <button class="btn-icon" @onclick="CloseKnowledgeSearchModal">
+                        <span class="material-icons">close</span>
+                    </button>
+                </div>
+
+                <div class="modal-body">
+                    <!-- Búsqueda -->
+                    <div class="form-group">
+                        <div style="position:relative">
+                            <span class="material-icons" style="position:absolute; left:12px; top:50%; transform:translateY(-50%); color:var(--text-gray)">search</span>
+                            <input type="text" @bind="knowledgeSearchTerm" @bind:event="oninput" @onkeyup="OnSearchKeyUp" placeholder="Buscar por título, problema o tags..." 
+                                   class="form-input" style="padding-left:44px" />
+                        </div>
+                    </div>
+
+                    <!-- Resultados -->
+                    <div style="max-height:400px; overflow-y:auto">
+                        @if (loadingKnowledge)
+                        {
+                            <div style="text-align:center; padding:40px">
+                                <p>Cargando base de conocimiento...</p>
+                            </div>
+                        }
+                        else if (!FilteredKnowledgeEntries.Any())
+                        {
+                            <div style="text-align:center; padding:40px; color:var(--text-gray)">
+                                <span class="material-icons" style="font-size:48px; opacity:0.3">search_off</span>
+                                <p style="margin:8px 0 0 0">No se encontraron entradas</p>
+                            </div>
+                        }
+                        else
+                        {
+                            @foreach (var entry in FilteredKnowledgeEntries)
+                            {
+                                <div class="knowledge-entry-card" @onclick="() => SelectKnowledgeEntry(entry)">
+                                    <div style="display:flex; align-items:start; justify-content:space-between">
+                                        <div style="flex:1">
+                                            <h4 style="margin:0 0 8px 0; font-size:16px">@entry.Title</h4>
+                                            <p style="margin:0 0 4px 0; font-size:13px; color:var(--text-gray); line-height:1.5"><strong>Problema:</strong> @entry.Problem</p>
+                                            <p style="margin:0; font-size:13px; color:var(--text-gray); line-height:1.5"><strong>Solución:</strong> @(entry.Solution.Length > 100 ? entry.Solution.Substring(0, 100) + "..." : entry.Solution)</p>
+                                            <div style="display:flex; gap:8px; margin-top:8px; flex-wrap:wrap">
+                                                <span class="badge badge-info">@entry.Category</span>
+                                                @foreach (var tag in entry.Tags.Take(3))
+                                                {
+                                                    <span class="badge badge-secondary">@tag</span>
+                                                }
+                                                <span class="badge badge-secondary">✓ Usado @entry.UsageCount veces</span>
+                                            </div>
+                                        </div>
+                                        <button class="btn-primary" style="margin-left:12px">
+                                            <span class="material-icons">add_circle</span>
+                                        </button>
+                                    </div>
+                                </div>
+                            }
+                        }
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button class="btn-secondary" @onclick="CloseKnowledgeSearchModal">Cerrar</button>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+@code {
+    [Parameter]
+    public Guid TicketId { get; set; }
+
+    private TicketResponseDto? ticket;
+    private bool loading = true;
+    
+    // Modal Resolver
+    private bool showResolveModal = false;
+    private string solutionTitle = "";
+    private string solutionDescription = "";
+    private bool addToKnowledgeBase = false;
+    private List<SolutionStepDto> solutionSteps = new();
+    private bool isSubmitting = false;
+    private string errorMessage = "";
+    
+    // Knowledge Base
+    private bool showKnowledgeSearchModal = false;
+    private bool loadingKnowledge = false;
+    private string knowledgeSearchTerm = "";
+    private List<KnowledgeEntryDto> knowledgeEntries = new();
+    private bool useKnowledgeEntry = false;
+    private KnowledgeEntryDto? selectedKnowledgeEntry = null;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await LoadTicketAsync();
+            await InvokeAsync(StateHasChanged);
+        }
+    }
+
+    private async Task LoadTicketAsync()
+    {
+        loading = true;
+        try
+        {
+            var token = await JS.InvokeAsync<string>("sessionStorage.getItem", "jwt");
+            if (string.IsNullOrEmpty(token))
+            {
+                Navigation.NavigateTo("/login");
+                return;
+            }
+
+            Http.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+            var response = await Http.GetAsync($"http://localhost:5238/api/technician/tickets/{TicketId}");
+            
+            if (response.IsSuccessStatusCode)
+            {
+                ticket = await response.Content.ReadFromJsonAsync<TicketResponseDto>();
+            }
+            else
+            {
+                Console.WriteLine($"Error loading ticket: {response.StatusCode}");
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error loading ticket: {ex.Message}");
+        }
+        finally
+        {
+            loading = false;
+        }
+    }
+
+    private void OpenResolveModal()
+    {
+        solutionTitle = "";
+        solutionDescription = "";
+        addToKnowledgeBase = false;
+        solutionSteps.Clear();
+        errorMessage = "";
+        useKnowledgeEntry = false;
+        selectedKnowledgeEntry = null;
+        showResolveModal = true;
+    }
+
+    private void CloseResolveModal()
+    {
+        showResolveModal = false;
+    }
+
+    private void AddStep()
+    {
+        var nextNumber = solutionSteps.Any() ? solutionSteps.Max(s => s.StepNumber) + 1 : 1;
+        solutionSteps.Add(new SolutionStepDto { StepNumber = nextNumber, Title = "", Description = "" });
+    }
+
+    private void RemoveStep(int stepNumber)
+    {
+        solutionSteps.RemoveAll(s => s.StepNumber == stepNumber);
+        // Renumerar
+        var ordered = solutionSteps.OrderBy(s => s.StepNumber).ToList();
+        for (int i = 0; i < ordered.Count; i++)
+        {
+            ordered[i].StepNumber = i + 1;
+        }
+    }
+
+    private async Task OpenKnowledgeSearchModal()
+    {
+        knowledgeSearchTerm = ""; // Limpiar búsqueda
+        showKnowledgeSearchModal = true;
+        await LoadKnowledgeEntries();
+        await InvokeAsync(StateHasChanged); // Forzar actualización de UI
+    }
+
+    private void CloseKnowledgeSearchModal()
+    {
+        showKnowledgeSearchModal = false;
+    }
+
+    private async Task LoadKnowledgeEntries()
+    {
+        loadingKnowledge = true;
+        try
+        {
+            var token = await JS.InvokeAsync<string>("sessionStorage.getItem", "jwt");
+            Http.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+            
+            // Si hay término de búsqueda, usarlo; si no, buscar por "*" para obtener todos
+            var searchTerm = string.IsNullOrWhiteSpace(knowledgeSearchTerm) ? "*" : knowledgeSearchTerm;
+            var response = await Http.GetAsync($"http://localhost:5238/api/knowledge/entries/search?searchTerm={Uri.EscapeDataString(searchTerm)}");
+            
+            if (response.IsSuccessStatusCode)
+            {
+                knowledgeEntries = await response.Content.ReadFromJsonAsync<List<KnowledgeEntryDto>>() ?? new();
+            }
+            else
+            {
+                Console.WriteLine($"Error loading knowledge entries: {response.StatusCode}");
+                knowledgeEntries = new();
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error loading knowledge entries: {ex.Message}");
+            knowledgeEntries = new();
+        }
+        finally
+        {
+            loadingKnowledge = false;
+        }
+    }
+    
+    private async Task SelectKnowledgeEntry(KnowledgeEntryDto entry)
+    {
+        // Primero cerrar el modal de búsqueda
+        CloseKnowledgeSearchModal();
+        
+        // Configurar la entrada seleccionada DESPUÉS de abrir el modal
+        selectedKnowledgeEntry = entry;
+        useKnowledgeEntry = true;
+        solutionTitle = entry.Title;
+        solutionDescription = entry.Solution;
+        
+        // Limpiar pasos manuales ya que usaremos la KB
+        solutionSteps.Clear();
+        errorMessage = "";
+        addToKnowledgeBase = false;
+        
+        // Abrir el modal de resolución
+        showResolveModal = true;
+        await InvokeAsync(StateHasChanged); // Forzar actualización de UI
+    }
+
+    private void ClearKnowledgeEntry()
+    {
+        useKnowledgeEntry = false;
+        selectedKnowledgeEntry = null;
+        solutionSteps.Clear();
+    }
+
+    private async Task OnSearchKeyUp()
+    {
+        // Recargar resultados cuando el usuario escribe
+        await LoadKnowledgeEntries();
+    }
+
+    private async Task SubmitSolution()
+    {
+        errorMessage = "";
+        
+        // Validaciones
+        if (string.IsNullOrWhiteSpace(solutionTitle))
+        {
+            errorMessage = "El título de la solución es obligatorio";
+            return;
+        }
+        
+        if (string.IsNullOrWhiteSpace(solutionDescription))
+        {
+            errorMessage = "La descripción de la solución es obligatoria";
+            return;
+        }
+        
+        // Solo validar pasos si NO estamos usando KB
+        // Si usamos KB, el backend manejará los pasos de la entrada existente
+        if (!useKnowledgeEntry && !solutionSteps.Any())
+        {
+            errorMessage = "Debes agregar al menos un paso a la solución";
+            return;
+        }
+
+        isSubmitting = true;
+        try
+        {
+            var token = await JS.InvokeAsync<string>("sessionStorage.getItem", "jwt");
+            var userId = await JS.InvokeAsync<string>("sessionStorage.getItem", "userId");
+            Http.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+
+            var solutionDto = new CreateSolutionDto
+            {
+                TicketId = TicketId,
+                Title = solutionTitle,
+                Description = solutionDescription,
+                CreatedByUserId = Guid.Parse(userId),
+                AddToKnowledgeBase = addToKnowledgeBase,
+                Steps = solutionSteps,
+                KnowledgeEntryId = useKnowledgeEntry ? selectedKnowledgeEntry?.Id : null
+            };
+
+            var response = await Http.PostAsJsonAsync("http://localhost:5238/api/solutions", solutionDto);
+            
+            if (response.IsSuccessStatusCode)
+            {
+                await JS.InvokeVoidAsync("alert", "Solución guardada exitosamente");
+                Navigation.NavigateTo("/tecnico/dashboard");
+            }
+            else
+            {
+                errorMessage = "Error al guardar la solución. Intenta nuevamente.";
+            }
+        }
+        catch (Exception ex)
+        {
+            errorMessage = $"Error: {ex.Message}";
+        }
+        finally
+        {
+            isSubmitting = false;
+        }
+    }
+
+    private IEnumerable<KnowledgeEntryDto> FilteredKnowledgeEntries => knowledgeEntries;
+
+    private string GetStatusClass(string status) => status?.ToLower() switch
+    {
+        "resuelto" => "status-resolved",
+        "en proceso" => "status-in-progress",
+        "pendiente" => "status-pending",
+        _ => "status-pending"
+    };
+
+    // DTOs
+    public class SolutionStepDto
+    {
+        public int StepNumber { get; set; }
+        public string Title { get; set; } = "";
+        public string Description { get; set; } = "";
+    }
+
+    public class CreateSolutionDto
+    {
+        public Guid TicketId { get; set; }
+        public string Title { get; set; } = "";
+        public string Description { get; set; } = "";
+        public Guid CreatedByUserId { get; set; }
+        public bool AddToKnowledgeBase { get; set; }
+        public List<SolutionStepDto> Steps { get; set; } = new();
+        public Guid? KnowledgeEntryId { get; set; }
+    }
+
+    public class KnowledgeEntryDto
+    {
+        public Guid Id { get; set; }
+        public string Title { get; set; } = "";
+        public string Problem { get; set; } = "";
+        public string Solution { get; set; } = "";
+        public string Category { get; set; } = "";
+        public List<string> Tags { get; set; } = new();
+        public int UsageCount { get; set; }
+        public DateTime CreatedAt { get; set; }
+        public List<KnowledgeStepDto> Steps { get; set; } = new();
+    }
+
+    public class KnowledgeStepDto
+    {
+        public int StepNumber { get; set; }
+        public string Title { get; set; } = "";
+        public string Description { get; set; } = "";
+    }
+}
+
+<style>
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+}
+
+.modal-content-large {
+    background: white;
+    border-radius: 12px;
+    max-width: 800px;
+    width: 90%;
+    max-height: 90vh;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+}
+
+.modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px 24px;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.modal-header h3 {
+    margin: 0;
+    font-size: 20px;
+    font-weight: 600;
+}
+
+.modal-body {
+    padding: 24px;
+    overflow-y: auto;
+}
+
+.modal-footer {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 12px;
+    padding: 16px 24px;
+    border-top: 1px solid var(--border-color);
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    display: block;
+    font-weight: 500;
+    margin-bottom: 6px;
+    font-size: 14px;
+    color: var(--text-dark);
+}
+
+.form-input {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    font-size: 14px;
+    font-family: inherit;
+    transition: border-color 0.2s;
+}
+
+.form-input:focus {
+    outline: none;
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 3px rgba(var(--color-primary-rgb), 0.1);
+}
+
+.step-card {
+    padding: 16px;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    margin-bottom: 12px;
+    background: #fafafa;
+}
+
+.knowledge-entry-card {
+    padding: 16px;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    margin-bottom: 12px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.knowledge-entry-card:hover {
+    border-color: var(--color-primary);
+    background: #f9fafb;
+    transform: translateY(-2px);
+}
+
+.btn-icon {
+    background: none;
+    border: none;
+    padding: 8px;
+    cursor: pointer;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s;
+}
+
+.btn-icon:hover {
+    background: #f1f5f9;
+}
+
+.btn-link {
+    background: none;
+    border: none;
+    color: var(--color-primary);
+    cursor: pointer;
+    text-decoration: underline;
+    font-size: 13px;
+}
+
+.alert-error {
+    padding: 12px 16px;
+    background: #fee;
+    border-left: 4px solid #dc2626;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #991b1b;
+}
+
+.badge {
+    display: inline-block;
+    padding: 4px 10px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 500;
+}
+
+.badge-info {
+    background: var(--color-info-light);
+    color: var(--color-info);
+}
+
+.badge-secondary {
+    background: #f1f5f9;
+    color: var(--text-gray);
+}
+
+.status-resolved {
+    background: var(--color-success-bg);
+    color: var(--color-success);
+}
+
+.status-in-progress {
+    background: var(--color-warning-bg);
+    color: var(--color-warning);
+}
+
+.status-pending {
+    background: var(--color-info-light);
+    color: var(--color-info);
+}
+
+.spinner {
+    animation: spin 1s linear infinite;
+}
+
+@@keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+</style>
