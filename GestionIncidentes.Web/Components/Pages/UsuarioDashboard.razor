@@ -8,9 +8,15 @@
 <link rel="stylesheet" href="/css/usuario.css" />
 
 <div class="page-shell">
-    <div class="page-header" style="text-align:center">
-        <h1 class="page-title">Mis Reportes</h1>
-        <p class="page-subtitle">Historial de incidentes reportados</p>
+    <div class="page-header" style="text-align:center; display:flex; justify-content:space-between; align-items:center; max-width:900px; margin:0 auto 20px;">
+        <div style="flex:1">
+            <h1 class="page-title">Mis Reportes</h1>
+            <p class="page-subtitle">Historial de incidentes reportados</p>
+        </div>
+        <button @onclick="RefreshData" class="btn-secondary" style="display:flex; align-items:center; gap:8px;">
+            <span class="material-icons" style="font-size:20px">refresh</span>
+            Recargar
+        </button>
     </div>
 
     @if (loading)
@@ -40,11 +46,8 @@
                     <thead>
                         <tr>
                             <th>ID</th>
-                            <th>Ubicación</th>
                             <th>Problema</th>
-                            <th>Estado</th>
                             <th>Fecha</th>
-                            <th>Acciones</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -52,20 +55,8 @@
                         {
                             <tr>
                                 <td><strong>@report.TicketNumber</strong></td>
-                                <td>@report.Location @(string.IsNullOrEmpty(report.LocationDetail) ? "" : $"- {report.LocationDetail}")</td>
                                 <td>@report.Title</td>
-                                <td><span class="badge @GetStatusClass(report.Status)">@report.Status</span></td>
                                 <td>@report.CreatedAt.ToString("dd/MM/yyyy")</td>
-                                <td>
-                                    @if (report.Status == "Resuelto" && report.Rating == null)
-                                    {
-                                        <button class="btn-small" @onclick="() => ShowRatingModal(report.Id)">Calificar</button>
-                                    }
-                                    else if (report.Rating != null)
-                                    {
-                                        <span style="color:var(--color-warning)">⭐ @report.Rating</span>
-                                    }
-                                </td>
                             </tr>
                         }
                     </tbody>
@@ -74,7 +65,12 @@
             else
             {
                 <div style="text-align:center; padding:40px; color:var(--text-gray)">
-                    No has reportado ningún incidente aún
+                    <div style="font-size: 48px; margin-bottom: 16px;">📭</div>
+                    <h3 style="margin-bottom: 8px;">No has reportado ningún incidente aún</h3>
+                    <p style="margin-bottom: 16px;">Cuando reportes un incidente, aparecerá aquí</p>
+                    <a href="/usuario/reportar" class="btn-primary" style="display: inline-block; padding: 12px 24px; text-decoration: none;">
+                        Reportar tu primer incidente
+                    </a>
                 </div>
             }
         </div>
@@ -104,6 +100,8 @@
     }
 </div>
 
+@inject GestionIncidentes.Web.Services.AuthService AuthService
+
 @code {
     private List<TicketResponseDto> myReports = new();
     private bool loading = true;
@@ -111,27 +109,69 @@
     private Guid? ratingTicketId = null;
     private int selectedRating = 0;
     private string feedbackComment = "";
+    private string debugInfo = "";
+    private string currentUserName = "";
+    private string currentUserEmail = "";
 
     protected override async Task OnInitializedAsync()
     {
+        Console.WriteLine("[UsuarioDashboard] OnInitializedAsync - Componente inicializado");
+        currentUserName = await AuthService.GetCurrentUserNameAsync() ?? "Desconocido";
+        currentUserEmail = await AuthService.GetCurrentUserEmailAsync() ?? "No disponible";
+        Console.WriteLine($"[UsuarioDashboard] Usuario actual: {currentUserName} ({currentUserEmail})");
         await LoadReportsAsync();
+    }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        Console.WriteLine("[UsuarioDashboard] OnParametersSetAsync - Recargando datos");
+        await LoadReportsAsync();
+    }
+
+    private async Task RefreshData()
+    {
+        Console.WriteLine("[UsuarioDashboard] RefreshData - Usuario solicitó recarga manual");
+        await LoadReportsAsync();
+        StateHasChanged();
     }
 
     private async Task LoadReportsAsync()
     {
         loading = true;
+        StateHasChanged(); // Forzar actualización de UI
+        
         try
         {
+            Console.WriteLine("[UsuarioDashboard] Iniciando carga de reportes...");
+            
+            // Agregar un pequeño delay para asegurar que la BD esté actualizada
+            await Task.Delay(100);
+            
             myReports = await ReportService.GetMyReportsAsync() ?? new List<TicketResponseDto>();
+            Console.WriteLine($"[UsuarioDashboard] Reportes cargados: {myReports.Count}");
+            
+            if (myReports.Count == 0)
+            {
+                Console.WriteLine("[UsuarioDashboard] ADVERTENCIA: No se encontraron reportes para este usuario");
+            }
+            else
+            {
+                foreach (var report in myReports)
+                {
+                    Console.WriteLine($"[UsuarioDashboard] Reporte: {report.TicketNumber} - {report.Title} - Status: {report.Status}");
+                }
+            }
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"Error loading reports: {ex.Message}");
+            Console.WriteLine($"[UsuarioDashboard] ERROR loading reports: {ex.Message}");
+            Console.WriteLine($"[UsuarioDashboard] Stack: {ex.StackTrace}");
             myReports = new List<TicketResponseDto>();
         }
         finally
         {
             loading = false;
+            StateHasChanged(); // Forzar actualización de UI después de cargar
         }
     }
 
@@ -170,9 +210,18 @@
     {
         "resuelto" => "baja",
         "en proceso" => "media",
+        "en progreso" => "media",
         "pendiente" => "alta",
         _ => "media"
     };
+
+    private string GetDisplayStatus(string status)
+    {
+        if (string.IsNullOrEmpty(status))
+            return "Pendiente";
+        
+        return status;
+    }
 }
 
 <style>

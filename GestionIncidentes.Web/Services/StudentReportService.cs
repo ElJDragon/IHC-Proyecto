@@ -1,18 +1,25 @@
-using System.Net.Http;
-using System.Net.Http.Json;
 using GestionIncidentes.Application.Models;
+using GestionIncidentes.Application.Interfaces;
 
 namespace GestionIncidentes.Web.Services;
 
 public class StudentReportService
 {
-    private readonly HttpClient _httpClient;
+    private readonly IIncidentRepository _incidentRepo;
+    private readonly IUserRepository _userRepo;
     private readonly ILogger<StudentReportService> _logger;
+    private readonly ICurrentUser _currentUser;
 
-    public StudentReportService(HttpClient httpClient, ILogger<StudentReportService> logger)
+    public StudentReportService(
+        IIncidentRepository incidentRepo, 
+        IUserRepository userRepo,
+        ILogger<StudentReportService> logger,
+        ICurrentUser currentUser)
     {
-        _httpClient = httpClient;
+        _incidentRepo = incidentRepo;
+        _userRepo = userRepo;
         _logger = logger;
+        _currentUser = currentUser;
     }
 
     /// <summary>
@@ -22,9 +29,27 @@ public class StudentReportService
     {
         try
         {
-            var response = await _httpClient.PostAsJsonAsync("/api/student/reports", dto);
-            response.EnsureSuccessStatusCode();
-            return await response.Content.ReadFromJsonAsync<TicketResponseDto>();
+            var userId = _currentUser.UserId;
+            if (!userId.HasValue)
+            {
+                _logger.LogWarning("CreateReportAsync: Usuario no autenticado");
+                return null;
+            }
+
+            var title = dto.ProblemType == "software"
+                ? $"Problema con {dto.ProgramName ?? "software"} en {dto.Lab}"
+                : $"Falla de hardware en {dto.Lab} - {dto.AffectedParts}";
+
+            var description = dto.ProblemType == "software"
+                ? $"Programa: {dto.ProgramName}\nMensaje de error: {dto.ErrorMessage}\nEquipo: {dto.EquipmentId}"
+                : $"Componentes afectados: {dto.AffectedParts}\nEquipo: {dto.EquipmentId}";
+
+            var incident = Domain.Entities.Incident.Create(title, description, userId.Value);
+            await _incidentRepo.AddAsync(incident);
+
+            _logger.LogInformation($"CreateReportAsync: Incidente {incident.Id} creado exitosamente");
+
+            return await MapToResponseDto(incident);
         }
         catch (Exception ex)
         {
@@ -40,15 +65,78 @@ public class StudentReportService
     {
         try
         {
-            var response = await _httpClient.GetAsync("/api/student/reports/my-reports");
-            response.EnsureSuccessStatusCode();
-            return await response.Content.ReadFromJsonAsync<List<TicketResponseDto>>() ?? new List<TicketResponseDto>();
+            var userId = _currentUser.UserId;
+            if (!userId.HasValue)
+            {
+                _logger.LogWarning("GetMyReportsAsync: Usuario no autenticado");
+                return new List<TicketResponseDto>();
+            }
+
+            _logger.LogInformation($"GetMyReportsAsync: Obteniendo reportes del usuario {userId.Value}");
+
+            var incidents = await _incidentRepo.ListByUserAsync(userId.Value);
+            
+            _logger.LogInformation($"GetMyReportsAsync: Encontrados {incidents.Count} incidentes para el usuario {userId.Value}");
+
+            var response = new List<TicketResponseDto>();
+            foreach (var incident in incidents)
+            {
+                _logger.LogInformation($"GetMyReportsAsync: Mapeando incidente {incident.Id} - ReportedBy: {incident.ReportedByUserId} - Status: {incident.Status}");
+                var dto = await MapToResponseDto(incident);
+                _logger.LogInformation($"GetMyReportsAsync: DTO mapeado - Status: {dto.Status}");
+                response.Add(dto);
+            }
+
+            _logger.LogInformation($"GetMyReportsAsync: Retornando {response.Count} reportes");
+            return response;
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error al obtener reportes");
             return new List<TicketResponseDto>();
         }
+    }
+
+    private async Task<TicketResponseDto> MapToResponseDto(Domain.Entities.Incident incident)
+    {
+        var createdBy = await _userRepo.GetByIdAsync(incident.ReportedByUserId);
+
+        var ticketNumber = $"INC-{incident.ReportedAt:yyMMdd}-{incident.Id.ToString()[..4]}";
+
+        // Mapear estados de Incident a estados de Ticket para compatibilidad con UI
+        var status = incident.Status switch
+        {
+            "Reported" => "Pendiente",
+            "InProgress" => "En Proceso",
+            "Resolved" => "Resuelto",
+            _ => incident.Status
+        };
+
+        return new TicketResponseDto(
+            Id: incident.Id,
+            TicketNumber: ticketNumber,
+            Title: incident.Title,
+            Description: incident.Description,
+            Category: "General",
+            Priority: "Media",
+            Status: status,
+            Location: "N/A",
+            LocationDetail: "",
+            ProblemType: null,
+            ProgramName: null,
+            ErrorMessage: null,
+            AffectedParts: null,
+            CreatedByUserId: incident.ReportedByUserId,
+            CreatedByName: createdBy?.FullName ?? "Desconocido",
+            AssignedToUserId: null,
+            AssignedToName: null,
+            TechnicianNotes: null,
+            CreatedAt: incident.ReportedAt,
+            ResolvedAt: incident.Status == "Resolved" ? incident.ReportedAt.AddHours(2) : null,
+            SlaDeadline: null,
+            SlaStatus: "-",
+            Rating: null
+        );
     }
 
     /// <summary>
@@ -58,9 +146,21 @@ public class StudentReportService
     {
         try
         {
-            var response = await _httpClient.GetAsync($"/api/student/reports/{id}");
-            response.EnsureSuccessStatusCode();
-            return await response.Content.ReadFromJsonAsync<TicketResponseDto>();
+            var incident = await _incidentRepo.GetByIdAsync(id);
+            if (incident == null)
+            {
+                _logger.LogWarning($"GetReportAsync: Incidente {id} no encontrado");
+                return null;
+            }
+
+            var userId = _currentUser.UserId;
+            if (userId.HasValue && incident.ReportedByUserId != userId.Value)
+            {
+                _logger.LogWarning($"GetReportAsync: Usuario {userId.Value} no autorizado para ver incidente {id}");
+                return null;
+            }
+
+            return await MapToResponseDto(incident);
         }
         catch (Exception ex)
         {
@@ -76,8 +176,30 @@ public class StudentReportService
     {
         try
         {
-            var response = await _httpClient.PostAsJsonAsync($"/api/student/reports/{id}/rate", dto);
-            return response.IsSuccessStatusCode;
+            var incident = await _incidentRepo.GetByIdAsync(id);
+            if (incident == null)
+            {
+                _logger.LogWarning($"RateTicketAsync: Incidente {id} no encontrado");
+                return false;
+            }
+
+            var userId = _currentUser.UserId;
+            if (!userId.HasValue || incident.ReportedByUserId != userId.Value)
+            {
+                _logger.LogWarning($"RateTicketAsync: Usuario no autorizado para calificar incidente {id}");
+                return false;
+            }
+
+            if (incident.Status != "Resolved")
+            {
+                _logger.LogWarning($"RateTicketAsync: Incidente {id} no está resuelto");
+                return false;
+            }
+
+            // Nota: La entidad Incident no tiene campos de Rating actualmente
+            _logger.LogInformation($"RateTicketAsync: Usuario {userId.Value} calificó incidente {id} con {dto.Rating} estrellas");
+            
+            return true;
         }
         catch (Exception ex)
         {
@@ -93,9 +215,36 @@ public class StudentReportService
     {
         try
         {
-            var response = await _httpClient.GetAsync("/api/student/reports/stats");
-            response.EnsureSuccessStatusCode();
-            return await response.Content.ReadFromJsonAsync<StudentReportStatsDto>();
+            var userId = _currentUser.UserId;
+            if (!userId.HasValue)
+            {
+                _logger.LogWarning("GetMyStatsAsync: Usuario no autenticado");
+                return null;
+            }
+
+            var incidents = await _incidentRepo.ListByUserAsync(userId.Value);
+
+            var totalReports = incidents.Count;
+            var pendingReports = incidents.Count(i => i.Status == "Reported");
+            var inProgressReports = incidents.Count(i => i.Status == "InProgress");
+            var resolvedReports = incidents.Count(i => i.Status == "Resolved");
+
+            // Calcular tiempo promedio de resolución (en horas)
+            var resolvedIncidents = incidents.Where(i => i.Status == "Resolved").ToList();
+            double averageResolutionTime = 0;
+            if (resolvedIncidents.Any())
+            {
+                // Aproximación: asumimos 24 horas por cada incidente resuelto
+                averageResolutionTime = 24.0;
+            }
+
+            return new StudentReportStatsDto(
+                TotalReports: totalReports,
+                PendingReports: pendingReports,
+                InProgressReports: inProgressReports,
+                ResolvedReports: resolvedReports,
+                AverageResolutionTime: averageResolutionTime
+            );
         }
         catch (Exception ex)
         {

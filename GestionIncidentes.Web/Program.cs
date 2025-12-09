@@ -193,10 +193,8 @@ builder.Services.AddHttpClient<GestionIncidentes.Web.Services.TechnicianTicketSe
 {
     client.BaseAddress = new Uri("http://localhost:5238");
 });
-builder.Services.AddHttpClient<GestionIncidentes.Web.Services.StudentReportService>(client =>
-{
-    client.BaseAddress = new Uri("http://localhost:5238");
-});
+// StudentReportService ahora usa inyección directa de repositorios
+builder.Services.AddScoped<GestionIncidentes.Web.Services.StudentReportService>();
 
 // Usuario actual
 builder.Services.AddHttpContextAccessor();
