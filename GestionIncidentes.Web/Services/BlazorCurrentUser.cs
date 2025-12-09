@@ -37,19 +37,29 @@ public class BlazorCurrentUser : ICurrentUser
             {
                 // Intentar obtener el usuario autenticado
                 var user = GetUserAsync().GetAwaiter().GetResult();
+                
+                if (user == null || !user.Identity?.IsAuthenticated == true)
+                {
+                    Console.WriteLine("[BlazorCurrentUser] Usuario no autenticado");
+                    return null;
+                }
+                
                 var userIdClaim = user?.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                Console.WriteLine($"[BlazorCurrentUser] UserId Claim: {userIdClaim}");
                 
                 if (Guid.TryParse(userIdClaim, out var guid))
+                {
+                    Console.WriteLine($"[BlazorCurrentUser] UserId parsed: {guid}");
                     return guid;
+                }
 
-                // Si no hay usuario autenticado, usar el usuario de prueba por defecto
-                // Este es el usuario que creamos en la base de datos
-                return Guid.Parse("00000000-0000-0000-0000-000000000001");
+                Console.WriteLine("[BlazorCurrentUser] No se pudo parsear el UserId");
+                return null;
             }
-            catch
+            catch (Exception ex)
             {
-                // En caso de error, retornar el usuario de prueba
-                return Guid.Parse("00000000-0000-0000-0000-000000000001");
+                Console.WriteLine($"[BlazorCurrentUser] Error obteniendo UserId: {ex.Message}");
+                return null;
             }
         }
     }

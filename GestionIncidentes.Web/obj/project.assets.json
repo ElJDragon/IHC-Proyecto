@@ -4244,23 +4244,23 @@
     ]
   },
   "packageFolders": {
-    "C:\\Users\\User\\.nuget\\packages\\": {},
+    "C:\\Users\\Jona\\.nuget\\packages\\": {},
     "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\User\\Documents\\Joshua Universidad\\Quinto\\IHC\\ProyectoIHC\\IHC-Proyecto\\GestionIncidentes.Web\\GestionIncidentes.Web.csproj",
+      "projectUniqueName": "C:\\Users\\Jona\\Desktop\\incidentes\\IHC-Proyecto\\GestionIncidentes.Web\\GestionIncidentes.Web.csproj",
       "projectName": "GestionIncidentes.Web",
-      "projectPath": "C:\\Users\\User\\Documents\\Joshua Universidad\\Quinto\\IHC\\ProyectoIHC\\IHC-Proyecto\\GestionIncidentes.Web\\GestionIncidentes.Web.csproj",
-      "packagesPath": "C:\\Users\\User\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\User\\Documents\\Joshua Universidad\\Quinto\\IHC\\ProyectoIHC\\IHC-Proyecto\\GestionIncidentes.Web\\obj\\",
+      "projectPath": "C:\\Users\\Jona\\Desktop\\incidentes\\IHC-Proyecto\\GestionIncidentes.Web\\GestionIncidentes.Web.csproj",
+      "packagesPath": "C:\\Users\\Jona\\.nuget\\packages\\",
+      "outputPath": "C:\\Users\\Jona\\Desktop\\incidentes\\IHC-Proyecto\\GestionIncidentes.Web\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
       ],
       "configFilePaths": [
-        "C:\\Users\\User\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Users\\Jona\\AppData\\Roaming\\NuGet\\NuGet.Config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
       ],
@@ -4269,21 +4269,20 @@
       ],
       "sources": {
         "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
-        "C:\\Program Files\\dotnet\\library-packs": {},
         "https://api.nuget.org/v3/index.json": {}
       },
       "frameworks": {
         "net9.0": {
           "targetAlias": "net9.0",
           "projectReferences": {
-            "C:\\Users\\User\\Documents\\Joshua Universidad\\Quinto\\IHC\\ProyectoIHC\\IHC-Proyecto\\GestionIncidentes.Application\\GestionIncidentes.Application.csproj": {
-              "projectPath": "C:\\Users\\User\\Documents\\Joshua Universidad\\Quinto\\IHC\\ProyectoIHC\\IHC-Proyecto\\GestionIncidentes.Application\\GestionIncidentes.Application.csproj"
+            "C:\\Users\\Jona\\Desktop\\incidentes\\IHC-Proyecto\\GestionIncidentes.Application\\GestionIncidentes.Application.csproj": {
+              "projectPath": "C:\\Users\\Jona\\Desktop\\incidentes\\IHC-Proyecto\\GestionIncidentes.Application\\GestionIncidentes.Application.csproj"
             },
-            "C:\\Users\\User\\Documents\\Joshua Universidad\\Quinto\\IHC\\ProyectoIHC\\IHC-Proyecto\\GestionIncidentes.Domain\\GestionIncidentes.Domain.csproj": {
-              "projectPath": "C:\\Users\\User\\Documents\\Joshua Universidad\\Quinto\\IHC\\ProyectoIHC\\IHC-Proyecto\\GestionIncidentes.Domain\\GestionIncidentes.Domain.csproj"
+            "C:\\Users\\Jona\\Desktop\\incidentes\\IHC-Proyecto\\GestionIncidentes.Domain\\GestionIncidentes.Domain.csproj": {
+              "projectPath": "C:\\Users\\Jona\\Desktop\\incidentes\\IHC-Proyecto\\GestionIncidentes.Domain\\GestionIncidentes.Domain.csproj"
             },
-            "C:\\Users\\User\\Documents\\Joshua Universidad\\Quinto\\IHC\\ProyectoIHC\\IHC-Proyecto\\GestionIncidentes.Infrastructure\\GestionIncidentes.Infrastructure.csproj": {
-              "projectPath": "C:\\Users\\User\\Documents\\Joshua Universidad\\Quinto\\IHC\\ProyectoIHC\\IHC-Proyecto\\GestionIncidentes.Infrastructure\\GestionIncidentes.Infrastructure.csproj"
+            "C:\\Users\\Jona\\Desktop\\incidentes\\IHC-Proyecto\\GestionIncidentes.Infrastructure\\GestionIncidentes.Infrastructure.csproj": {
+              "projectPath": "C:\\Users\\Jona\\Desktop\\incidentes\\IHC-Proyecto\\GestionIncidentes.Infrastructure\\GestionIncidentes.Infrastructure.csproj"
             }
           }
         }
@@ -4342,7 +4341,7 @@
             "privateAssets": "all"
           }
         },
-        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.307/PortableRuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.304/PortableRuntimeIdentifierGraph.json"
       }
     }
   }

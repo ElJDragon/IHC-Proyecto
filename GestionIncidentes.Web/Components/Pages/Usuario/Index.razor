@@ -1,0 +1,488 @@
+@page "/usuario"
+@page "/usuario/"
+@layout UsuarioLayout
+@rendermode InteractiveServer
+@inject GestionIncidentes.Web.Services.StudentReportService ReportService
+@inject GestionIncidentes.Web.Services.AuthService AuthService
+@using GestionIncidentes.Application.Models
+
+<link rel="stylesheet" href="/css/pages.css" />
+<link rel="stylesheet" href="/css/usuario.css" />
+
+<PageTitle>Mi Dashboard - Gestión de Incidentes</PageTitle>
+
+<div class="page-shell">
+    <div class="page-header" style="text-align:center">
+        <h1 class="page-title">Bienvenido, @userName</h1>
+        <p class="page-subtitle">Panel de control de usuario</p>
+    </div>
+
+    @if (loading)
+    {
+        <div style="text-align:center; padding:40px">
+            <div class="spinner"></div>
+            <p style="margin-top: 16px; color: var(--text-gray)">Cargando información...</p>
+        </div>
+    }
+    else
+    {
+        <!-- Estadísticas Resumen -->
+        <div class="grid-cards" style="max-width:1200px; margin:0 auto 32px">
+            <div class="card stat-card">
+                <div class="stat-icon" style="background: var(--color-primary-light); color: var(--color-primary);">📊</div>
+                <div class="stat-content">
+                    <div class="stat-label">Tickets Abiertos</div>
+                    <div class="stat-value">@openTicketsCount</div>
+                    <div class="card-desc">En espera de atención</div>
+                </div>
+            </div>
+            
+            <div class="card stat-card">
+                <div class="stat-icon" style="background: #e3f2fd; color: #1976d2;">📝</div>
+                <div class="stat-content">
+                    <div class="stat-label">Total Reportados</div>
+                    <div class="stat-value">@totalTicketsCount</div>
+                    <div class="card-desc">Historial completo</div>
+                </div>
+            </div>
+            
+            <div class="card stat-card">
+                <div class="stat-icon" style="background: #e8f5e9; color: #388e3c;">✅</div>
+                <div class="stat-content">
+                    <div class="stat-label">Resueltos</div>
+                    <div class="stat-value">@resolvedTicketsCount</div>
+                    <div class="card-desc">Tickets completados</div>
+                </div>
+            </div>
+
+            <div class="card stat-card">
+                <div class="stat-icon" style="background: #fff3e0; color: #f57c00;">⏱️</div>
+                <div class="stat-content">
+                    <div class="stat-label">En Progreso</div>
+                    <div class="stat-value">@inProgressCount</div>
+                    <div class="card-desc">Siendo atendidos</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Información del Usuario -->
+        <div class="user-info-section" style="max-width:1200px; margin:0 auto 32px">
+            <div class="card">
+                <h2 class="section-title">📋 Información del Usuario</h2>
+                <div class="user-details-grid">
+                    <div class="user-detail-item">
+                        <span class="detail-label">👤 Nombre:</span>
+                        <span class="detail-value">@userName</span>
+                    </div>
+                    <div class="user-detail-item">
+                        <span class="detail-label">🏷️ Rol:</span>
+                        <span class="detail-value badge">@userRole</span>
+                    </div>
+                    <div class="user-detail-item">
+                        <span class="detail-label">📧 Correo:</span>
+                        <span class="detail-value">@userEmail</span>
+                    </div>
+                    <div class="user-detail-item">
+                        <span class="detail-label">📅 Último Reporte:</span>
+                        <span class="detail-value">@lastReportDate</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Últimos Tickets Reportados -->
+        <div class="recent-tickets-section" style="max-width:1200px; margin:0 auto">
+            <div class="card">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                    <h2 class="section-title">🎫 Tus Últimos Incidentes</h2>
+                    <a href="/usuario/dashboard" class="btn-link">Ver todos →</a>
+                </div>
+                
+                @if (recentReports.Any())
+                {
+                    <div class="tickets-list">
+                        @foreach (var report in recentReports.Take(5))
+                        {
+                            <div class="ticket-item">
+                                <div class="ticket-header-row">
+                                    <div class="ticket-info">
+                                        <strong class="ticket-number">@report.TicketNumber</strong>
+                                        <span class="ticket-title">@report.Title</span>
+                                    </div>
+                                    <span class="badge @GetStatusClass(report.Status)">@report.Status</span>
+                                </div>
+                                <div class="ticket-details-row">
+                                    <span class="ticket-meta">📍 @report.Location</span>
+                                    <span class="ticket-meta">📅 @report.CreatedAt.ToString("dd/MM/yyyy HH:mm")</span>
+                                    @if (!string.IsNullOrEmpty(report.Category))
+                                    {
+                                        <span class="ticket-meta">🏷️ @report.Category</span>
+                                    }
+                                </div>
+                            </div>
+                        }
+                    </div>
+                }
+                else
+                {
+                    <div class="empty-state">
+                        <div class="empty-icon">📭</div>
+                        <h3>No has reportado ningún incidente aún</h3>
+                        <p>Cuando reportes un incidente, aparecerá aquí</p>
+                        <a href="/usuario/reportar" class="btn-primary" style="margin-top: 16px; display: inline-block;">Reportar Incidente</a>
+                    </div>
+                }
+            </div>
+        </div>
+
+        <!-- Acciones Rápidas -->
+        <div class="quick-actions" style="max-width:1200px; margin:32px auto 0">
+            <div class="card">
+                <h2 class="section-title">⚡ Acciones Rápidas</h2>
+                <div class="actions-grid">
+                    <a href="/usuario/reportar" class="action-button">
+                        <div class="action-icon">📝</div>
+                        <div class="action-label">Reportar Incidente</div>
+                    </a>
+                    <a href="/usuario/dashboard" class="action-button">
+                        <div class="action-icon">📊</div>
+                        <div class="action-label">Ver Mis Reportes</div>
+                    </a>
+                    <a href="/usuario/ayuda" class="action-button">
+                        <div class="action-icon">❓</div>
+                        <div class="action-label">Centro de Ayuda</div>
+                    </a>
+                    <a href="/usuario/configuracion" class="action-button">
+                        <div class="action-icon">⚙️</div>
+                        <div class="action-label">Configuración</div>
+                    </a>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+@code {
+    private List<TicketResponseDto> myReports = new();
+    private List<TicketResponseDto> recentReports = new();
+    private bool loading = true;
+    
+    private string userName = "Usuario";
+    private string userRole = "Usuario";
+    private string userEmail = "usuario@universidad.edu";
+    
+    private int openTicketsCount = 0;
+    private int totalTicketsCount = 0;
+    private int resolvedTicketsCount = 0;
+    private int inProgressCount = 0;
+    private string lastReportDate = "N/A";
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadUserDataAsync();
+    }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        // Recargar datos cuando se navegue a esta página
+        await LoadUserDataAsync();
+    }
+
+    private async Task LoadUserDataAsync()
+    {
+        loading = true;
+        StateHasChanged();
+        
+        try
+        {
+            Console.WriteLine("[Usuario/Index] Cargando datos del usuario...");
+            
+            // Cargar información del usuario
+            userName = await AuthService.GetCurrentUserNameAsync() ?? "Usuario";
+            userRole = await AuthService.GetCurrentUserRoleAsync() ?? "Usuario";
+            userEmail = await AuthService.GetCurrentUserEmailAsync() ?? "usuario@universidad.edu";
+
+            Console.WriteLine($"[Usuario/Index] Usuario: {userName}, Email: {userEmail}");
+
+            // Cargar reportes del usuario
+            myReports = await ReportService.GetMyReportsAsync() ?? new List<TicketResponseDto>();
+            Console.WriteLine($"[Usuario/Index] Reportes cargados: {myReports.Count}");
+            
+            // Calcular estadísticas
+            totalTicketsCount = myReports.Count;
+            openTicketsCount = myReports.Count(r => r.Status != "Resuelto" && r.Status != "Cerrado");
+            resolvedTicketsCount = myReports.Count(r => r.Status == "Resuelto");
+            inProgressCount = myReports.Count(r => r.Status == "En Proceso" || r.Status == "En Progreso");
+            
+            // Obtener últimos reportes
+            recentReports = myReports.OrderByDescending(r => r.CreatedAt).ToList();
+            
+            // Obtener fecha del último reporte
+            if (recentReports.Any())
+            {
+                lastReportDate = recentReports.First().CreatedAt.ToString("dd/MM/yyyy HH:mm");
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"[Usuario/Index] ERROR loading user data: {ex.Message}");
+            Console.WriteLine($"[Usuario/Index] Stack: {ex.StackTrace}");
+            myReports = new List<TicketResponseDto>();
+        }
+        finally
+        {
+            loading = false;
+            StateHasChanged();
+        }
+    }
+
+    private string GetStatusClass(string status) => status?.ToLower() switch
+    {
+        "resuelto" => "baja",
+        "en proceso" => "media",
+        "en progreso" => "media",
+        "pendiente" => "alta",
+        "abierto" => "alta",
+        _ => "media"
+    };
+}
+
+<style>
+.spinner {
+    border: 3px solid rgba(0, 0, 0, 0.1);
+    border-top: 3px solid var(--color-primary);
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    animation: spin 1s linear infinite;
+    margin: 0 auto;
+}
+
+@@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.stat-card {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 20px;
+}
+
+.stat-icon {
+    width: 60px;
+    height: 60px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 28px;
+    flex-shrink: 0;
+}
+
+.stat-content {
+    flex: 1;
+}
+
+.stat-label {
+    font-size: 14px;
+    color: var(--text-gray);
+    margin-bottom: 4px;
+}
+
+.stat-value {
+    font-size: 32px;
+    font-weight: 700;
+    color: var(--color-text-primary);
+    line-height: 1;
+    margin-bottom: 4px;
+}
+
+.section-title {
+    font-size: 20px;
+    font-weight: 600;
+    color: var(--color-text-primary);
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.user-details-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 20px;
+}
+
+.user-detail-item {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.detail-label {
+    font-size: 14px;
+    color: var(--text-gray);
+    font-weight: 500;
+}
+
+.detail-value {
+    font-size: 16px;
+    color: var(--color-text-primary);
+    font-weight: 600;
+}
+
+.tickets-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.ticket-item {
+    padding: 16px;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    transition: all 0.2s ease;
+}
+
+.ticket-item:hover {
+    border-color: var(--color-primary);
+    background-color: rgba(117, 34, 57, 0.02);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.ticket-header-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+    gap: 16px;
+}
+
+.ticket-info {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex: 1;
+}
+
+.ticket-number {
+    color: var(--color-primary);
+    font-size: 14px;
+    font-weight: 700;
+}
+
+.ticket-title {
+    color: var(--color-text-primary);
+    font-size: 15px;
+    font-weight: 500;
+}
+
+.ticket-details-row {
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+}
+
+.ticket-meta {
+    font-size: 13px;
+    color: var(--text-gray);
+}
+
+.btn-link {
+    color: var(--color-primary);
+    text-decoration: none;
+    font-weight: 500;
+    font-size: 14px;
+    transition: color 0.2s ease;
+}
+
+.btn-link:hover {
+    color: var(--color-primary-dark);
+}
+
+.empty-state {
+    text-align: center;
+    padding: 60px 20px;
+}
+
+.empty-icon {
+    font-size: 64px;
+    margin-bottom: 16px;
+}
+
+.empty-state h3 {
+    font-size: 20px;
+    color: var(--color-text-primary);
+    margin-bottom: 8px;
+}
+
+.empty-state p {
+    color: var(--text-gray);
+    font-size: 14px;
+}
+
+.actions-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 16px;
+}
+
+.action-button {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    padding: 24px;
+    border: 2px solid var(--border-color);
+    border-radius: 12px;
+    text-decoration: none;
+    transition: all 0.2s ease;
+    background: white;
+}
+
+.action-button:hover {
+    border-color: var(--color-primary);
+    background-color: rgba(117, 34, 57, 0.02);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.action-icon {
+    font-size: 40px;
+    width: 70px;
+    height: 70px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(117, 34, 57, 0.05);
+    border-radius: 50%;
+}
+
+.action-label {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--color-text-primary);
+    text-align: center;
+}
+
+@@media (max-width: 768px) {
+    .grid-cards {
+        grid-template-columns: 1fr;
+    }
+    
+    .user-details-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .ticket-header-row {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    
+    .actions-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+</style>
