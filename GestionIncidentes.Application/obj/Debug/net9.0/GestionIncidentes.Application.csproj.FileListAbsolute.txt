@@ -61,3 +61,19 @@ C:\Users\User\Documents\Joshua Universidad\Quinto\IHC\ProyectoIHC\IHC-Proyecto\G
 C:\Users\User\Documents\Joshua Universidad\Quinto\IHC\ProyectoIHC\IHC-Proyecto\GestionIncidentes.Application\obj\Debug\net9.0\refint\GestionIncidentes.Application.dll
 C:\Users\User\Documents\Joshua Universidad\Quinto\IHC\ProyectoIHC\IHC-Proyecto\GestionIncidentes.Application\obj\Debug\net9.0\GestionIncidentes.Application.pdb
 C:\Users\User\Documents\Joshua Universidad\Quinto\IHC\ProyectoIHC\IHC-Proyecto\GestionIncidentes.Application\obj\Debug\net9.0\ref\GestionIncidentes.Application.dll
+C:\Users\Jona\Downloads\IHC-Proyecto\IHC-Proyecto\GestionIncidentes.Application\bin\Debug\net9.0\GestionIncidentes.Application.deps.json
+C:\Users\Jona\Downloads\IHC-Proyecto\IHC-Proyecto\GestionIncidentes.Application\bin\Debug\net9.0\GestionIncidentes.Application.dll
+C:\Users\Jona\Downloads\IHC-Proyecto\IHC-Proyecto\GestionIncidentes.Application\bin\Debug\net9.0\GestionIncidentes.Application.pdb
+C:\Users\Jona\Downloads\IHC-Proyecto\IHC-Proyecto\GestionIncidentes.Application\bin\Debug\net9.0\GestionIncidentes.Domain.dll
+C:\Users\Jona\Downloads\IHC-Proyecto\IHC-Proyecto\GestionIncidentes.Application\bin\Debug\net9.0\GestionIncidentes.Domain.pdb
+C:\Users\Jona\Downloads\IHC-Proyecto\IHC-Proyecto\GestionIncidentes.Application\obj\Debug\net9.0\GestionIncidentes.Application.csproj.AssemblyReference.cache
+C:\Users\Jona\Downloads\IHC-Proyecto\IHC-Proyecto\GestionIncidentes.Application\obj\Debug\net9.0\GestionIncidentes.Application.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\Jona\Downloads\IHC-Proyecto\IHC-Proyecto\GestionIncidentes.Application\obj\Debug\net9.0\GestionIncidentes.Application.AssemblyInfoInputs.cache
+C:\Users\Jona\Downloads\IHC-Proyecto\IHC-Proyecto\GestionIncidentes.Application\obj\Debug\net9.0\GestionIncidentes.Application.AssemblyInfo.cs
+C:\Users\Jona\Downloads\IHC-Proyecto\IHC-Proyecto\GestionIncidentes.Application\obj\Debug\net9.0\GestionIncidentes.Application.csproj.CoreCompileInputs.cache
+C:\Users\Jona\Downloads\IHC-Proyecto\IHC-Proyecto\GestionIncidentes.Application\obj\Debug\net9.0\GestionIncidentes.Application.sourcelink.json
+C:\Users\Jona\Downloads\IHC-Proyecto\IHC-Proyecto\GestionIncidentes.Application\obj\Debug\net9.0\GestionI.B4BC0063.Up2Date
+C:\Users\Jona\Downloads\IHC-Proyecto\IHC-Proyecto\GestionIncidentes.Application\obj\Debug\net9.0\GestionIncidentes.Application.dll
+C:\Users\Jona\Downloads\IHC-Proyecto\IHC-Proyecto\GestionIncidentes.Application\obj\Debug\net9.0\refint\GestionIncidentes.Application.dll
+C:\Users\Jona\Downloads\IHC-Proyecto\IHC-Proyecto\GestionIncidentes.Application\obj\Debug\net9.0\GestionIncidentes.Application.pdb
+C:\Users\Jona\Downloads\IHC-Proyecto\IHC-Proyecto\GestionIncidentes.Application\obj\Debug\net9.0\ref\GestionIncidentes.Application.dll

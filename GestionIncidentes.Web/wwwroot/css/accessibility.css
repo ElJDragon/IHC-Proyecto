@@ -1,0 +1,376 @@
+/* ==========================================
+   VARIABLES CSS GLOBALES
+   Asegura que las variables estén disponibles
+   ========================================== */
+
+:root {
+  /* Colores modo claro (por defecto) */
+  --color-primary: #3b82f6;
+  --color-primary-light: rgba(59, 130, 246, 0.1);
+  --color-success: #10b981;
+  --color-success-bg: rgba(16, 185, 129, 0.1);
+  --color-warning: #f59e0b;
+  --color-error: #ef4444;
+  --color-info: #06b6d4;
+  --color-info-light: rgba(6, 182, 212, 0.1);
+  
+  --text-dark: #1f2937;
+  --text-gray: #6b7280;
+  --text-light: #9ca3af;
+  
+  --bg-primary: #ffffff;
+  --bg-secondary: #f9fafb;
+  --bg-tertiary: #f3f4f6;
+  
+  --border-color: #e5e7eb;
+  --border-light: #f3f4f6;
+  
+  /* Tamaño de fuente base */
+  --base-font-size: 100%;
+}
+
+/* ==========================================
+   TEMA OSCURO - Siguiendo principios de IHC
+   - Contraste WCAG AA mínimo 4.5:1 para texto
+   - Reducción de fatiga visual con tonos azul-gris
+   - Jerarquía visual clara con elevaciones
+   ========================================== */
+
+.dark-theme {
+  /* Colores primarios con mayor contraste */
+  --color-primary: #60a5fa;
+  --color-primary-light: rgba(96, 165, 250, 0.15);
+  --color-success: #34d399;
+  --color-success-bg: rgba(52, 211, 153, 0.15);
+  --color-warning: #fbbf24;
+  --color-error: #f87171;
+  --color-info: #22d3ee;
+  --color-info-light: rgba(34, 211, 238, 0.15);
+  
+  /* Textos con contraste óptimo (WCAG AA) */
+  --text-dark: #f9fafb;
+  --text-gray: #d1d5db;
+  --text-light: #9ca3af;
+  
+  /* Fondos con jerarquía visual */
+  --bg-primary: #0f172a;
+  --bg-secondary: #1e293b;
+  --bg-tertiary: #334155;
+  
+  /* Bordes sutiles pero visibles */
+  --border-color: #475569;
+  --border-light: #64748b;
+  
+  background-color: var(--bg-primary);
+  color: var(--text-dark);
+}
+
+.dark-theme .card,
+.dark-theme .setting-option {
+  background-color: var(--bg-secondary);
+  border-color: var(--border-color);
+}
+
+.dark-theme .sidebar,
+.dark-theme .admin-sidebar {
+  background-color: var(--bg-secondary);
+  border-color: var(--border-color);
+}
+
+.dark-theme .top-navbar,
+.dark-theme .navbar {
+  background-color: var(--bg-secondary);
+  border-color: var(--border-color);
+}
+
+.dark-theme input,
+.dark-theme select,
+.dark-theme textarea {
+  background-color: var(--bg-tertiary);
+  border-color: var(--border-color);
+  color: var(--text-dark);
+}
+
+.dark-theme input::placeholder,
+.dark-theme textarea::placeholder {
+  color: var(--text-light);
+}
+
+.dark-theme .table thead,
+.dark-theme .table-header {
+  background-color: var(--bg-tertiary);
+}
+
+.dark-theme .table tbody tr,
+.dark-theme .table-row {
+  border-color: var(--border-color);
+}
+
+.dark-theme .table tbody tr:hover,
+.dark-theme .table-row:hover {
+  background-color: var(--bg-tertiary);
+}
+
+/* Botones en modo oscuro */
+.dark-theme .btn-primary {
+  background-color: var(--color-primary);
+  color: var(--bg-primary);
+}
+
+.dark-theme .btn-secondary {
+  background-color: var(--bg-tertiary);
+  color: var(--text-dark);
+  border-color: var(--border-color);
+}
+
+/* Estados de los elementos */
+.dark-theme .badge {
+  filter: brightness(1.2);
+}
+
+.dark-theme .metric-card {
+  background-color: var(--bg-secondary);
+  border-color: var(--border-color);
+}
+
+/* ==========================================
+   MODOS DALTONISMO
+   Paletas optimizadas según investigación de accesibilidad
+   Mantienen contraste y distinción entre estados
+   ========================================== */
+
+/* Protanopia - Dificultad con Rojo (7% hombres, 0.5% mujeres)
+   Usa azul-amarillo-gris para máxima distinción */
+.colorblind-protanopia {
+  --color-primary: #0284c7; /* Azul brillante */
+  --color-primary-light: rgba(2, 132, 199, 0.15);
+  --color-success: #0891b2; /* Cyan (visible) */
+  --color-success-bg: rgba(8, 145, 178, 0.15);
+  --color-error: #fbbf24; /* Amarillo/Ámbar (alto contraste) */
+  --color-warning: #f59e0b; /* Naranja */
+  --color-info: #06b6d4; /* Cyan claro */
+  --color-info-light: rgba(6, 182, 212, 0.15);
+}
+
+/* Deuteranopia - Dificultad con Verde (más común: 6% hombres)
+   Evita verde-rojo, usa azul-amarillo-púrpura */
+.colorblind-deuteranopia {
+  --color-primary: #3b82f6; /* Azul */
+  --color-primary-light: rgba(59, 130, 246, 0.15);
+  --color-success: #0ea5e9; /* Azul cielo (reemplaza verde) */
+  --color-success-bg: rgba(14, 165, 233, 0.15);
+  --color-error: #f59e0b; /* Ámbar (reemplaza rojo) */
+  --color-warning: #fbbf24; /* Amarillo */
+  --color-info: #8b5cf6; /* Púrpura */
+  --color-info-light: rgba(139, 92, 246, 0.15);
+}
+
+/* Tritanopia - Dificultad con Azul-Amarillo (rara: 0.01%)
+   Usa rojo-verde-magenta */
+.colorblind-tritanopia {
+  --color-primary: #ec4899; /* Rosa/Magenta */
+  --color-primary-light: rgba(236, 72, 153, 0.15);
+  --color-success: #22c55e; /* Verde brillante */
+  --color-success-bg: rgba(34, 197, 94, 0.15);
+  --color-error: #ef4444; /* Rojo */
+  --color-warning: #f97316; /* Naranja rojizo */
+  --color-info: #a855f7; /* Púrpura */
+  --color-info-light: rgba(168, 85, 247, 0.15);
+}
+
+/* ==========================================
+   TAMAÑO DE FUENTE VARIABLE
+   Aplica escalado proporcional a toda la UI
+   ========================================== */
+
+html {
+  font-size: var(--base-font-size) !important;
+}
+
+body {
+  font-size: 1rem !important;
+}
+
+/* Escalar todos los elementos tipográficos */
+h1 { font-size: 2rem !important; }
+h2 { font-size: 1.5rem !important; }
+h3 { font-size: 1.25rem !important; }
+h4 { font-size: 1.125rem !important; }
+h5 { font-size: 1rem !important; }
+h6 { font-size: 0.875rem !important; }
+
+p, span:not(.material-icons), div, a, button, input, select, textarea, label {
+  font-size: inherit !important;
+}
+
+.card, .btn, .badge, .metric-card, .stat-card {
+  font-size: inherit !important;
+}
+
+/* ==========================================
+   BOTONES Y COMPONENTES
+   ========================================== */
+
+.btn-primary, .btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 20px;
+  border-radius: 8px;
+  border: none;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-primary {
+  background: var(--color-primary);
+  color: white;
+}
+
+.btn-primary:hover {
+  opacity: 0.9;
+  transform: translateY(-1px);
+}
+
+.btn-secondary {
+  background: white;
+  color: var(--text-dark);
+  border: 1px solid var(--border-color);
+}
+
+.btn-secondary:hover {
+  background: var(--bg-secondary);
+}
+
+.dark-theme .btn-secondary {
+  background: var(--bg-tertiary);
+  border-color: var(--border-color);
+}
+
+.dark-theme .btn-secondary:hover {
+  background: var(--bg-secondary);
+}
+
+/* ==========================================
+   ANIMACIONES
+   ========================================== */
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.loading-spinner {
+  width: 40px;
+  height: 40px;
+  border: 4px solid var(--border-color);
+  border-top-color: var(--color-primary);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+/* ==========================================
+   TRANSICIONES SUAVES
+   ========================================== */
+
+* {
+  transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+}
+
+button, a, input, select, textarea {
+  transition: all 0.2s ease;
+}
+
+/* ==========================================
+   ESTILOS GLOBALES PARA MODO OSCURO
+   Aplica a todas las páginas y componentes
+   ========================================== */
+
+/* Body y contenedores principales */
+.dark-theme body,
+.dark-theme .page-shell,
+.dark-theme .page-container {
+  background-color: var(--bg-primary) !important;
+  color: var(--text-dark) !important;
+}
+
+/* Layouts */
+.dark-theme .admin-layout,
+.dark-theme .main-content,
+.dark-theme .content-area {
+  background-color: var(--bg-primary) !important;
+}
+
+/* Títulos y texto */
+.dark-theme h1,
+.dark-theme h2,
+.dark-theme h3,
+.dark-theme h4,
+.dark-theme h5,
+.dark-theme h6 {
+  color: var(--text-dark) !important;
+}
+
+.dark-theme p,
+.dark-theme span:not(.material-icons),
+.dark-theme label,
+.dark-theme div {
+  color: inherit;
+}
+
+/* Links */
+.dark-theme a {
+  color: var(--color-primary);
+}
+
+/* Métricas y estadísticas */
+.dark-theme .stat-card,
+.dark-theme .metric-value,
+.dark-theme .metric-label {
+  background-color: var(--bg-secondary) !important;
+  border-color: var(--border-color) !important;
+  color: var(--text-dark) !important;
+}
+
+/* Listas y tablas */
+.dark-theme .list-item,
+.dark-theme .table-row,
+.dark-theme tr {
+  background-color: transparent;
+  border-color: var(--border-color) !important;
+}
+
+.dark-theme .list-item:hover,
+.dark-theme .table-row:hover,
+.dark-theme tr:hover {
+  background-color: var(--bg-tertiary) !important;
+}
+
+/* Badges y etiquetas */
+.dark-theme .badge,
+.dark-theme .status-badge,
+.dark-theme .priority-badge {
+  filter: brightness(1.3);
+}
+
+/* Formularios */
+.dark-theme .form-control,
+.dark-theme .form-select {
+  background-color: var(--bg-tertiary) !important;
+  border-color: var(--border-color) !important;
+  color: var(--text-dark) !important;
+}
+
+/* Modales y dropdowns */
+.dark-theme .modal-content,
+.dark-theme .dropdown-menu {
+  background-color: var(--bg-secondary) !important;
+  border-color: var(--border-color) !important;
+  color: var(--text-dark) !important;
+}
+
+/* Iconos Material */
+.dark-theme .material-icons {
+  color: inherit;
+}

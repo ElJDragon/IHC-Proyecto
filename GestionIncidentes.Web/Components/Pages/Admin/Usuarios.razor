@@ -1,31 +1,47 @@
 @page "/admin/usuarios"
+@layout AdminLayout
 @using GestionIncidentes.Domain.Entities
 @using GestionIncidentes.Application.Interfaces
 @rendermode InteractiveServer
 
 <PageTitle>Gestión de Usuarios - Admin</PageTitle>
 
-<div class="usuarios-container">
-    <div class="page-header">
-        <div>
-            <h2>👥 Gestión de Usuarios</h2>
-            <p class="subtitle">Administra usuarios del sistema</p>
-        </div>
+<link rel="stylesheet" href="/css/pages.css" />
+
+<div>
+    <!-- Breadcrumbs -->
+    <nav style="margin-bottom: 24px; color: var(--text-gray); font-size: 14px">
+        <span>Inicio</span>
+        <span style="margin: 0 8px">&gt;</span>
+        <span>Administración</span>
+        <span style="margin: 0 8px">&gt;</span>
+        <span style="color: var(--color-primary)">Gestión de Usuarios</span>
+    </nav>
+
+    <!-- Page Header -->
+    <div style="margin-bottom: 24px">
+        <h1>👥 Gestión de Usuarios</h1>
+        <p style="color: var(--text-gray); margin-top: 4px">Administra usuarios del sistema</p>
     </div>
 
     <!-- Filtros -->
-    <div class="filters-section">
-        <div class="search-box">
-            <input type="text" @bind="searchTerm" @bind:event="oninput" @onkeyup="FilterUsers" placeholder="🔍 Buscar por nombre o email..." class="search-input" />
-        </div>
-        <div class="filter-row">
-            <select @bind="selectedRole" @bind:after="FilterUsers" class="filter-select">
+    <div class="card" style="margin-bottom: 24px; padding: 20px">
+        <div style="display: flex; gap: 16px; flex-wrap: wrap; align-items: center">
+            <div style="flex: 1; min-width: 250px; position: relative">
+                <span class="material-icons" style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--text-gray); font-size: 20px">search</span>
+                <input type="text" @bind="searchTerm" @bind:event="oninput" @onkeyup="FilterUsers" 
+                       placeholder="Buscar por nombre o email..." 
+                       style="width: 100%; padding: 10px 10px 10px 40px; border: 1px solid var(--border-light); border-radius: 8px; font-size: 14px" />
+            </div>
+            <select @bind="selectedRole" @bind:after="FilterUsers" 
+                    style="padding: 10px 32px 10px 12px; border: 1px solid var(--border-light); border-radius: 8px; font-size: 14px; background: white; cursor: pointer">
                 <option value="">Todos los roles</option>
                 <option value="Administrador">Administrador</option>
                 <option value="Tecnico">Técnico</option>
                 <option value="Usuario">Usuario</option>
             </select>
-            <select @bind="selectedDepartment" @bind:after="FilterUsers" class="filter-select">
+            <select @bind="selectedDepartment" @bind:after="FilterUsers" 
+                    style="padding: 10px 32px 10px 12px; border: 1px solid var(--border-light); border-radius: 8px; font-size: 14px; background: white; cursor: pointer">
                 <option value="">Todos los departamentos</option>
                 @foreach (var dept in departments)
                 {
@@ -38,67 +54,78 @@
     <!-- Tabla de Usuarios -->
     @if (isLoading)
     {
-        <div class="loading">Cargando usuarios...</div>
+        <div class="card" style="padding: 40px; text-align: center">
+            <div class="spinner" style="margin: 0 auto 16px"></div>
+            <p style="color: var(--text-gray)">Cargando usuarios...</p>
+        </div>
     }
     else if (filteredUsers.Any())
     {
-        <div class="table-container">
-            <table class="users-table">
-                <thead>
+        <div class="card" style="padding: 0; overflow: hidden">
+            <table style="width: 100%; border-collapse: collapse">
+                <thead style="background: var(--color-bg-light); border-bottom: 1px solid var(--border-light)">
                     <tr>
-                        <th>Usuario</th>
-                        <th>Rol</th>
-                        <th>Departamento</th>
-                        <th>Carga de Trabajo</th>
-                        <th>Métricas</th>
+                        <th style="padding: 16px; text-align: left; font-weight: 600; color: var(--text-dark); font-size: 14px; text-transform: uppercase; letter-spacing: 0.5px">Usuario</th>
+                        <th style="padding: 16px; text-align: left; font-weight: 600; color: var(--text-dark); font-size: 14px; text-transform: uppercase; letter-spacing: 0.5px">Rol</th>
+                        <th style="padding: 16px; text-align: left; font-weight: 600; color: var(--text-dark); font-size: 14px; text-transform: uppercase; letter-spacing: 0.5px">Departamento</th>
+                        <th style="padding: 16px; text-align: left; font-weight: 600; color: var(--text-dark); font-size: 14px; text-transform: uppercase; letter-spacing: 0.5px">Carga de Trabajo</th>
+                        <th style="padding: 16px; text-align: left; font-weight: 600; color: var(--text-dark); font-size: 14px; text-transform: uppercase; letter-spacing: 0.5px">Métricas</th>
                     </tr>
                 </thead>
                 <tbody>
                     @foreach (var user in filteredUsers)
                     {
-                        <tr>
-                            <td>
-                                <div class="user-cell">
-                                    <div class="user-avatar">
+                        <tr style="border-bottom: 1px solid var(--border-light); transition: background 0.2s" 
+                            onmouseover="this.style.background='var(--color-bg-light)'" 
+                            onmouseout="this.style.background='white'">
+                            <td style="padding: 16px">
+                                <div style="display: flex; align-items: center; gap: 12px">
+                                    <div style="width: 40px; height: 40px; background: var(--color-primary); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: 600; font-size: 14px">
                                         @GetUserInitials(user.FullName)
                                     </div>
                                     <div>
-                                        <div class="user-name">@user.FullName</div>
-                                        <div class="user-email">@user.Email</div>
+                                        <div style="font-weight: 500; color: var(--text-dark)">@user.FullName</div>
+                                        <div style="font-size: 13px; color: var(--text-gray); margin-top: 2px">@user.Email</div>
                                     </div>
                                 </div>
                             </td>
-                            <td>
-                                <span class="role-badge role-@user.Role.ToLower()">
+                            <td style="padding: 16px">
+                                <span style="display: inline-flex; align-items: center; gap: 6px; padding: 6px 12px; border-radius: 20px; font-size: 13px; font-weight: 500; @GetRoleStyle(user.Role)">
                                     @GetRoleIcon(user.Role) @user.Role
                                 </span>
                             </td>
-                            <td>@GetDepartmentName(user.DepartmentId)</td>
-                            <td>
-                                <span class="workload">@user.Workload tickets</span>
+                            <td style="padding: 16px; color: var(--text-dark)">@GetDepartmentName(user.DepartmentId)</td>
+                            <td style="padding: 16px">
+                                <span style="display: inline-flex; align-items: center; gap: 6px; padding: 6px 12px; background: var(--color-bg-light); border-radius: 6px; font-size: 13px; font-weight: 500; color: var(--text-dark)">
+                                    <span class="material-icons" style="font-size: 16px">assignment</span>
+                                    @user.Workload tickets
+                                </span>
                             </td>
-                            <td>
+                            <td style="padding: 16px">
                                 @if (user.Role == "Tecnico" && userMetrics.ContainsKey(user.Id))
                                 {
                                     var metrics = userMetrics[user.Id];
-                                    <div class="metrics-cell">
-                                        <div class="metric-item">
-                                            <span class="metric-label">✅ Resueltos:</span>
-                                            <span class="metric-value">@metrics.TicketsResolved</span>
+                                    <div style="display: flex; flex-direction: column; gap: 6px">
+                                        <div style="display: flex; align-items: center; gap: 8px; font-size: 13px">
+                                            <span class="material-icons" style="font-size: 16px; color: var(--color-success)">check_circle</span>
+                                            <span style="color: var(--text-gray)">Resueltos:</span>
+                                            <span style="font-weight: 500; color: var(--text-dark)">@metrics.TicketsResolved</span>
                                         </div>
-                                        <div class="metric-item">
-                                            <span class="metric-label">⏱️ Promedio:</span>
-                                            <span class="metric-value">@metrics.AvgResolutionTime</span>
+                                        <div style="display: flex; align-items: center; gap: 8px; font-size: 13px">
+                                            <span class="material-icons" style="font-size: 16px; color: var(--color-info)">schedule</span>
+                                            <span style="color: var(--text-gray)">Promedio:</span>
+                                            <span style="font-weight: 500; color: var(--text-dark)">@metrics.AvgResolutionTime</span>
                                         </div>
-                                        <div class="metric-item">
-                                            <span class="metric-label">⭐ Rating:</span>
-                                            <span class="metric-value">@metrics.Rating.ToString("F1")</span>
+                                        <div style="display: flex; align-items: center; gap: 8px; font-size: 13px">
+                                            <span class="material-icons" style="font-size: 16px; color: var(--color-warning)">star</span>
+                                            <span style="color: var(--text-gray)">Rating:</span>
+                                            <span style="font-weight: 500; color: var(--text-dark)">@metrics.Rating.ToString("F1")</span>
                                         </div>
                                     </div>
                                 }
                                 else
                                 {
-                                    <span class="text-secondary">N/A</span>
+                                    <span style="color: var(--text-gray); font-size: 13px">N/A</span>
                                 }
                             </td>
                         </tr>
@@ -109,10 +136,10 @@
     }
     else
     {
-        <div class="empty-state">
-            <div class="empty-icon">👥</div>
-            <h3>No se encontraron usuarios</h3>
-            <p>Ajusta los filtros para ver más resultados</p>
+        <div class="card" style="padding: 48px 24px; text-align: center">
+            <div style="font-size: 64px; margin-bottom: 16px">👥</div>
+            <h3 style="color: var(--text-dark); margin-bottom: 8px; font-weight: 600">No se encontraron usuarios</h3>
+            <p style="color: var(--text-gray); margin: 0">Ajusta los filtros para ver más resultados</p>
         </div>
     }
 </div>
@@ -444,6 +471,17 @@
             "Tecnico" => "🔧",
             "Usuario" => "👤",
             _ => "❓"
+        };
+    }
+
+    private string GetRoleStyle(string role)
+    {
+        return role switch
+        {
+            "Administrador" => "background: #fef3c7; color: #92400e",
+            "Tecnico" => "background: #dbeafe; color: #1e40af",
+            "Usuario" => "background: #f3e8ff; color: #6b21a8",
+            _ => "background: var(--color-bg-light); color: var(--text-gray)"
         };
     }
 

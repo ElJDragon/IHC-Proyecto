@@ -1,0 +1,934 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NetManager - Panel de Administración</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body { margin: 0; display: flex; }
+        .sidebar { width: 256px; height: 100vh; background: var(--color-surface); border-right: 1px solid var(--color-border); position: fixed; left: 0; top: 0; display: flex; flex-direction: column; z-index: 100; }
+        .sidebar-logo { padding: 1.25rem 1.5rem; border-bottom: 1px solid var(--color-border); display: flex; align-items: center; gap: 0.75rem; }
+        .sidebar-logo-icon { width: 40px; height: 40px; background: var(--color-primary); border-radius: var(--radius-md); display: flex; align-items: center; justify-content: center; }
+        .sidebar-nav { flex: 1; padding: 1rem 0.75rem; overflow-y: auto; }
+        .nav-item { display: flex; align-items: center; gap: 0.75rem; padding: 0.625rem 0.75rem; margin-bottom: 0.25rem; border-radius: var(--radius-md); color: var(--color-text-secondary); text-decoration: none; transition: all 0.2s; cursor: pointer; }
+        .nav-item:hover { background: #f8f9fa; }
+        .nav-item.active { background: var(--color-primary-light); color: var(--color-primary); }
+        .nav-item-content { flex: 1; }
+        .nav-item-label { font-size: 14px; font-weight: 500; }
+        .nav-item-sublabel { font-size: 12px; color: var(--color-text-tertiary); }
+        .sidebar-footer { padding: 1rem 1.5rem; border-top: 1px solid var(--color-border); display: flex; align-items: center; gap: 0.5rem; }
+        .status-indicator { width: 8px; height: 8px; background: var(--color-success); border-radius: 50%; animation: pulse 2s infinite; }
+        .topbar { height: 64px; background: var(--color-surface); border-bottom: 1px solid var(--color-border); position: fixed; top: 0; left: 256px; right: 0; display: flex; align-items: center; justify-content: space-between; padding: 0 1.5rem; z-index: 90; }
+        .search-bar { flex: 1; max-width: 600px; position: relative; }
+        .search-bar input { width: 100%; padding: 0.625rem 1rem 0.625rem 2.5rem; background: var(--color-background); border: 1px solid var(--color-border); border-radius: var(--radius-md); font-size: 14px; }
+        .search-icon { position: absolute; left: 0.75rem; top: 50%; transform: translateY(-50%); color: var(--color-text-tertiary); }
+        .topbar-actions { display: flex; align-items: center; gap: 0.5rem; margin-left: 1.5rem; }
+        .icon-btn { position: relative; padding: 0.5rem; border-radius: var(--radius-md); background: transparent; border: none; cursor: pointer; color: var(--color-text-secondary); transition: background 0.2s; }
+        .icon-btn:hover { background: #f8f9fa; }
+        .notification-badge { position: absolute; top: 6px; right: 6px; width: 8px; height: 8px; background: var(--color-critical); border-radius: 50%; }
+        .user-menu { display: flex; align-items: center; gap: 0.5rem; padding: 0.375rem; border-radius: var(--radius-md); cursor: pointer; transition: background 0.2s; }
+        .user-menu:hover { background: #f8f9fa; }
+        .user-avatar { width: 32px; height: 32px; background: var(--color-primary); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; }
+        .main-content { margin-left: 256px; margin-top: 64px; padding: 1.5rem; flex: 1; }
+        .breadcrumbs { display: flex; align-items: center; gap: 0.5rem; margin-bottom: 1.5rem; font-size: 14px; color: var(--color-text-tertiary); }
+        .kpi-card { background: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--radius-lg); padding: 1.5rem; box-shadow: var(--shadow-sm); transition: box-shadow 0.2s; }
+        .kpi-card:hover { box-shadow: var(--shadow-md); }
+        .kpi-header { display: flex; justify-content: space-between; align-items: flex-start; }
+        .kpi-label { font-size: 14px; color: var(--color-text-secondary); margin-bottom: 0.25rem; }
+        .kpi-value { font-size: 32px; font-weight: 600; line-height: 1.2; margin-bottom: 0.5rem; }
+        .kpi-change { display: flex; align-items: center; gap: 0.25rem; font-size: 12px; }
+        .kpi-icon-container { width: 48px; height: 48px; border-radius: var(--radius-md); display: flex; align-items: center; justify-content: center; }
+        
+        /* Tabla de Tickets */
+        .tickets-table { background: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--radius-lg); overflow: hidden; box-shadow: var(--shadow-sm); }
+        .table-header { padding: 1.5rem; border-bottom: 1px solid var(--color-border); }
+        .filters-bar { padding: 0.75rem 1.5rem; background: #f8f9fa; border-bottom: 1px solid var(--color-border); display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap; }
+        table { width: 100%; border-collapse: collapse; }
+        thead { background: #f8f9fa; }
+        th { padding: 0.75rem 1.5rem; text-align: left; font-size: 12px; font-weight: 500; color: var(--color-text-secondary); text-transform: uppercase; }
+        td { padding: 1rem 1.5rem; border-top: 1px solid var(--color-border); font-size: 14px; }
+        tbody tr { transition: background 0.2s; cursor: pointer; }
+        tbody tr:hover { background: #f8f9fa; }
+        .table-footer { padding: 1rem 1.5rem; background: #f8f9fa; border-top: 1px solid var(--color-border); display: flex; justify-content: space-between; align-items: center; }
+        
+        select.filter-select { padding: 0.375rem 2rem 0.375rem 0.75rem; border: 1px solid var(--color-border); border-radius: var(--radius-md); background: white; font-size: 14px; cursor: pointer; appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%235f6478' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 0.5rem center; }
+        .search-input { padding: 0.375rem 0.75rem 0.375rem 2rem; border: 1px solid var(--color-border); border-radius: var(--radius-md); font-size: 14px; width: 250px; position: relative; }
+    </style>
+</head>
+<body>
+    <!-- Sidebar -->
+    <aside class="sidebar">
+        <div class="sidebar-logo">
+            <div class="sidebar-logo-icon">
+                <svg style="width: 24px; height: 24px; stroke: white;" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke-width="2">
+                    <rect x="2" y="2" width="20" height="8" rx="2"></rect>
+                    <rect x="2" y="14" width="20" height="8" rx="2"></rect>
+                    <line x1="6" y1="6" x2="6.01" y2="6"></line>
+                    <line x1="6" y1="18" x2="6.01" y2="18"></line>
+                </svg>
+            </div>
+            <div>
+                <div style="font-weight: 600;">NetManager</div>
+                <div style="font-size: 12px; color: var(--color-text-tertiary);">Universidad</div>
+            </div>
+        </div>
+
+        <nav class="sidebar-nav">
+            <a href="dashboard.html" class="nav-item">
+                <svg class="icon-sm" style="width: 20px; height: 20px;" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="9"></rect><rect x="14" y="3" width="7" height="5"></rect><rect x="14" y="12" width="7" height="9"></rect><rect x="3" y="16" width="7" height="5"></rect></svg>
+                <div class="nav-item-content">
+                    <div class="nav-item-label">Dashboard</div>
+                    <div class="nav-item-sublabel">Centro de Control</div>
+                </div>
+            </a>
+            <div class="nav-item active" onclick="showSection('dashboard')">
+                <svg class="icon-sm" style="width: 20px; height: 20px;" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>
+                <div class="nav-item-content">
+                    <div class="nav-item-label">Administración</div>
+                    <div class="nav-item-sublabel">Visión Global</div>
+                </div>
+            </div>
+            <div class="nav-item" onclick="showSection('usuarios')">
+                <svg class="icon-sm" style="width: 20px; height: 20px;" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+                <div class="nav-item-content">
+                    <div class="nav-item-label">Usuarios</div>
+                    <div class="nav-item-sublabel">Gestión</div>
+                </div>
+            </div>
+            <div class="nav-item" onclick="showSection('historial')">
+                <svg class="icon-sm" style="width: 20px; height: 20px;" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                <div class="nav-item-content">
+                    <div class="nav-item-label">Historial</div>
+                    <div class="nav-item-sublabel">Métricas</div>
+                </div>
+            </div>
+            <div class="nav-item" onclick="showSection('configuracion')">
+                <svg class="icon-sm" style="width: 20px; height: 20px;" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"></circle><path d="M12 1v6m0 6v6"></path><path d="m4.93 4.93 4.24 4.24m5.66 5.66 4.24 4.24"></path><path d="M1 12h6m6 0h6"></path><path d="m4.93 19.07 4.24-4.24m5.66-5.66 4.24-4.24"></path></svg>
+                <div class="nav-item-content">
+                    <div class="nav-item-label">Configuración</div>
+                    <div class="nav-item-sublabel">Sistema</div>
+                </div>
+            </div>
+        </nav>
+
+        <div class="sidebar-footer">
+            <div class="status-indicator"></div>
+            <span style="font-size: 12px; color: var(--color-text-tertiary);">Servicios operativos</span>
+        </div>
+    </aside>
+
+    <!-- TopBar -->
+    <header class="topbar">
+        <div class="search-bar">
+            <svg class="search-icon" style="width: 20px; height: 20px;" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><path d="m21 21-4.35-4.35"></path></svg>
+            <input type="text" placeholder="Buscar tickets, artículos, activos...">
+        </div>
+        <div class="topbar-actions">
+            <button class="icon-btn">
+                <svg style="width: 20px; height: 20px;" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg>
+                <span class="notification-badge"></span>
+            </button>
+            <div class="user-menu" onclick="logout()">
+                <div class="user-avatar">
+                    <svg style="width: 20px; height: 20px;" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+                </div>
+                <div style="text-align: left;">
+                    <div style="font-size: 14px; font-weight: 500;">Admin Red</div>
+                    <div style="font-size: 12px; color: var(--color-text-tertiary);">Administrador</div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="breadcrumbs">
+            <span>Inicio</span>
+            <svg style="width: 16px; height: 16px;" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"></polyline></svg>
+            <span>Administración</span>
+            <svg style="width: 16px; height: 16px;" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"></polyline></svg>
+            <span style="color: var(--color-text-primary);">Visión Global</span>
+        </div>
+
+        <div style="margin-bottom: 1.5rem;">
+            <h1>Panel de Administración</h1>
+            <p class="text-secondary" style="margin-top: 0.25rem;">Monitoreo global del sistema y gestión centralizada</p>
+        </div>
+
+        <!-- KPI Cards -->
+        <div class="grid grid-cols-4" style="margin-bottom: 1.5rem;">
+            <div class="kpi-card">
+                <div class="kpi-header">
+                    <div>
+                        <div class="kpi-label">Total Incidentes</div>
+                        <div class="kpi-value">181</div>
+                        <div class="kpi-change" style="color: var(--color-success);">
+                            <svg style="width: 16px; height: 16px;" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline></svg>
+                            -12% vs semana pasada
+                        </div>
+                    </div>
+                    <div class="kpi-icon-container" style="background: var(--color-primary-light);">
+                        <svg style="width: 24px; height: 24px; color: var(--color-primary);" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2"></rect><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path></svg>
+                    </div>
+                </div>
+            </div>
+
+            <div class="kpi-card">
+                <div class="kpi-header">
+                    <div>
+                        <div class="kpi-label">Tiempo Promedio</div>
+                        <div class="kpi-value">4.2h</div>
+                        <div class="kpi-change" style="color: var(--color-success);">Meta: &lt;6h</div>
+                    </div>
+                    <div class="kpi-icon-container" style="background: var(--color-success-bg);">
+                        <svg style="width: 24px; height: 24px; color: var(--color-success);" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                    </div>
+                </div>
+            </div>
+
+            <div class="kpi-card">
+                <div class="kpi-header">
+                    <div>
+                        <div class="kpi-label">Equipos Críticos</div>
+                        <div class="kpi-value">Lab 1</div>
+                        <div class="kpi-change" style="color: var(--color-text-tertiary);">45 reportes</div>
+                    </div>
+                    <div class="kpi-icon-container" style="background: var(--color-critical-bg);">
+                        <svg style="width: 24px; height: 24px; color: var(--color-critical);" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2"></rect><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path></svg>
+                    </div>
+                </div>
+            </div>
+
+            <div class="kpi-card">
+                <div class="kpi-header">
+                    <div>
+                        <div class="kpi-label">Eficiencia Dpto.</div>
+                        <div class="kpi-value" style="color: var(--color-success);">94%</div>
+                        <div class="kpi-change" style="color: var(--color-text-tertiary);">SLA cumplido</div>
+                    </div>
+                    <div class="kpi-icon-container" style="background: var(--color-success-bg);">
+                        <svg style="width: 24px; height: 24px; color: var(--color-success);" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle></svg>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sección Dashboard (por defecto) -->
+        <div id="dashboardSection">
+            <!-- Gráfico de Incidentes por Laboratorio -->
+            <div class="card" style="margin-bottom: 1.5rem; padding: 1.5rem;">
+                <div style="margin-bottom: 1rem;">
+                    <h3>Incidentes por Laboratorio</h3>
+                    <p class="text-xs text-tertiary" style="margin-top: 0.25rem;">Mapa de calor - Últimos 30 días</p>
+                </div>
+                <div style="height: 280px; position: relative;">
+                    <canvas id="heatmapChart"></canvas>
+                </div>
+            </div>
+
+        <!-- Tabla de Gestión de Tickets -->
+        <div class="tickets-table">
+            <div class="table-header">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <div>
+                        <h3>Gestión de Tickets</h3>
+                        <p class="text-xs text-tertiary" style="margin-top: 0.25rem;">8 tickets en total</p>
+                    </div>
+                    <div style="position: relative;">
+                        <svg style="position: absolute; left: 0.75rem; top: 50%; transform: translateY(-50%); width: 16px; height: 16px; color: var(--color-text-tertiary);" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><path d="m21 21-4.35-4.35"></path></svg>
+                        <input id="searchInput" type="text" class="search-input" placeholder="Buscar tickets..." onkeyup="filterTable()">
+                    </div>
+                </div>
+            </div>
+
+            <div class="filters-bar">
+                <div style="display: flex; align-items: center; gap: 0.5rem;">
+                    <svg style="width: 16px; height: 16px; color: var(--color-text-tertiary);" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon></svg>
+                    <span style="font-size: 14px; font-weight: 500;">Filtros:</span>
+                </div>
+                <select id="filterTecnico" class="filter-select" onchange="filterTable()">
+                    <option value="all">Todos los técnicos</option>
+                    <option value="Carlos Méndez">Carlos Méndez</option>
+                    <option value="Ana Torres">Ana Torres</option>
+                    <option value="Luis García">Luis García</option>
+                </select>
+                <select id="filterEstado" class="filter-select" onchange="filterTable()">
+                    <option value="all">Todos los estados</option>
+                    <option value="Pendiente">Pendiente</option>
+                    <option value="En proceso">En proceso</option>
+                    <option value="Resuelto">Resuelto</option>
+                </select>
+                <select id="filterPrioridad" class="filter-select" onchange="filterTable()">
+                    <option value="all">Todas las prioridades</option>
+                    <option value="Crítica">Crítica</option>
+                    <option value="Alta">Alta</option>
+                    <option value="Media">Media</option>
+                    <option value="Baja">Baja</option>
+                </select>
+                <button onclick="clearFilters()" style="font-size: 14px; color: var(--color-primary); background: none; border: none; cursor: pointer; padding: 0.375rem 0.75rem;">Limpiar filtros</button>
+            </div>
+
+            <table id="ticketsTable">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>TÍTULO</th>
+                        <th>LABORATORIO</th>
+                        <th>TÉCNICO</th>
+                        <th>ESTADO</th>
+                        <th>PRIORIDAD</th>
+                        <th>SLA</th>
+                        <th>FECHA</th>
+                    </tr>
+                </thead>
+                <tbody id="ticketsBody">
+                    <tr data-tecnico="Carlos Méndez" data-estado="En proceso" data-prioridad="Crítica">
+                        <td><span style="color: var(--color-primary); font-weight: 500;">TKT-204</span></td>
+                        <td>Router sin respuesta</td>
+                        <td>Lab 1</td>
+                        <td>Carlos Méndez</td>
+                        <td><span class="badge badge-info">En proceso</span></td>
+                        <td><span class="badge badge-critical">Crítica</span></td>
+                        <td style="color: var(--color-warning);">2h</td>
+                        <td style="color: var(--color-text-tertiary);">2025-11-30 09:15</td>
+                    </tr>
+                    <tr data-tecnico="Ana Torres" data-estado="Resuelto" data-prioridad="Media">
+                        <td><span style="color: var(--color-primary); font-weight: 500;">TKT-203</span></td>
+                        <td>Pantalla no enciende</td>
+                        <td>Lab 3</td>
+                        <td>Ana Torres</td>
+                        <td><span class="badge badge-success">Resuelto</span></td>
+                        <td><span class="badge badge-info">Media</span></td>
+                        <td style="color: var(--color-text-tertiary);">-</td>
+                        <td style="color: var(--color-text-tertiary);">2025-11-30 08:45</td>
+                    </tr>
+                    <tr data-tecnico="Luis García" data-estado="Pendiente" data-prioridad="Alta">
+                        <td><span style="color: var(--color-primary); font-weight: 500;">TKT-202</span></td>
+                        <td>Software no inicia</td>
+                        <td>Lab 2</td>
+                        <td>Luis García</td>
+                        <td><span class="badge badge-warning">Pendiente</span></td>
+                        <td><span class="badge badge-warning">Alta</span></td>
+                        <td style="color: var(--color-warning);">6h</td>
+                        <td style="color: var(--color-text-tertiary);">2025-11-29 16:30</td>
+                    </tr>
+                    <tr data-tecnico="Carlos Méndez" data-estado="En proceso" data-prioridad="Baja">
+                        <td><span style="color: var(--color-primary); font-weight: 500;">TKT-201</span></td>
+                        <td>Teclado defectuoso</td>
+                        <td>Lab 1</td>
+                        <td>Carlos Méndez</td>
+                        <td><span class="badge badge-info">En proceso</span></td>
+                        <td><span class="badge badge-success">Baja</span></td>
+                        <td style="color: var(--color-warning);">24h</td>
+                        <td style="color: var(--color-text-tertiary);">2025-11-29 14:20</td>
+                    </tr>
+                    <tr data-tecnico="Ana Torres" data-estado="Pendiente" data-prioridad="Crítica">
+                        <td><span style="color: var(--color-primary); font-weight: 500;">TKT-200</span></td>
+                        <td>WiFi intermitente</td>
+                        <td>Biblioteca</td>
+                        <td>Ana Torres</td>
+                        <td><span class="badge badge-warning">Pendiente</span></td>
+                        <td><span class="badge badge-critical">Crítica</span></td>
+                        <td style="color: var(--color-warning);">1h</td>
+                        <td style="color: var(--color-text-tertiary);">2025-11-29 11:00</td>
+                    </tr>
+                    <tr data-tecnico="Luis García" data-estado="Resuelto" data-prioridad="Media">
+                        <td><span style="color: var(--color-primary); font-weight: 500;">TKT-199</span></td>
+                        <td>Monitor parpadeante</td>
+                        <td>Lab 4</td>
+                        <td>Luis García</td>
+                        <td><span class="badge badge-success">Resuelto</span></td>
+                        <td><span class="badge badge-info">Media</span></td>
+                        <td style="color: var(--color-text-tertiary);">-</td>
+                        <td style="color: var(--color-text-tertiary);">2025-11-29 09:15</td>
+                    </tr>
+                    <tr data-tecnico="Carlos Méndez" data-estado="Resuelto" data-prioridad="Alta">
+                        <td><span style="color: var(--color-primary); font-weight: 500;">TKT-198</span></td>
+                        <td>Licencia expirada</td>
+                        <td>Lab 3</td>
+                        <td>Carlos Méndez</td>
+                        <td><span class="badge badge-success">Resuelto</span></td>
+                        <td><span class="badge badge-warning">Alta</span></td>
+                        <td style="color: var(--color-text-tertiary);">-</td>
+                        <td style="color: var(--color-text-tertiary);">2025-11-28 15:45</td>
+                    </tr>
+                    <tr data-tecnico="Ana Torres" data-estado="En proceso" data-prioridad="Media">
+                        <td><span style="color: var(--color-primary); font-weight: 500;">TKT-197</span></td>
+                        <td>Proyector no funciona</td>
+                        <td>Auditorio</td>
+                        <td>Ana Torres</td>
+                        <td><span class="badge badge-info">En proceso</span></td>
+                        <td><span class="badge badge-info">Media</span></td>
+                        <td style="color: var(--color-warning);">12h</td>
+                        <td style="color: var(--color-text-tertiary);">2025-11-28 13:30</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="table-footer">
+                <p style="font-size: 14px; color: var(--color-text-tertiary);">Mostrando <span id="resultCount">8</span> resultados</p>
+                <div style="display: flex; gap: 0.5rem;">
+                    <button class="btn-secondary" style="padding: 0.375rem 0.75rem; font-size: 14px;">Anterior</button>
+                    <button class="btn-primary" style="padding: 0.375rem 0.75rem; font-size: 14px;">1</button>
+                    <button class="btn-secondary" style="padding: 0.375rem 0.75rem; font-size: 14px;">2</button>
+                    <button class="btn-secondary" style="padding: 0.375rem 0.75rem; font-size: 14px;">Siguiente</button>
+                </div>
+            </div>
+        </div>
+        </div>
+
+        <!-- Sección de Usuarios -->
+        <div id="usuariosSection" style="display: none;">
+            <div style="margin-bottom: 1.5rem;">
+                <h2>Gestión de Usuarios</h2>
+                <p class="text-secondary" style="margin-top: 0.25rem;">Usuarios activos en el sistema</p>
+            </div>
+
+            <div class="card" style="padding: 1.5rem; margin-bottom: 1.5rem;">
+                <div style="margin-bottom: 1rem;">
+                    <h3>Usuarios Activos</h3>
+                    <p class="text-xs text-tertiary" style="margin-top: 0.25rem;">Total: 12 usuarios</p>
+                </div>
+
+                <table style="width: 100%; border-collapse: collapse;">
+                    <thead style="background: #f8f9fa;">
+                        <tr>
+                            <th style="padding: 0.75rem; text-align: left; font-size: 12px; font-weight: 500; color: var(--color-text-secondary);">USUARIO</th>
+                            <th style="padding: 0.75rem; text-align: left; font-size: 12px; font-weight: 500; color: var(--color-text-secondary);">ROL</th>
+                            <th style="padding: 0.75rem; text-align: left; font-size: 12px; font-weight: 500; color: var(--color-text-secondary);">DEPARTAMENTO</th>
+                            <th style="padding: 0.75rem; text-align: left; font-size: 12px; font-weight: 500; color: var(--color-text-secondary);">ESTADO</th>
+                            <th style="padding: 0.75rem; text-align: left; font-size: 12px; font-weight: 500; color: var(--color-text-secondary);">TICKETS ASIGNADOS</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr style="border-top: 1px solid var(--color-border);">
+                            <td style="padding: 1rem; font-size: 14px;">Carlos Méndez</td>
+                            <td style="padding: 1rem; font-size: 14px;"><span class="badge badge-primary">Técnico</span></td>
+                            <td style="padding: 1rem; font-size: 14px;">Soporte TI</td>
+                            <td style="padding: 1rem; font-size: 14px;"><span class="badge badge-success">Activo</span></td>
+                            <td style="padding: 1rem; font-size: 14px;">3 tickets</td>
+                        </tr>
+                        <tr style="border-top: 1px solid var(--color-border);">
+                            <td style="padding: 1rem; font-size: 14px;">Ana Torres</td>
+                            <td style="padding: 1rem; font-size: 14px;"><span class="badge badge-primary">Técnico</span></td>
+                            <td style="padding: 1rem; font-size: 14px;">Soporte TI</td>
+                            <td style="padding: 1rem; font-size: 14px;"><span class="badge badge-success">Activo</span></td>
+                            <td style="padding: 1rem; font-size: 14px;">3 tickets</td>
+                        </tr>
+                        <tr style="border-top: 1px solid var(--color-border);">
+                            <td style="padding: 1rem; font-size: 14px;">Luis García</td>
+                            <td style="padding: 1rem; font-size: 14px;"><span class="badge badge-primary">Técnico</span></td>
+                            <td style="padding: 1rem; font-size: 14px;">Soporte TI</td>
+                            <td style="padding: 1rem; font-size: 14px;"><span class="badge badge-success">Activo</span></td>
+                            <td style="padding: 1rem; font-size: 14px;">2 tickets</td>
+                        </tr>
+                        <tr style="border-top: 1px solid var(--color-border);">
+                            <td style="padding: 1rem; font-size: 14px;">María González</td>
+                            <td style="padding: 1rem; font-size: 14px;"><span class="badge badge-info">Estudiante</span></td>
+                            <td style="padding: 1rem; font-size: 14px;">Ingeniería</td>
+                            <td style="padding: 1rem; font-size: 14px;"><span class="badge badge-success">Activo</span></td>
+                            <td style="padding: 1rem; font-size: 14px;">-</td>
+                        </tr>
+                        <tr style="border-top: 1px solid var(--color-border);">
+                            <td style="padding: 1rem; font-size: 14px;">Pedro Ramírez</td>
+                            <td style="padding: 1rem; font-size: 14px;"><span class="badge badge-info">Estudiante</span></td>
+                            <td style="padding: 1rem; font-size: 14px;">Ciencias</td>
+                            <td style="padding: 1rem; font-size: 14px;"><span class="badge badge-warning">Inactivo</span></td>
+                            <td style="padding: 1rem; font-size: 14px;">-</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Sección de Historial -->
+        <div id="historialSection" style="display: none;">
+            <div style="margin-bottom: 1.5rem;">
+                <h2>Historial de Actividades</h2>
+                <p class="text-secondary" style="margin-top: 0.25rem;">Registro completo de incidentes y métricas</p>
+            </div>
+
+            <!-- Métricas de Historial -->
+            <div class="grid grid-cols-3" style="margin-bottom: 1.5rem;">
+                <div class="kpi-card">
+                    <div class="kpi-label">Incidentes Totales</div>
+                    <div class="kpi-value">181</div>
+                    <div class="kpi-change" style="color: var(--color-text-tertiary);">Últimos 30 días</div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-label">En Proceso</div>
+                    <div class="kpi-value" style="color: var(--color-info);">24</div>
+                    <div class="kpi-change" style="color: var(--color-text-tertiary);">Actualmente</div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-label">Resueltos</div>
+                    <div class="kpi-value" style="color: var(--color-success);">157</div>
+                    <div class="kpi-change" style="color: var(--color-success);">87% tasa de resolución</div>
+                </div>
+            </div>
+
+            <!-- Filtros de Historial -->
+            <div class="card" style="padding: 1.5rem; margin-bottom: 1.5rem;">
+                <div style="margin-bottom: 1rem;">
+                    <h3>Filtrar Historial</h3>
+                </div>
+                <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
+                    <select id="historialPeriodo" class="filter-select">
+                        <option value="7">Últimos 7 días</option>
+                        <option value="30" selected>Últimos 30 días</option>
+                        <option value="90">Últimos 3 meses</option>
+                        <option value="365">Último año</option>
+                    </select>
+                    <select id="historialEstado" class="filter-select">
+                        <option value="all">Todos los estados</option>
+                        <option value="resuelto">Resueltos</option>
+                        <option value="proceso">En proceso</option>
+                        <option value="pendiente">Pendientes</option>
+                    </select>
+                    <select id="historialPrioridad" class="filter-select">
+                        <option value="all">Todas las prioridades</option>
+                        <option value="critica">Crítica</option>
+                        <option value="alta">Alta</option>
+                        <option value="media">Media</option>
+                        <option value="baja">Baja</option>
+                    </select>
+                    <button onclick="aplicarFiltrosHistorial()" class="btn-primary" style="padding: 0.375rem 1rem;">Aplicar Filtros</button>
+                </div>
+            </div>
+
+            <!-- Tabla de Historial -->
+            <div class="card" style="padding: 1.5rem;">
+                <div style="margin-bottom: 1rem;">
+                    <h3>Registro de Incidentes</h3>
+                </div>
+                <table style="width: 100%; border-collapse: collapse;">
+                    <thead style="background: #f8f9fa;">
+                        <tr>
+                            <th style="padding: 0.75rem; text-align: left; font-size: 12px;">FECHA</th>
+                            <th style="padding: 0.75rem; text-align: left; font-size: 12px;">TICKET</th>
+                            <th style="padding: 0.75rem; text-align: left; font-size: 12px;">DESCRIPCIÓN</th>
+                            <th style="padding: 0.75rem; text-align: left; font-size: 12px;">TÉCNICO</th>
+                            <th style="padding: 0.75rem; text-align: left; font-size: 12px;">ESTADO</th>
+                            <th style="padding: 0.75rem; text-align: left; font-size: 12px;">TIEMPO</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr style="border-top: 1px solid var(--color-border);">
+                            <td style="padding: 1rem; font-size: 14px;">2025-11-30</td>
+                            <td style="padding: 1rem; font-size: 14px;"><span style="color: var(--color-primary); font-weight: 500;">TKT-204</span></td>
+                            <td style="padding: 1rem; font-size: 14px;">Router sin respuesta</td>
+                            <td style="padding: 1rem; font-size: 14px;">Carlos Méndez</td>
+                            <td style="padding: 1rem; font-size: 14px;"><span class="badge badge-info">En proceso</span></td>
+                            <td style="padding: 1rem; font-size: 14px;">2h</td>
+                        </tr>
+                        <tr style="border-top: 1px solid var(--color-border);">
+                            <td style="padding: 1rem; font-size: 14px;">2025-11-30</td>
+                            <td style="padding: 1rem; font-size: 14px;"><span style="color: var(--color-primary); font-weight: 500;">TKT-203</span></td>
+                            <td style="padding: 1rem; font-size: 14px;">Pantalla no enciende</td>
+                            <td style="padding: 1rem; font-size: 14px;">Ana Torres</td>
+                            <td style="padding: 1rem; font-size: 14px;"><span class="badge badge-success">Resuelto</span></td>
+                            <td style="padding: 1rem; font-size: 14px;">1.5h</td>
+                        </tr>
+                        <tr style="border-top: 1px solid var(--color-border);">
+                            <td style="padding: 1rem; font-size: 14px;">2025-11-29</td>
+                            <td style="padding: 1rem; font-size: 14px;"><span style="color: var(--color-primary); font-weight: 500;">TKT-202</span></td>
+                            <td style="padding: 1rem; font-size: 14px;">Software no inicia</td>
+                            <td style="padding: 1rem; font-size: 14px;">Luis García</td>
+                            <td style="padding: 1rem; font-size: 14px;"><span class="badge badge-warning">Pendiente</span></td>
+                            <td style="padding: 1rem; font-size: 14px;">6h</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Sección de Configuración -->
+        <div id="configuracionSection" style="display: none;">
+            <div style="margin-bottom: 1.5rem;">
+                <h2>Configuración del Sistema</h2>
+                <p class="text-secondary" style="margin-top: 0.25rem;">Personaliza la apariencia y accesibilidad</p>
+            </div>
+
+            <!-- Configuración de Apariencia -->
+            <div class="card" style="padding: 1.5rem; margin-bottom: 1.5rem;">
+                <div style="margin-bottom: 1.5rem;">
+                    <h3>Apariencia</h3>
+                    <p class="text-xs text-tertiary" style="margin-top: 0.25rem;">Personaliza el tema visual</p>
+                </div>
+
+                <div style="display: flex; flex-direction: column; gap: 1.5rem;">
+                    <!-- Modo Oscuro -->
+                    <div style="display: flex; justify-content: space-between; align-items: center; padding-bottom: 1rem; border-bottom: 1px solid var(--color-border);">
+                        <div>
+                            <div style="font-weight: 500; margin-bottom: 0.25rem;">Modo Oscuro</div>
+                            <div class="text-xs text-tertiary">Reduce el brillo de la pantalla</div>
+                        </div>
+                        <label style="display: flex; align-items: center; cursor: pointer;">
+                            <input type="checkbox" id="modoOscuro" onchange="toggleDarkMode()" style="display: none;">
+                            <div id="toggleModoOscuro" style="width: 44px; height: 24px; background: var(--color-border); border-radius: 12px; position: relative; transition: background 0.3s;">
+                                <div style="width: 20px; height: 20px; background: white; border-radius: 50%; position: absolute; top: 2px; left: 2px; transition: transform 0.3s;"></div>
+                            </div>
+                        </label>
+                    </div>
+
+                    <!-- Tamaño de Fuente -->
+                    <div style="padding-bottom: 1rem; border-bottom: 1px solid var(--color-border);">
+                        <div style="font-weight: 500; margin-bottom: 0.25rem;">Tamaño de Fuente</div>
+                        <div class="text-xs text-tertiary" style="margin-bottom: 1rem;">Ajusta el tamaño del texto</div>
+                        <div style="display: flex; gap: 0.5rem;">
+                            <button onclick="setFontSize('small')" class="btn-secondary" style="flex: 1; padding: 0.5rem;">Pequeño</button>
+                            <button onclick="setFontSize('medium')" class="btn-primary" style="flex: 1; padding: 0.5rem;">Mediano</button>
+                            <button onclick="setFontSize('large')" class="btn-secondary" style="flex: 1; padding: 0.5rem;">Grande</button>
+                        </div>
+                    </div>
+
+                    <!-- Tipografía -->
+                    <div style="padding-bottom: 1rem; border-bottom: 1px solid var(--color-border);">
+                        <div style="font-weight: 500; margin-bottom: 0.25rem;">Tipografía</div>
+                        <div class="text-xs text-tertiary" style="margin-bottom: 1rem;">Selecciona la fuente del sistema</div>
+                        <select id="tipografia" onchange="changeFontFamily()" style="width: 100%; padding: 0.5rem; border: 1px solid var(--color-border); border-radius: var(--radius-md); font-size: 14px;">
+                            <option value="Inter">Inter (Predeterminada)</option>
+                            <option value="Arial">Arial</option>
+                            <option value="Verdana">Verdana</option>
+                            <option value="Georgia">Georgia</option>
+                            <option value="'Courier New'">Courier New</option>
+                            <option value="'Comic Sans MS'">Comic Sans MS</option>
+                        </select>
+                    </div>
+
+                    <!-- Modo Daltónico -->
+                    <div>
+                        <div style="font-weight: 500; margin-bottom: 0.25rem;">Modo Daltónico</div>
+                        <div class="text-xs text-tertiary" style="margin-bottom: 1rem;">Ajusta los colores para mejor accesibilidad</div>
+                        <div style="display: flex; gap: 0.5rem;">
+                            <button onclick="setColorBlindMode('none')" class="btn-primary" style="flex: 1; padding: 0.5rem;">Normal</button>
+                            <button onclick="setColorBlindMode('protanopia')" class="btn-secondary" style="flex: 1; padding: 0.5rem;">Protanopia</button>
+                            <button onclick="setColorBlindMode('deuteranopia')" class="btn-secondary" style="flex: 1; padding: 0.5rem;">Deuteranopia</button>
+                            <button onclick="setColorBlindMode('tritanopia')" class="btn-secondary" style="flex: 1; padding: 0.5rem;">Tritanopia</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Guardar Configuración -->
+            <div style="display: flex; justify-content: flex-end; gap: 0.5rem;">
+                <button onclick="resetConfig()" class="btn-secondary" style="padding: 0.5rem 1rem;">Restablecer</button>
+                <button onclick="saveConfig()" class="btn-primary" style="padding: 0.5rem 1rem;">Guardar Cambios</button>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // Verificar autenticación
+        if (localStorage.getItem('isLoggedIn') !== 'true') {
+            window.location.href = 'login.html';
+        }
+
+        function logout() {
+            localStorage.clear();
+            window.location.href = 'login.html';
+        }
+
+        // Navegación entre secciones - Simple y directo
+        function showSection(section) {
+            // Ocultar todas las secciones
+            document.getElementById('dashboardSection').style.display = 'none';
+            document.getElementById('usuariosSection').style.display = 'none';
+            document.getElementById('historialSection').style.display = 'none';
+            document.getElementById('configuracionSection').style.display = 'none';
+
+            // Remover clase active de todos los nav-items
+            document.querySelectorAll('.sidebar-nav .nav-item').forEach(item => {
+                item.classList.remove('active');
+            });
+
+            // Mostrar la sección seleccionada
+            if (section === 'usuarios') {
+                document.getElementById('usuariosSection').style.display = 'block';
+                document.querySelectorAll('.sidebar-nav .nav-item')[2].classList.add('active');
+            } else if (section === 'historial') {
+                document.getElementById('historialSection').style.display = 'block';
+                document.querySelectorAll('.sidebar-nav .nav-item')[3].classList.add('active');
+            } else if (section === 'configuracion') {
+                document.getElementById('configuracionSection').style.display = 'block';
+                document.querySelectorAll('.sidebar-nav .nav-item')[4].classList.add('active');
+            } else {
+                document.getElementById('dashboardSection').style.display = 'block';
+                document.querySelectorAll('.sidebar-nav .nav-item')[1].classList.add('active');
+            }
+        }
+
+        // Cargar configuración guardada
+        function loadConfig() {
+            const darkMode = localStorage.getItem('darkMode') === 'true';
+            const fontSize = localStorage.getItem('fontSize') || 'medium';
+            const fontFamily = localStorage.getItem('fontFamily') || 'Inter';
+            const colorBlindMode = localStorage.getItem('colorBlindMode') || 'none';
+
+            if (darkMode) {
+                document.body.classList.add('dark-mode');
+                document.getElementById('modoOscuro').checked = true;
+                updateToggle(true);
+            }
+
+            applyFontSize(fontSize);
+            applyFontFamily(fontFamily);
+            applyColorBlindMode(colorBlindMode);
+
+            document.getElementById('tipografia').value = fontFamily;
+        }
+
+        // Modo Oscuro
+        function toggleDarkMode() {
+            const isChecked = document.getElementById('modoOscuro').checked;
+            updateToggle(isChecked);
+            
+            if (isChecked) {
+                document.body.classList.add('dark-mode');
+                applyDarkModeStyles();
+            } else {
+                document.body.classList.remove('dark-mode');
+                removeDarkModeStyles();
+            }
+        }
+
+        function updateToggle(isActive) {
+            const toggle = document.getElementById('toggleModoOscuro');
+            const slider = toggle.querySelector('div');
+            
+            if (isActive) {
+                toggle.style.background = 'var(--color-primary)';
+                slider.style.transform = 'translateX(20px)';
+            } else {
+                toggle.style.background = 'var(--color-border)';
+                slider.style.transform = 'translateX(0)';
+            }
+        }
+
+        function applyDarkModeStyles() {
+            const root = document.documentElement;
+            root.style.setProperty('--color-background', '#1a1a1a');
+            root.style.setProperty('--color-surface', '#2d2d2d');
+            root.style.setProperty('--color-border', '#404040');
+            root.style.setProperty('--color-text-primary', '#ffffff');
+            root.style.setProperty('--color-text-secondary', '#b0b0b0');
+            root.style.setProperty('--color-text-tertiary', '#808080');
+        }
+
+        function removeDarkModeStyles() {
+            const root = document.documentElement;
+            root.style.setProperty('--color-background', '#f5f7fa');
+            root.style.setProperty('--color-surface', '#ffffff');
+            root.style.setProperty('--color-border', '#e0e5ee');
+            root.style.setProperty('--color-text-primary', '#1a1d29');
+            root.style.setProperty('--color-text-secondary', '#5f6478');
+            root.style.setProperty('--color-text-tertiary', '#9da3b4');
+        }
+
+        // Tamaño de Fuente
+        function setFontSize(size) {
+            applyFontSize(size);
+            
+            // Actualizar botones activos
+            document.querySelectorAll('[onclick^="setFontSize"]').forEach(btn => {
+                btn.classList.remove('btn-primary');
+                btn.classList.add('btn-secondary');
+            });
+            event.target.classList.remove('btn-secondary');
+            event.target.classList.add('btn-primary');
+        }
+
+        function applyFontSize(size) {
+            const root = document.documentElement;
+            if (size === 'small') {
+                root.style.fontSize = '14px';
+            } else if (size === 'large') {
+                root.style.fontSize = '18px';
+            } else {
+                root.style.fontSize = '16px';
+            }
+        }
+
+        // Tipografía
+        function changeFontFamily() {
+            const fontFamily = document.getElementById('tipografia').value;
+            applyFontFamily(fontFamily);
+        }
+
+        function applyFontFamily(fontFamily) {
+            document.body.style.fontFamily = fontFamily + ', sans-serif';
+        }
+
+        // Modo Daltónico
+        function setColorBlindMode(mode) {
+            applyColorBlindMode(mode);
+            
+            // Actualizar botones activos
+            document.querySelectorAll('[onclick^="setColorBlindMode"]').forEach(btn => {
+                btn.classList.remove('btn-primary');
+                btn.classList.add('btn-secondary');
+            });
+            event.target.classList.remove('btn-secondary');
+            event.target.classList.add('btn-primary');
+        }
+
+        function applyColorBlindMode(mode) {
+            const root = document.documentElement;
+            
+            if (mode === 'protanopia') {
+                // Rojo-verde (sin rojo)
+                root.style.setProperty('--color-critical', '#d4a017');
+                root.style.setProperty('--color-success', '#0074d9');
+                root.style.setProperty('--color-warning', '#ff851b');
+            } else if (mode === 'deuteranopia') {
+                // Rojo-verde (sin verde)
+                root.style.setProperty('--color-critical', '#d4a017');
+                root.style.setProperty('--color-success', '#0074d9');
+                root.style.setProperty('--color-warning', '#ff851b');
+            } else if (mode === 'tritanopia') {
+                // Azul-amarillo
+                root.style.setProperty('--color-primary', '#d4004b');
+                root.style.setProperty('--color-info', '#d4004b');
+                root.style.setProperty('--color-warning', '#85144b');
+            } else {
+                // Colores normales
+                root.style.setProperty('--color-critical', '#d32f2f');
+                root.style.setProperty('--color-success', '#2e7d32');
+                root.style.setProperty('--color-warning', '#f57c00');
+                root.style.setProperty('--color-primary', '#0056d2');
+                root.style.setProperty('--color-info', '#0288d1');
+            }
+        }
+
+        // Guardar configuración
+        function saveConfig() {
+            localStorage.setItem('darkMode', document.getElementById('modoOscuro').checked);
+            localStorage.setItem('fontSize', getCurrentFontSize());
+            localStorage.setItem('fontFamily', document.getElementById('tipografia').value);
+            localStorage.setItem('colorBlindMode', getCurrentColorBlindMode());
+            
+            alert('Configuración guardada correctamente');
+        }
+
+        function getCurrentFontSize() {
+            const fontSize = getComputedStyle(document.documentElement).fontSize;
+            if (fontSize === '14px') return 'small';
+            if (fontSize === '18px') return 'large';
+            return 'medium';
+        }
+
+        function getCurrentColorBlindMode() {
+            const critical = getComputedStyle(document.documentElement).getPropertyValue('--color-critical');
+            if (critical.includes('#d4a017')) return 'protanopia';
+            return 'none';
+        }
+
+        // Restablecer configuración
+        function resetConfig() {
+            localStorage.removeItem('darkMode');
+            localStorage.removeItem('fontSize');
+            localStorage.removeItem('fontFamily');
+            localStorage.removeItem('colorBlindMode');
+            
+            document.getElementById('modoOscuro').checked = false;
+            updateToggle(false);
+            removeDarkModeStyles();
+            applyFontSize('medium');
+            applyFontFamily('Inter');
+            applyColorBlindMode('none');
+            document.getElementById('tipografia').value = 'Inter';
+            
+            alert('Configuración restablecida');
+        }
+
+        // Filtros de historial
+        function aplicarFiltrosHistorial() {
+            const periodo = document.getElementById('historialPeriodo').value;
+            const estado = document.getElementById('historialEstado').value;
+            const prioridad = document.getElementById('historialPrioridad').value;
+            
+            console.log('Aplicando filtros:', { periodo, estado, prioridad });
+            alert('Filtros aplicados: ' + periodo + ' días, Estado: ' + estado + ', Prioridad: ' + prioridad);
+        }
+
+        // Cargar configuración al iniciar
+        loadConfig();
+
+        // Chart.js - Heatmap
+        const ctx = document.getElementById('heatmapChart').getContext('2d');
+        new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: ['Lab 1', 'Lab 2', 'Lab 3', 'Lab 4', 'Lab 5', 'Lab 6', 'Biblioteca', 'Auditorio'],
+                datasets: [{
+                    label: 'Incidentes',
+                    data: [45, 23, 38, 12, 31, 8, 19, 5],
+                    backgroundColor: ['#d32f2f', '#f57c00', '#d32f2f', '#388e3c', '#f57c00', '#388e3c', '#f57c00', '#388e3c'],
+                    borderRadius: 8
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { 
+                    legend: { display: false }
+                },
+                scales: {
+                    y: { 
+                        beginAtZero: true, 
+                        grid: { color: '#e0e5ee' },
+                        ticks: { color: '#5f6478' }
+                    },
+                    x: { 
+                        grid: { color: '#e0e5ee' },
+                        ticks: { color: '#5f6478' }
+                    }
+                }
+            }
+        });
+
+        // Filtrado de tabla
+        function filterTable() {
+            const searchValue = document.getElementById('searchInput').value.toLowerCase();
+            const tecnicoFilter = document.getElementById('filterTecnico').value;
+            const estadoFilter = document.getElementById('filterEstado').value;
+            const prioridadFilter = document.getElementById('filterPrioridad').value;
+            
+            const rows = document.querySelectorAll('#ticketsBody tr');
+            let visibleCount = 0;
+            
+            rows.forEach(row => {
+                const text = row.textContent.toLowerCase();
+                const tecnico = row.getAttribute('data-tecnico');
+                const estado = row.getAttribute('data-estado');
+                const prioridad = row.getAttribute('data-prioridad');
+                
+                const matchSearch = searchValue === '' || text.includes(searchValue);
+                const matchTecnico = tecnicoFilter === 'all' || tecnico === tecnicoFilter;
+                const matchEstado = estadoFilter === 'all' || estado === estadoFilter;
+                const matchPrioridad = prioridadFilter === 'all' || prioridad === prioridadFilter;
+                
+                if (matchSearch && matchTecnico && matchEstado && matchPrioridad) {
+                    row.style.display = '';
+                    visibleCount++;
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+            
+            document.getElementById('resultCount').textContent = visibleCount;
+        }
+
+        function clearFilters() {
+            document.getElementById('searchInput').value = '';
+            document.getElementById('filterTecnico').value = 'all';
+            document.getElementById('filterEstado').value = 'all';
+            document.getElementById('filterPrioridad').value = 'all';
+            filterTable();
+        }
+    </script>
+</body>
+</html>

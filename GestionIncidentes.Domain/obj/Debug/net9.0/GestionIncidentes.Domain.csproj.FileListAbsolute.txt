@@ -47,3 +47,16 @@ C:\Users\User\Documents\Joshua Universidad\Quinto\IHC\ProyectoIHC\IHC-Proyecto\G
 C:\Users\User\Documents\Joshua Universidad\Quinto\IHC\ProyectoIHC\IHC-Proyecto\GestionIncidentes.Domain\obj\Debug\net9.0\refint\GestionIncidentes.Domain.dll
 C:\Users\User\Documents\Joshua Universidad\Quinto\IHC\ProyectoIHC\IHC-Proyecto\GestionIncidentes.Domain\obj\Debug\net9.0\GestionIncidentes.Domain.pdb
 C:\Users\User\Documents\Joshua Universidad\Quinto\IHC\ProyectoIHC\IHC-Proyecto\GestionIncidentes.Domain\obj\Debug\net9.0\ref\GestionIncidentes.Domain.dll
+C:\Users\Jona\Downloads\IHC-Proyecto\IHC-Proyecto\GestionIncidentes.Domain\bin\Debug\net9.0\GestionIncidentes.Domain.deps.json
+C:\Users\Jona\Downloads\IHC-Proyecto\IHC-Proyecto\GestionIncidentes.Domain\bin\Debug\net9.0\GestionIncidentes.Domain.dll
+C:\Users\Jona\Downloads\IHC-Proyecto\IHC-Proyecto\GestionIncidentes.Domain\bin\Debug\net9.0\GestionIncidentes.Domain.pdb
+C:\Users\Jona\Downloads\IHC-Proyecto\IHC-Proyecto\GestionIncidentes.Domain\obj\Debug\net9.0\GestionIncidentes.Domain.csproj.AssemblyReference.cache
+C:\Users\Jona\Downloads\IHC-Proyecto\IHC-Proyecto\GestionIncidentes.Domain\obj\Debug\net9.0\GestionIncidentes.Domain.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\Jona\Downloads\IHC-Proyecto\IHC-Proyecto\GestionIncidentes.Domain\obj\Debug\net9.0\GestionIncidentes.Domain.AssemblyInfoInputs.cache
+C:\Users\Jona\Downloads\IHC-Proyecto\IHC-Proyecto\GestionIncidentes.Domain\obj\Debug\net9.0\GestionIncidentes.Domain.AssemblyInfo.cs
+C:\Users\Jona\Downloads\IHC-Proyecto\IHC-Proyecto\GestionIncidentes.Domain\obj\Debug\net9.0\GestionIncidentes.Domain.csproj.CoreCompileInputs.cache
+C:\Users\Jona\Downloads\IHC-Proyecto\IHC-Proyecto\GestionIncidentes.Domain\obj\Debug\net9.0\GestionIncidentes.Domain.sourcelink.json
+C:\Users\Jona\Downloads\IHC-Proyecto\IHC-Proyecto\GestionIncidentes.Domain\obj\Debug\net9.0\GestionIncidentes.Domain.dll
+C:\Users\Jona\Downloads\IHC-Proyecto\IHC-Proyecto\GestionIncidentes.Domain\obj\Debug\net9.0\refint\GestionIncidentes.Domain.dll
+C:\Users\Jona\Downloads\IHC-Proyecto\IHC-Proyecto\GestionIncidentes.Domain\obj\Debug\net9.0\GestionIncidentes.Domain.pdb
+C:\Users\Jona\Downloads\IHC-Proyecto\IHC-Proyecto\GestionIncidentes.Domain\obj\Debug\net9.0\ref\GestionIncidentes.Domain.dll
