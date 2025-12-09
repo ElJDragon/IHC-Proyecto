@@ -1,25 +1,15 @@
 /* ============================================
-   DASHBOARD STYLES
+   DASHBOARD STYLES - Sistema de Diseño UTA
+   IHC: Variables Globales - Usar sistema centralizado
    ============================================ */
-
-:root {
-    --primary-blue: #2563EB;
-    --primary-blue-light: #3B82F6;
-    --success-green: #10B981;
-    --warning-yellow: #F59E0B;
-    --danger-red: #EF4444;
-    --text-dark: #111827;
-    --text-gray: #6B7280;
-    --background-light: #F9FAFB;
-    --background-white: #FFFFFF;
-    --border-color: #E5E7EB;
-}
 
 /* ============================================
    HEADER
+   IHC: Jerarquía Visual - Títulos destacados
+   Justificación: Claridad en navegación y contexto del usuario
    ============================================ */
 .dashboard-header {
-    margin-bottom: 32px;
+    margin-bottom: var(--spacing-2xl);
 }
 
 .header-content {
@@ -29,217 +19,247 @@
 }
 
 .page-title {
-    font-size: 28px;
-    font-weight: 700;
-    color: var(--text-dark);
-    margin: 0 0 4px 0;
+    font-size: var(--font-size-h1);
+    font-weight: var(--font-weight-bold);
+    color: var(--color-text-primary);
+    margin: 0 0 var(--spacing-2xs) 0;
 }
 
 .page-subtitle {
-    font-size: 14px;
-    color: var(--text-gray);
+    font-size: var(--font-size-body);
+    color: var(--color-text-secondary);
     margin: 0;
 }
 
 /* ============================================
    METRICS GRID
+   IHC: Agrupación Visual + Chunking - Cards de métricas agrupadas
+   Justificación: Información organizada en bloques escaneables
    ============================================ */
 .metrics-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-    gap: 20px;
-    margin-bottom: 32px;
+    gap: var(--spacing-lg);
+    margin-bottom: var(--spacing-2xl);
 }
 
+/* IHC: Affordance + Feedback Inmediato - Cards con hover elevation */
 .metric-card {
-    background-color: var(--background-white);
-    border-radius: 12px;
-    padding: 24px;
+    background-color: var(--color-surface);
+    border-radius: var(--radius-lg);
+    padding: var(--spacing-xl);
     display: flex;
     align-items: center;
-    gap: 16px;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-    transition: all 0.2s ease;
+    gap: var(--spacing-md);
+    box-shadow: var(--shadow-sm);
+    transition: all var(--transition-fast);
+    border: 1px solid var(--color-border);
 }
 
 .metric-card:hover {
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    box-shadow: var(--shadow-md);
+    transform: translateY(-2px);
 }
 
+/* IHC: Iconos Semánticos - Colores UTA para cada tipo de métrica */
 .metric-icon {
     width: 56px;
     height: 56px;
-    border-radius: 12px;
+    border-radius: var(--radius-lg);
     display: flex;
     align-items: center;
     justify-content: center;
     font-size: 28px;
-    color: white;
+    color: var(--color-text-inverse);
+    box-shadow: var(--shadow-sm);
 }
 
 .metric-icon.usuarios {
-    background: linear-gradient(135deg, #3B82F6, #1E40AF);
+    background: linear-gradient(135deg, var(--color-primary), var(--color-primary-hover));
 }
 
 .metric-icon.tecnicos {
-    background: linear-gradient(135deg, #10B981, #059669);
+    background: linear-gradient(135deg, var(--color-info), #0EA5E9);
 }
 
 .metric-icon.incidentes {
-    background: linear-gradient(135deg, #F59E0B, #D97706);
+    background: linear-gradient(135deg, var(--color-warning), #F97316);
 }
 
 .metric-icon.resolucion {
-    background: linear-gradient(135deg, #8B5CF6, #6D28D9);
+    background: linear-gradient(135deg, var(--color-success), #16A34A);
 }
 
 .metric-content {
     flex: 1;
 }
 
+/* IHC: Etiquetas Visibles - Labels siempre visibles con tamaño legible */
 .metric-label {
-    font-size: 13px;
-    color: var(--text-gray);
-    font-weight: 500;
-    margin: 0 0 4px 0;
+    font-size: var(--font-size-small);
+    color: var(--color-text-secondary);
+    font-weight: var(--font-weight-medium);
+    margin: 0 0 var(--spacing-2xs) 0;
     letter-spacing: 0.5px;
+    text-transform: uppercase;
 }
 
 .metric-value {
-    font-size: 24px;
-    font-weight: 700;
-    color: var(--text-dark);
+    font-size: var(--font-size-h1);
+    font-weight: var(--font-weight-bold);
+    color: var(--color-text-primary);
     margin: 0;
 }
 
 /* ============================================
    DASHBOARD GRID (ACTION CARDS)
+   IHC: Affordance - Cards clicables con hover y cursor pointer
+   Justificación: Indicar claramente qué elementos son interactivos
    ============================================ */
 .dashboard-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-    gap: 20px;
-    margin-bottom: 32px;
+    gap: var(--spacing-lg);
+    margin-bottom: var(--spacing-2xl);
 }
 
 .dashboard-card {
-    background-color: var(--background-white);
-    border-radius: 12px;
-    padding: 24px;
+    background-color: var(--color-surface);
+    border-radius: var(--radius-lg);
+    padding: var(--spacing-xl);
     display: flex;
     align-items: center;
-    gap: 16px;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-    transition: all 0.2s ease;
+    gap: var(--spacing-md);
+    box-shadow: var(--shadow-sm);
+    transition: all var(--transition-fast);
+    border: 1px solid var(--color-border);
 }
 
+/* IHC: Feedback Inmediato - Hover con elevación y transform */
 .dashboard-card.clickable {
     cursor: pointer;
 }
 
 .dashboard-card.clickable:hover {
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+    box-shadow: var(--shadow-lg);
     transform: translateY(-2px);
 }
 
+.dashboard-card.clickable:focus {
+    outline: 2px solid var(--color-primary);
+    outline-offset: 2px;
+}
+
+/* IHC: Iconos Semánticos - Colores UTA por funcionalidad */
 .card-icon {
     width: 64px;
     height: 64px;
-    border-radius: 12px;
+    border-radius: var(--radius-lg);
     display: flex;
     align-items: center;
     justify-content: center;
     font-size: 32px;
-    color: white;
+    color: var(--color-text-inverse);
     flex-shrink: 0;
+    box-shadow: var(--shadow-sm);
 }
 
 .card-icon.gestion-usuarios {
-    background: linear-gradient(135deg, #3B82F6, #1E40AF);
+    background: linear-gradient(135deg, var(--color-primary), var(--color-primary-hover));
 }
 
 .card-icon.config {
-    background: linear-gradient(135deg, #8B5CF6, #6D28D9);
+    background: linear-gradient(135deg, var(--color-info), #0EA5E9);
 }
 
 .card-icon.reportes {
-    background: linear-gradient(135deg, #EC4899, #BE185D);
+    background: linear-gradient(135deg, var(--color-warning), #F97316);
 }
 
 .card-icon.bd {
-    background: linear-gradient(135deg, #10B981, #059669);
+    background: linear-gradient(135deg, var(--color-success), #16A34A);
 }
 
 .card-content {
     flex: 1;
 }
 
+/* IHC: Jerarquía Visual - Título destacado */
 .card-title {
-    font-size: 16px;
-    font-weight: 600;
-    color: var(--text-dark);
-    margin: 0 0 4px 0;
+    font-size: var(--font-size-body);
+    font-weight: var(--font-weight-semibold);
+    color: var(--color-text-primary);
+    margin: 0 0 var(--spacing-2xs) 0;
 }
 
 .card-description {
-    font-size: 13px;
-    color: var(--text-gray);
+    font-size: var(--font-size-small);
+    color: var(--color-text-secondary);
     margin: 0;
 }
 
+/* IHC: Affordance - Flecha aparece en hover indicando acción */
 .card-arrow {
-    color: var(--text-gray);
+    color: var(--color-text-secondary);
     opacity: 0;
-    transition: all 0.2s ease;
+    transition: all var(--transition-fast);
 }
 
 .dashboard-card.clickable:hover .card-arrow {
     opacity: 1;
-    color: var(--primary-blue);
+    color: var(--color-primary);
+    transform: translateX(4px);
 }
 
 /* ============================================
    DASHBOARD CONTENT
+   IHC: Agrupación Visual - Sección de contenido con cards
    ============================================ */
 .dashboard-content {
     display: grid;
     grid-template-columns: 1fr;
-    gap: 20px;
+    gap: var(--spacing-lg);
 }
 
 .content-row {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
-    gap: 20px;
+    gap: var(--spacing-lg);
 }
 
+/* IHC: Agrupación Visual - Cards de contenido con border */
 .content-card {
-    background-color: var(--background-white);
-    border-radius: 12px;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    background-color: var(--color-surface);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-sm);
     overflow: hidden;
+    border: 1px solid var(--color-border);
 }
 
 .card-header {
-    padding: 20px;
-    border-bottom: 1px solid var(--border-color);
+    padding: var(--spacing-lg);
+    border-bottom: 1px solid var(--color-border);
+    background-color: var(--color-surface-hover);
 }
 
 .card-header .card-title {
-    font-size: 18px;
-    font-weight: 600;
+    font-size: var(--font-size-h2);
+    font-weight: var(--font-weight-semibold);
     margin: 0;
+    color: var(--color-text-primary);
 }
 
 .card-body {
-    padding: 20px;
+    padding: var(--spacing-lg);
 }
 
 /* ============================================
    STATUS ITEMS
+   IHC: Indicadores de Estado - Barras de progreso y valores
+   Justificación: Feedback visual claro del estado del sistema
    ============================================ */
 .status-item {
-    margin-bottom: 24px;
+    margin-bottom: var(--spacing-xl);
 }
 
 .status-item:last-child {
@@ -248,55 +268,63 @@
 
 .status-label {
     display: block;
-    font-size: 13px;
-    font-weight: 500;
-    color: var(--text-gray);
-    margin-bottom: 8px;
+    font-size: var(--font-size-small);
+    font-weight: var(--font-weight-medium);
+    color: var(--color-text-secondary);
+    margin-bottom: var(--spacing-xs);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
 }
 
 .status-value {
     display: inline-block;
-    font-size: 18px;
-    font-weight: 700;
-    color: var(--text-dark);
-    margin-bottom: 8px;
+    font-size: var(--font-size-h2);
+    font-weight: var(--font-weight-bold);
+    color: var(--color-text-primary);
+    margin-bottom: var(--spacing-xs);
 }
 
+/* IHC: Feedback Inmediato - Barra de progreso visual */
 .status-bar {
     width: 100%;
     height: 8px;
-    background-color: var(--background-light);
-    border-radius: 4px;
+    background-color: var(--color-surface-hover);
+    border-radius: var(--radius-sm);
     overflow: hidden;
-    margin-bottom: 4px;
+    margin-bottom: var(--spacing-2xs);
+    box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.05);
 }
 
 .status-progress {
     height: 100%;
-    border-radius: 4px;
-    transition: width 0.3s ease;
+    border-radius: var(--radius-sm);
+    transition: width var(--transition-normal);
+    background: linear-gradient(90deg, var(--color-primary), var(--color-primary-hover));
 }
 
 .status-target {
     display: block;
-    font-size: 12px;
-    color: var(--text-gray);
+    font-size: var(--font-size-xs);
+    color: var(--color-text-tertiary);
     text-align: right;
 }
 
 /* ============================================
    ACTIVITIES
+   IHC: Chunking - Lista de actividades con separadores visuales
+   Justificación: Organización clara de eventos/acciones recientes
    ============================================ */
 .activities {
     padding: 0;
 }
 
+/* IHC: Affordance - Items con hover para indicar interactividad */
 .activity-item {
     display: flex;
-    gap: 12px;
-    padding: 16px;
-    border-bottom: 1px solid var(--border-color);
-    transition: all 0.2s ease;
+    gap: var(--spacing-sm);
+    padding: var(--spacing-md);
+    border-bottom: 1px solid var(--color-border);
+    transition: all var(--transition-fast);
 }
 
 .activity-item:last-child {
@@ -304,20 +332,22 @@
 }
 
 .activity-item:hover {
-    background-color: var(--background-light);
+    background-color: var(--color-surface-hover);
 }
 
+/* IHC: Iconos Semánticos - Iconos con gradiente UTA */
 .activity-icon {
     width: 40px;
     height: 40px;
-    border-radius: 50%;
-    background: linear-gradient(135deg, #3B82F6, #1E40AF);
-    color: white;
+    border-radius: var(--radius-full);
+    background: linear-gradient(135deg, var(--color-primary), var(--color-primary-hover));
+    color: var(--color-text-inverse);
     display: flex;
     align-items: center;
     justify-content: center;
     flex-shrink: 0;
     font-size: 20px;
+    box-shadow: var(--shadow-sm);
 }
 
 .activity-content {
@@ -325,26 +355,27 @@
 }
 
 .activity-title {
-    font-size: 14px;
-    font-weight: 600;
-    color: var(--text-dark);
-    margin: 0 0 2px 0;
+    font-size: var(--font-size-body);
+    font-weight: var(--font-weight-semibold);
+    color: var(--color-text-primary);
+    margin: 0 0 var(--spacing-2xs) 0;
 }
 
 .activity-user {
-    font-size: 12px;
-    color: var(--text-gray);
+    font-size: var(--font-size-small);
+    color: var(--color-text-secondary);
     margin: 0;
 }
 
 .activity-time {
-    font-size: 12px;
-    color: var(--text-gray);
+    font-size: var(--font-size-small);
+    color: var(--color-text-tertiary);
     margin: 0;
 }
 
 /* ============================================
    PROGRESS BAR WIDTHS
+   IHC: Feedback Inmediato - Ancho dinámico con colores de estado
    ============================================ */
 .status-progress.p75 {
     width: 75%;
@@ -362,16 +393,18 @@
     width: 94%;
 }
 
+/* IHC: Contraste de Color - Verde para éxito, naranja para advertencia */
 .status-progress.green {
-    background-color: #10B981;
+    background: linear-gradient(90deg, var(--color-success), #16A34A);
 }
 
 .status-progress.orange {
-    background-color: #F59E0B;
+    background: linear-gradient(90deg, var(--color-warning), #F97316);
 }
 
 /* ============================================
-   RESPONSIVE
+   RESPONSIVE - Espaciado adaptativo
+   IHC: Chunking - Reducir columnas en mobile para claridad
    ============================================ */
 @media (max-width: 768px) {
     .metrics-grid {
@@ -389,7 +422,7 @@
     .header-content {
         flex-direction: column;
         align-items: flex-start;
-        gap: 16px;
+        gap: var(--spacing-md);
     }
 }
 
@@ -404,6 +437,17 @@
     }
 
     .page-title {
-        font-size: 24px;
+        font-size: var(--font-size-h2);
+    }
+}
+
+/* IHC: Accesibilidad - Prefers-reduced-motion */
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
     }
 }
