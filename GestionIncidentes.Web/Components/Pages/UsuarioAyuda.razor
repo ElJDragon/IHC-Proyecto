@@ -1,19 +1,677 @@
 @page "/usuario/ayuda"
 @layout UsuarioLayout
 @rendermode InteractiveServer
+@using System.Text.RegularExpressions
+@inject NavigationManager Navigation
+@inject IJSRuntime JS
 
 <link rel="stylesheet" href="/css/pages.css" />
+<link rel="stylesheet" href="/css/usuario.css" />
 
 <div class="page-shell">
-  <div class="page-header" style="text-align:center">
-    <span class="material-icons" style="font-size:48px; color:var(--color-primary); margin-bottom:8px">help_outline</span>
-    <h1 class="page-title">Ayuda y Guías</h1>
-    <p class="page-subtitle">Documentación y soporte para usuarios</p>
-  </div>
+    <div class="page-header" style="text-align:center">
+        <span class="material-icons icon-large">help_outline</span>
+        <h1 class="page-title">Ayuda y Guías</h1>
+        <p class="page-subtitle">Documentación, tutoriales y soporte rápido</p>
+    </div>
 
-  <div class="card" style="max-width:600px; margin:0 auto; padding:48px; text-align:center">
-    <span class="material-icons" style="font-size:64px; color:#e5e7eb; margin-bottom:16px">construction</span>
-    <h3>Sección en desarrollo</h3>
-    <p style="color:var(--text-gray); margin-top:12px">Aquí encontrarás guías, tutoriales y preguntas frecuentes para resolver problemas técnicos.</p>
-  </div>
+    <div class="page-content-grid">
+        <!-- MAIN COLUMN -->
+        <main class="main-column">
+            <!-- Quick access tiles -->
+            <div class="tiles-container">
+                <button class="tile" title="Ir a Mis Reportes" @onclick='() => GoTo("/usuario/dashboard")' aria-label="Mis Reportes">
+                    <div class="tile-icon"><span class="material-icons">dashboard</span></div>
+                    <div class="tile-text">Mis Reportes</div>
+                </button>
+                <button class="tile" title="Reportar un problema" @onclick='() => GoTo("/usuario/reportar")' aria-label="Reportar un problema">
+                    <div class="tile-icon"><span class="material-icons">error_outline</span></div>
+                    <div class="tile-text">Reportar</div>
+                </button>
+            </div>
+
+            <!-- Search -->
+            <div class="search-container">
+                <input @bind="searchTerm"
+                       @bind:event="oninput"
+                       placeholder="Buscar FAQ o guías (ej. 'equipo', 'software', 'calificar')"
+                       class="search-input"
+                       aria-label="Buscar en preguntas frecuentes" />
+                <button class="btn btn-secondary" @onclick="ClearSearch" aria-label="Limpiar búsqueda">Limpiar</button>
+            </div>
+
+            <!-- FAQ Accordion -->
+            <section class="card faq-section" role="region" aria-label="Preguntas frecuentes">
+                <h2>Preguntas frecuentes</h2>
+                @if (FilteredFaqs.Any())
+                {
+                    <div class="accordion" role="presentation">
+                        @foreach (var f in FilteredFaqs)
+                        {
+                            <div class="accordion-item">
+                                <button class="accordion-header"
+                                        @onclick='() => ToggleFaq(f.Id)'
+                                        aria-expanded="@(openedFaq == f.Id ? "true" : "false")"
+                                        aria-controls="faq-@f.Id">
+                                    <div><strong>@f.Question</strong></div>
+                                    <div class="material-icons accordion-icon">@((openedFaq == f.Id) ? "expand_less" : "expand_more")</div>
+                                </button>
+                                <div id="faq-@f.Id"
+                                     class="accordion-body"
+                                     style="@(openedFaq == f.Id ? "display:block" : "display:none")">
+                                    @((MarkupString)f.AnswerHtml)
+                                </div>
+                            </div>
+                        }
+                    </div>
+                }
+                else
+                {
+                    <div class="empty-state">No se encontraron resultados para la búsqueda.</div>
+                }
+            </section>
+
+            <!-- Quick Guides -->
+            <section class="card guides-section" role="region" aria-label="Guías rápidas">
+                <h2>Guías rápidas</h2>
+
+                <article>
+                    <h3>1) Cómo reportar un problema (paso a paso)</h3>
+                    <ol>
+                        <li>Ir a <em>Reportar Problema</em> (botón superior).</li>
+                        <li>Seleccionar <strong>Edificio → Laboratorio → Equipo</strong>.</li>
+                        <li>Elegir tipo: <strong>Hardware</strong> o <strong>Software</strong>.</li>
+                        <li>Describe el error con detalles.</li>
+                        <li>Enviar: verás el ID del incidente.</li>
+                    </ol>
+                </article>
+
+                <article>
+                    <h3>2) Calificar un ticket</h3>
+                    <p>En <em>Mis Reportes</em>, cuando un ticket está <strong>Resuelto</strong>, pulsa <strong>Calificar</strong>. Selecciona estrellas y deja un comentario opcional.</p>
+                </article>
+            </section>
+
+            <!-- Recommendations -->
+            <section class="card recommendations-section" role="region" aria-label="Recomendaciones">
+                <h2>Recomendaciones</h2>
+                <ul>
+                    <li><strong>Títulos descriptivos:</strong> Mantener formato `TIPO: Laboratorio - Equipo`.</li>
+                    <li><strong>Validación:</strong> Checks en cliente y servidor para seguridad.</li>
+                    <li><strong>Prevención de duplicados:</strong> Sugerir incidentes similares.</li>
+                    <li><strong>Base de conocimiento:</strong> Crear KB automáticamente.</li>
+                    <li><strong>Feedback visual:</strong> Toasts en lugar de alert().</li>
+                </ul>
+            </section>
+        </main>
+
+        <!-- SIDEBAR RIGHT -->
+        <aside class="sidebar">
+            <div class="card">
+                <h3 style="font-size: 18px; font-weight: 600; margin: 0 0 16px 0; color: var(--text-dark);">
+                    <span class="material-icons" style="vertical-align: middle; margin-right: 8px; color: var(--color-primary);">link</span>
+                    Atajos rápidos
+                </h3>
+                <div style="display: flex; flex-direction: column; gap: 8px;">
+                    <button @onclick='() => GoTo("/usuario/reportar")' class="btn-secondary" style="width: 100%; justify-content: flex-start;">
+                        <span class="material-icons">add_circle_outline</span>
+                        <span>Crear nuevo incidente</span>
+                    </button>
+                    <button @onclick='() => GoTo("/usuario/dashboard")' class="btn-secondary" style="width: 100%; justify-content: flex-start;">
+                        <span class="material-icons">assignment</span>
+                        <span>Ver mis reportes</span>
+                    </button>
+                </div>
+            </div>
+
+            <div class="card">
+                <h3 style="font-size: 18px; font-weight: 600; margin: 0 0 12px 0; color: var(--text-dark);">
+                    <span class="material-icons" style="vertical-align: middle; margin-right: 8px; color: var(--color-primary);">mail_outline</span>
+                    Contacto rápido
+                </h3>
+                <p style="font-size: 14px; color: var(--text-gray); margin-bottom: 16px;">Si no encuentras solución, envía un mensaje.</p>
+
+                @if (contactError != null)
+                {
+                    <div style="padding: 12px; background: #fee; border-left: 4px solid #dc2626; border-radius: 6px; margin-bottom: 12px; display: flex; align-items: center; gap: 8px;">
+                        <span class="material-icons" style="font-size: 20px; color: #dc2626;">error</span>
+                        <span style="font-size: 13px; color: #991b1b;">@contactError</span>
+                    </div>
+                }
+
+                @if (contactSuccess)
+                {
+                    <div style="padding: 12px; background: #d1fae5; border-left: 4px solid #10b981; border-radius: 6px; margin-bottom: 12px; display: flex; align-items: center; gap: 8px;">
+                        <span class="material-icons" style="font-size: 20px; color: #10b981;">check_circle</span>
+                        <span style="font-size: 13px; color: #065f46;">Mensaje enviado correctamente</span>
+                    </div>
+                }
+
+                <textarea @bind="contactMessage"
+                          rows="4"
+                          placeholder="Escribe tu mensaje aquí..."
+                          aria-label="Mensaje de contacto"
+                          disabled="@isSubmitting"
+                          style="width: 100%; padding: 12px; border: 2px solid var(--border-color); border-radius: 8px; font-family: inherit; font-size: 14px; resize: vertical; margin-bottom: 12px;"></textarea>
+
+                <div style="display: flex; gap: 8px;">
+                    <button class="btn-secondary"
+                            @onclick="ClearContact"
+                            disabled="@isSubmitting"
+                            style="flex: 1;">
+                        Limpiar
+                    </button>
+                    <button class="btn-primary"
+                            @onclick="SendContact"
+                            disabled="@isSubmitting"
+                            style="flex: 1;">
+                        @if (isSubmitting)
+                        {
+                            <span class="material-icons spinner" style="font-size: 18px;">hourglass_empty</span>
+                            <span>Enviando...</span>
+                        }
+                        else
+                        {
+                            <span>Enviar</span>
+                        }
+                    </button>
+                </div>
+            </div>
+
+            <div class="card" style="background: var(--color-info-light); border: 2px solid var(--color-info);">
+                <h3 style="font-size: 18px; font-weight: 600; margin: 0 0 12px 0; color: var(--text-dark);">
+                    <span class="material-icons" style="vertical-align: middle; margin-right: 8px; color: var(--color-info);">lightbulb</span>
+                    Consejo rápido
+                </h3>
+                <p style="font-size: 14px; color: var(--text-dark); margin: 0;">Al describir errores, copia el mensaje exacto (o captura de pantalla) para resolver más rápido.</p>
+            </div>
+        </aside>
+    </div>
 </div>
+
+@code {
+    private record FaqItem(int Id, string Question, string AnswerHtml);
+
+    private List<FaqItem> faqs = new()
+  {
+    new FaqItem(1, "¿Cómo reporto un problema paso a paso?",
+      "<p>Ve a <strong>Reportar Problema</strong>, selecciona <em>Edificio → Laboratorio → Equipo</em>, elige si es <strong>hardware</strong> o <strong>software</strong>, completa la descripción y envía. Recibirás un ID de incidente.</p>"),
+    new FaqItem(2, "¿Qué campos son obligatorios al reportar?",
+      "<ul><li>Edificio, Laboratorio, Equipo</li><li>Tipo de falla (hardware/software)</li><li>Si software: tipo de software o nombre del programa + descripción del error</li><li>Si hardware: componente afectado (o especificar 'Otro')</li></ul>"),
+    new FaqItem(3, "¿Puedo calificar la atención?",
+      "<p>Sí — en <strong>Mis Reportes</strong> cuando el ticket está <em>Resuelto</em> verás el botón <strong>Calificar</strong>. Selecciona 1–5 estrellas y deja un comentario opcional.</p>"),
+    new FaqItem(4, "¿Qué hago si mi reporte no aparece en 'Mis Reportes'?",
+      "<p>Intenta recargar la página. Si persiste, revisa la consola del navegador para errores y contacta a soporte con el ID del incidente.</p>")
+  };
+
+    private string searchTerm = "";
+    private int? openedFaq = null;
+    private string contactMessage = "";
+    private bool isSubmitting = false;
+    private string? contactError = null;
+    private bool contactSuccess = false;
+
+    private IEnumerable<FaqItem> FilteredFaqs =>
+      string.IsNullOrWhiteSpace(searchTerm)
+        ? faqs
+        : faqs.Where(f =>
+            (f.Question + " " + Regex.Replace(f.AnswerHtml, "<.*?>", ""))
+              .Contains(searchTerm, StringComparison.OrdinalIgnoreCase));
+
+    private void ToggleFaq(int id)
+    {
+        openedFaq = openedFaq == id ? null : id;
+    }
+
+    private void ClearSearch()
+    {
+        searchTerm = "";
+    }
+
+    private async Task SendContact()
+    {
+        // Reset states
+        contactError = null;
+        contactSuccess = false;
+
+        if (string.IsNullOrWhiteSpace(contactMessage))
+        {
+            contactError = "Por favor, escribe un mensaje antes de enviar.";
+            return;
+        }
+
+        if (contactMessage.Length < 10)
+        {
+            contactError = "El mensaje debe tener al menos 10 caracteres.";
+            return;
+        }
+
+        if (contactMessage.Length > 1000)
+        {
+            contactError = "El mensaje no puede exceder 1000 caracteres.";
+            return;
+        }
+
+        isSubmitting = true;
+
+        try
+        {
+            // TODO: Replace with actual API call
+            // var response = await HttpClient.PostAsJsonAsync("/api/contact", new { message = contactMessage });
+            // if (!response.IsSuccessStatusCode) throw new Exception("Error al enviar");
+
+            // Simulation: Remove when API is implemented
+            await Task.Delay(1000);
+
+            contactSuccess = true;
+            contactMessage = "";
+
+            // Clear success message after 5 seconds
+            _ = Task.Run(async () =>
+            {
+                await Task.Delay(5000);
+                contactSuccess = false;
+                await InvokeAsync(StateHasChanged);
+            });
+        }
+        catch (Exception ex)
+        {
+            contactError = "Error al enviar el mensaje. Intenta más tarde.";
+            Console.Error.WriteLine($"Contact error: {ex.Message}");
+        }
+        finally
+        {
+            isSubmitting = false;
+        }
+    }
+
+    private void ClearContact()
+    {
+        contactMessage = "";
+        contactError = null;
+        contactSuccess = false;
+    }
+
+    private void GoTo(string uri)
+    {
+        Navigation.NavigateTo(uri, forceLoad: false);
+    }
+}
+
+<style>
+    /* PAGE LAYOUT */
+    .page-content-grid {
+        max-width: 1300px;
+        margin: 0 auto;
+        display: grid;
+        grid-template-columns: 1fr 320px;
+        gap: 24px;
+        padding: 0 16px;
+    }
+
+    /* MAIN CONTENT */
+    .main-column {
+        grid-column: 1;
+        display: flex;
+        flex-direction: column;
+        gap: 18px;
+    }
+
+    /* TILES */
+    .tiles-container {
+        display: flex;
+        gap: 12px;
+        flex-wrap: wrap;
+    }
+
+    .tile {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 12px 14px;
+        border-radius: 10px;
+        background: white;
+        border: 1px solid var(--border);
+        cursor: pointer;
+        min-width: 140px;
+        transition: all 0.2s ease;
+        font-size: 14px;
+    }
+
+        .tile:hover {
+            border-color: var(--color-primary);
+            background: rgba(var(--color-primary-rgb), 0.05);
+            transform: translateY(-2px);
+        }
+
+    .tile-icon {
+        width: 40px;
+        height: 40px;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: #f1f5f9;
+    }
+
+    .tile-text {
+        font-weight: 600;
+    }
+
+    /* SEARCH */
+    .search-container {
+        display: flex;
+        gap: 8px;
+        align-items: center;
+    }
+
+    .search-input {
+        flex: 1;
+        padding: 10px 12px;
+        border-radius: 8px;
+        border: 1px solid var(--border);
+        font-size: 14px;
+        transition: border-color 0.2s;
+    }
+
+        .search-input:focus {
+            outline: none;
+            border-color: var(--color-primary);
+            box-shadow: 0 0 0 3px rgba(var(--color-primary-rgb), 0.1);
+        }
+
+    /* SECTIONS */
+    .card {
+        background: white;
+        border-radius: 10px;
+        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
+        padding: 18px;
+    }
+
+    .faq-section h2,
+    .guides-section h2,
+    .recommendations-section h2 {
+        margin-top: 0;
+        margin-bottom: 16px;
+        color: var(--text-primary);
+    }
+
+    /* ACCORDION */
+    .accordion {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .accordion-item {
+        border-top: 1px solid rgba(0, 0, 0, 0.04);
+        padding: 12px 0;
+    }
+
+        .accordion-item:first-child {
+            border-top: none;
+            padding-top: 0;
+        }
+
+    .accordion-header {
+        width: 100%;
+        background: none;
+        border: none;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 8px 0;
+        cursor: pointer;
+        font-size: 15px;
+        color: var(--text-primary);
+        transition: color 0.2s;
+    }
+
+        .accordion-header:hover {
+            color: var(--color-primary);
+        }
+
+    .accordion-icon {
+        font-size: 20px;
+        flex-shrink: 0;
+    }
+
+    .accordion-body {
+        padding: 12px 0 0 0;
+        color: var(--text-gray);
+        font-size: 14px;
+        line-height: 1.6;
+    }
+
+        .accordion-body ul,
+        .accordion-body ol {
+            margin: 8px 0;
+            padding-left: 20px;
+        }
+
+        .accordion-body li {
+            margin: 4px 0;
+        }
+
+        .accordion-body code {
+            background: #f1f5f9;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: monospace;
+            font-size: 13px;
+        }
+
+    /* GUIDES */
+    .guides-section article {
+        margin-bottom: 18px;
+    }
+
+    .guides-section h3 {
+        margin-top: 16px;
+        margin-bottom: 8px;
+        font-size: 15px;
+        color: var(--text-primary);
+    }
+
+    .guides-section p {
+        margin: 8px 0;
+        color: var(--text-gray);
+        font-size: 14px;
+        line-height: 1.6;
+    }
+
+    /* RECOMMENDATIONS */
+    .recommendations-section ul {
+        padding-left: 20px;
+    }
+
+    .recommendations-section li {
+        margin: 8px 0;
+        color: var(--text-gray);
+        font-size: 14px;
+        line-height: 1.6;
+    }
+
+    .recommendations-section strong {
+        color: var(--text-primary);
+    }
+
+    /* EMPTY STATE */
+    .empty-state {
+        color: var(--text-gray);
+        padding: 20px 0;
+        text-align: center;
+        font-size: 14px;
+    }
+
+    /* SIDEBAR */
+    .sidebar {
+        grid-column: 2;
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+        position: sticky;
+        top: 24px;
+        align-self: start;
+    }
+
+    .shortcuts-card h3,
+    .contact-card h3,
+    .tip-card h3 {
+        margin-top: 0;
+        margin-bottom: 12px;
+        font-size: 15px;
+    }
+
+    .shortcuts-card ul {
+        padding-left: 18px;
+        margin: 0;
+    }
+
+    .shortcuts-card li {
+        margin: 8px 0;
+    }
+
+    .link {
+        color: var(--color-primary);
+        cursor: pointer;
+        text-decoration: none;
+        transition: text-decoration 0.2s;
+        font-size: 14px;
+    }
+
+        .link:hover {
+            text-decoration: underline;
+        }
+
+    /* CONTACT SECTION */
+    .contact-card p {
+        color: var(--text-gray);
+        margin-bottom: 12px;
+        font-size: 13px;
+    }
+
+    .contact-textarea {
+        width: 100%;
+        padding: 10px;
+        border-radius: 8px;
+        border: 1px solid var(--border);
+        font-family: inherit;
+        font-size: 13px;
+        resize: vertical;
+        margin-bottom: 12px;
+        transition: border-color 0.2s;
+    }
+
+        .contact-textarea:focus {
+            outline: none;
+            border-color: var(--color-primary);
+        }
+
+        .contact-textarea:disabled {
+            background: #f5f5f5;
+            cursor: not-allowed;
+        }
+
+    .error-message,
+    .success-message {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 10px 12px;
+        border-radius: 6px;
+        margin-bottom: 12px;
+        font-size: 13px;
+    }
+
+    .error-message {
+        background: #fee;
+        color: #c33;
+        border: 1px solid #fcc;
+    }
+
+    .success-message {
+        background: #efe;
+        color: #3c3;
+        border: 1px solid #cfc;
+    }
+
+        .error-message .material-icons,
+        .success-message .material-icons {
+            font-size: 18px;
+            flex-shrink: 0;
+        }
+
+    .button-group {
+        display: flex;
+        gap: 8px;
+        justify-content: flex-end;
+    }
+
+    /* BUTTONS */
+    .btn {
+        padding: 8px 14px;
+        border-radius: 8px;
+        border: none;
+        cursor: pointer;
+        font-size: 13px;
+        font-weight: 600;
+        transition: all 0.2s;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        white-space: nowrap;
+    }
+
+    .btn-primary {
+        background: var(--color-primary);
+        color: white;
+    }
+
+        .btn-primary:hover:not(:disabled) {
+            opacity: 0.9;
+            transform: translateY(-1px);
+        }
+
+    .btn-secondary {
+        background: transparent;
+        border: 1px solid var(--border);
+        color: var(--text-primary);
+    }
+
+        .btn-secondary:hover:not(:disabled) {
+            background: #f9f9f9;
+            border-color: var(--text-primary);
+        }
+
+    .btn:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+    }
+
+    .btn .material-icons {
+        font-size: 16px;
+    }
+
+    .spinner {
+        animation: spin 1s linear infinite;
+    }
+
+  
+
+    /* ICONS */
+    .icon-large {
+        font-size: 48px;
+        color: var(--color-primary);
+        margin-bottom: 8px;
+        display: block;
+    }
+
+    .tile .material-icons,
+    .tile-icon .material-icons {
+        font-size: 20px;
+        color: var(--color-primary);
+    }
+
+    /* RESPONSIVE */
+ 
+</style>

@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("GestionIncidentes.Application")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+63119f2cc691cc770c8f55f0346cead95b26a376")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+e24cacedde1969ced076e8d5414eb640d5f878f8")]
 [assembly: System.Reflection.AssemblyProductAttribute("GestionIncidentes.Application")]
 [assembly: System.Reflection.AssemblyTitleAttribute("GestionIncidentes.Application")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
