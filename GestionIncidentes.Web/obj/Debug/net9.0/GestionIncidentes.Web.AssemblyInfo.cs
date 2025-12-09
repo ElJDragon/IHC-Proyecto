@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("GestionIncidentes.Web")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+f8ed03f388fe37c0eb673d3990bca721b3e448f3")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+d4272d43bf8de8d8504478b1905358f07b5370ea")]
 [assembly: System.Reflection.AssemblyProductAttribute("GestionIncidentes.Web")]
 [assembly: System.Reflection.AssemblyTitleAttribute("GestionIncidentes.Web")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
