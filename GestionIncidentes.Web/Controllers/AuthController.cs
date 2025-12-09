@@ -1,9 +1,12 @@
-using Microsoft.AspNetCore.Mvc;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+using System.Text;
+using GestionIncidentes.Application.Features.Auth.Commands;
+using MediatR;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
-using System.Security.Claims;
-using MediatR;
-using GestionIncidentes.Application.Features.Auth.Commands;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.IdentityModel.Tokens;
 
 namespace GestionIncidentes.Web.Controllers;
 
@@ -71,9 +74,20 @@ public class AuthController : ControllerBase
         _logger.LogInformation("[AuthController] Login - Cookie creada exitosamente, expira en 8 horas");
         _logger.LogInformation($"[AuthController] Login - URL de redireccion: {GetRedirectUrl(result.Role!)}");
         _logger.LogInformation("=== [AuthController] Login POST - FIN EXITOSO ===");
+        var key = Encoding.ASCII.GetBytes("EstaClaveTieneExactamente32Bytes!!"); // misma que en Program.cs
+        var tokenDescriptor = new SecurityTokenDescriptor
+        {
+            Subject = new ClaimsIdentity(claims),
+            Expires = DateTime.UtcNow.AddHours(8),
+            SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
+        };
 
+        var tokenHandler = new JwtSecurityTokenHandler();
+        var token = tokenHandler.CreateToken(tokenDescriptor);
+        var tokenString = tokenHandler.WriteToken(token);
         return Ok(new
         {
+            token = tokenString,
             success = true,
             userId = result.UserId,
             userName = result.UserName,

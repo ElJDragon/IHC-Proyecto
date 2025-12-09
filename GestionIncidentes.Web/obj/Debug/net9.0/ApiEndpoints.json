@@ -1,0 +1,798 @@
+[
+  {
+    "ContainingType": "GestionIncidentes.Web.Controllers.DepartmentsController",
+    "Method": "Create",
+    "RelativePath": "api/admin/departments",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "department",
+        "Type": "GestionIncidentes.Domain.Entities.Department",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "GestionIncidentes.Web.Controllers.DepartmentsController",
+    "Method": "List",
+    "RelativePath": "api/admin/departments",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "GestionIncidentes.Web.Controllers.DepartmentsController",
+    "Method": "Get",
+    "RelativePath": "api/admin/departments/{id}",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Guid",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "GestionIncidentes.Web.Controllers.DepartmentsController",
+    "Method": "Update",
+    "RelativePath": "api/admin/departments/{id}",
+    "HttpMethod": "PUT",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Guid",
+        "IsRequired": true
+      },
+      {
+        "Name": "dto",
+        "Type": "GestionIncidentes.Web.Controllers.DepartmentsController\u002BUpdateDepartmentDto",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "GestionIncidentes.Web.Controllers.DepartmentsController",
+    "Method": "Delete",
+    "RelativePath": "api/admin/departments/{id}",
+    "HttpMethod": "DELETE",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Guid",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "GestionIncidentes.Web.Controllers.RolesController",
+    "Method": "List",
+    "RelativePath": "api/admin/roles",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "GestionIncidentes.Web.Controllers.RolesController",
+    "Method": "Create",
+    "RelativePath": "api/admin/roles",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "dto",
+        "Type": "GestionIncidentes.Web.Controllers.RolesController\u002BCreateRoleDto",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "GestionIncidentes.Web.Controllers.AdminTicketsController",
+    "Method": "CreateIncident",
+    "RelativePath": "api/admin/tickets",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "dto",
+        "Type": "GestionIncidentes.Application.Models.CreateAdminTicketDto",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "GestionIncidentes.Web.Controllers.AdminTicketsController",
+    "Method": "ListTickets",
+    "RelativePath": "api/admin/tickets",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "technician",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "status",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "priority",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "search",
+        "Type": "System.String",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "GestionIncidentes.Web.Controllers.TicketsController",
+    "Method": "Create",
+    "RelativePath": "api/admin/tickets",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "dto",
+        "Type": "GestionIncidentes.Application.Models.CreateTicketDto",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "GestionIncidentes.Web.Controllers.TicketsController",
+    "Method": "List",
+    "RelativePath": "api/admin/tickets",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "GestionIncidentes.Web.Controllers.AdminTicketsController",
+    "Method": "GetTicket",
+    "RelativePath": "api/admin/tickets/{id}",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Guid",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "GestionIncidentes.Web.Controllers.AdminTicketsController",
+    "Method": "UpdateTicket",
+    "RelativePath": "api/admin/tickets/{id}",
+    "HttpMethod": "PUT",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Guid",
+        "IsRequired": true
+      },
+      {
+        "Name": "dto",
+        "Type": "GestionIncidentes.Application.Models.UpdateTicketDto",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "GestionIncidentes.Web.Controllers.AdminTicketsController",
+    "Method": "DeleteTicket",
+    "RelativePath": "api/admin/tickets/{id}",
+    "HttpMethod": "DELETE",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Guid",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "GestionIncidentes.Web.Controllers.TicketsController",
+    "Method": "Get",
+    "RelativePath": "api/admin/tickets/{id}",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Guid",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "GestionIncidentes.Web.Controllers.TicketsController",
+    "Method": "Update",
+    "RelativePath": "api/admin/tickets/{id}",
+    "HttpMethod": "PUT",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Guid",
+        "IsRequired": true
+      },
+      {
+        "Name": "dto",
+        "Type": "GestionIncidentes.Web.Controllers.TicketsController\u002BUpdateTicketDto",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "GestionIncidentes.Web.Controllers.TicketsController",
+    "Method": "Delete",
+    "RelativePath": "api/admin/tickets/{id}",
+    "HttpMethod": "DELETE",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Guid",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "GestionIncidentes.Web.Controllers.AdminTicketsController",
+    "Method": "GetDashboardStats",
+    "RelativePath": "api/admin/tickets/stats/dashboard",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "GestionIncidentes.Web.Controllers.TicketsController",
+    "Method": "ListByUser",
+    "RelativePath": "api/admin/tickets/user/{userId}",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "userId",
+        "Type": "System.Guid",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "GestionIncidentes.Web.Controllers.UsersController",
+    "Method": "Create",
+    "RelativePath": "api/admin/users",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "dto",
+        "Type": "GestionIncidentes.Application.Models.CreateUserDto",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "GestionIncidentes.Web.Controllers.UsersController",
+    "Method": "List",
+    "RelativePath": "api/admin/users",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "GestionIncidentes.Web.Controllers.UsersController",
+    "Method": "Get",
+    "RelativePath": "api/admin/users/{id}",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Guid",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "GestionIncidentes.Web.Controllers.UsersController",
+    "Method": "Update",
+    "RelativePath": "api/admin/users/{id}",
+    "HttpMethod": "PUT",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Guid",
+        "IsRequired": true
+      },
+      {
+        "Name": "dto",
+        "Type": "GestionIncidentes.Application.Models.UpdateUserDto",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "GestionIncidentes.Web.Controllers.UsersController",
+    "Method": "Delete",
+    "RelativePath": "api/admin/users/{id}",
+    "HttpMethod": "DELETE",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Guid",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "GestionIncidentes.Web.Controllers.UsersController",
+    "Method": "ListByDepartment",
+    "RelativePath": "api/admin/users/department/{deptId}",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "deptId",
+        "Type": "System.Guid",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "GestionIncidentes.Web.Controllers.AuthController",
+    "Method": "CheckAuth",
+    "RelativePath": "api/Auth/check",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "GestionIncidentes.Web.Controllers.AuthController",
+    "Method": "Login",
+    "RelativePath": "api/Auth/login",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "loginRequest",
+        "Type": "GestionIncidentes.Web.Controllers.LoginRequest",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "GestionIncidentes.Web.Controllers.AuthController",
+    "Method": "Logout",
+    "RelativePath": "api/Auth/logout",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "GestionIncidentes.Web.Controllers.IncidentsController",
+    "Method": "ReportIncident",
+    "RelativePath": "api/Incidents",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "dto",
+        "Type": "GestionIncidentes.Application.Features.Incidents.Dtos.ReportIncidentDto",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "GestionIncidentes.Web.Controllers.IncidentsController",
+    "Method": "ListIncidents",
+    "RelativePath": "api/Incidents",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "GestionIncidentes.Web.Controllers.IncidentsController",
+    "Method": "GetIncidentDetails",
+    "RelativePath": "api/Incidents/{id}",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Guid",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "GestionIncidentes.Web.Controllers.KnowledgeController",
+    "Method": "CreateKnowledgeEntry",
+    "RelativePath": "api/Knowledge/entries",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "request",
+        "Type": "GestionIncidentes.Web.Controllers.CreateKnowledgeEntryRequest",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": [
+      {
+        "Type": "System.Guid",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
+  },
+  {
+    "ContainingType": "GestionIncidentes.Web.Controllers.KnowledgeController",
+    "Method": "SearchKnowledgeEntries",
+    "RelativePath": "api/Knowledge/entries/search",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "searchTerm",
+        "Type": "System.String",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": [
+      {
+        "Type": "System.Collections.Generic.List\u00601[[GestionIncidentes.Application.Features.Knowledge.KnowledgeEntryDto, GestionIncidentes.Application, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
+  },
+  {
+    "ContainingType": "GestionIncidentes.Web.Controllers.KnowledgeController",
+    "Method": "GetNotifications",
+    "RelativePath": "api/Knowledge/notifications",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": [
+      {
+        "Type": "System.Collections.Generic.List\u00601[[GestionIncidentes.Application.Features.Notifications.NotificationDto, GestionIncidentes.Application, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
+  },
+  {
+    "ContainingType": "GestionIncidentes.Web.Controllers.KnowledgeController",
+    "Method": "MarkNotificationAsRead",
+    "RelativePath": "api/Knowledge/notifications/{notificationId}/read",
+    "HttpMethod": "PUT",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "notificationId",
+        "Type": "System.Guid",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "GestionIncidentes.Web.Controllers.KnowledgeController",
+    "Method": "GenerateTicketReport",
+    "RelativePath": "api/Knowledge/reports",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "request",
+        "Type": "GestionIncidentes.Web.Controllers.GenerateTicketReportRequest",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": [
+      {
+        "Type": "System.Guid",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
+  },
+  {
+    "ContainingType": "GestionIncidentes.Web.Controllers.StudentReportsController",
+    "Method": "CreateReport",
+    "RelativePath": "api/student/reports",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "dto",
+        "Type": "GestionIncidentes.Application.Models.CreateStudentReportDto",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "GestionIncidentes.Web.Controllers.StudentReportsController",
+    "Method": "GetReport",
+    "RelativePath": "api/student/reports/{id}",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Guid",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "GestionIncidentes.Web.Controllers.StudentReportsController",
+    "Method": "RateTicket",
+    "RelativePath": "api/student/reports/{id}/rate",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Guid",
+        "IsRequired": true
+      },
+      {
+        "Name": "dto",
+        "Type": "GestionIncidentes.Web.Controllers.RateTicketDto",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "GestionIncidentes.Web.Controllers.StudentReportsController",
+    "Method": "GetMyReports",
+    "RelativePath": "api/student/reports/my-reports",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "GestionIncidentes.Web.Controllers.StudentReportsController",
+    "Method": "GetMyStats",
+    "RelativePath": "api/student/reports/stats",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "GestionIncidentes.Web.Controllers.TechnicianTicketsController",
+    "Method": "GetTicket",
+    "RelativePath": "api/technician/tickets/{id}",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Guid",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "GestionIncidentes.Web.Controllers.TechnicianTicketsController",
+    "Method": "CloseTicket",
+    "RelativePath": "api/technician/tickets/{id}/close",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Guid",
+        "IsRequired": true
+      },
+      {
+        "Name": "dto",
+        "Type": "GestionIncidentes.Application.Models.CloseTicketDto",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "GestionIncidentes.Web.Controllers.TechnicianTicketsController",
+    "Method": "UpdateNotes",
+    "RelativePath": "api/technician/tickets/{id}/notes",
+    "HttpMethod": "PATCH",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Guid",
+        "IsRequired": true
+      },
+      {
+        "Name": "dto",
+        "Type": "GestionIncidentes.Web.Controllers.UpdateNotesDto",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "GestionIncidentes.Web.Controllers.TechnicianTicketsController",
+    "Method": "ReassignTicket",
+    "RelativePath": "api/technician/tickets/{id}/reassign",
+    "HttpMethod": "PATCH",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Guid",
+        "IsRequired": true
+      },
+      {
+        "Name": "dto",
+        "Type": "GestionIncidentes.Web.Controllers.ReassignTicketDto",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "GestionIncidentes.Web.Controllers.TechnicianTicketsController",
+    "Method": "ChangeStatus",
+    "RelativePath": "api/technician/tickets/{id}/status",
+    "HttpMethod": "PATCH",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Guid",
+        "IsRequired": true
+      },
+      {
+        "Name": "dto",
+        "Type": "GestionIncidentes.Application.Models.ChangeTicketStatusDto",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "GestionIncidentes.Web.Controllers.TechnicianTicketsController",
+    "Method": "GetMyTickets",
+    "RelativePath": "api/technician/tickets/my-tickets/{id}",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Guid",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "GestionIncidentes.Web.Controllers.TechnicianTicketsController",
+    "Method": "GetMyStats",
+    "RelativePath": "api/technician/tickets/stats",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  }
+]

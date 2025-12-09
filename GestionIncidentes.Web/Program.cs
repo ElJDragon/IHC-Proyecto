@@ -74,7 +74,7 @@ builder.Services.AddRazorPages();
 builder.Services.AddCascadingAuthenticationState();
 
 // ✅ Custom Authentication State Provider
-builder.Services.AddScoped<Microsoft.AspNetCore.Components.Authorization.AuthenticationStateProvider, 
+builder.Services.AddScoped<Microsoft.AspNetCore.Components.Authorization.AuthenticationStateProvider,
     GestionIncidentes.Web.Auth.CustomAuthenticationStateProvider>();
 
 // Agregar soporte para sesión
@@ -98,12 +98,13 @@ builder.Services.AddCors(options =>
         .AllowAnyOrigin());
 });
 
-// ✅ Cookie Authentication para Blazor (Admin, Tecnico, Usuario)
+// -------------------- Autenticación combinada JWT + Cookies --------------------
+var jwtKey = Encoding.ASCII.GetBytes("EstaClaveTieneExactamente32Bytes!!");
+
 builder.Services.AddAuthentication(options =>
 {
-    options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
-    options.DefaultAuthenticateScheme = CookieAuthenticationDefaults.AuthenticationScheme;
-    options.DefaultChallengeScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+    // Usamos PolicyScheme para elegir automáticamente el esquema
+    options.DefaultScheme = "SmartScheme";
 })
 .AddCookie(CookieAuthenticationDefaults.AuthenticationScheme, options =>
 {
@@ -117,32 +118,42 @@ builder.Services.AddAuthentication(options =>
     options.Cookie.SecurePolicy = CookieSecurePolicy.SameAsRequest;
     options.Cookie.SameSite = SameSiteMode.Strict;
 })
-// JWT para API endpoints
 .AddJwtBearer(JwtBearerDefaults.AuthenticationScheme, options =>
 {
-    var key = Encoding.ASCII.GetBytes("EstaClaveTieneExactamente32Bytes!!");
-    options.RequireHttpsMetadata = false;
+    options.RequireHttpsMetadata = false; // true en producción
     options.SaveToken = true;
     options.TokenValidationParameters = new TokenValidationParameters
     {
         ValidateIssuerSigningKey = true,
-        IssuerSigningKey = new SymmetricSecurityKey(key),
+        IssuerSigningKey = new SymmetricSecurityKey(jwtKey),
         ValidateIssuer = false,
         ValidateAudience = false,
         RoleClaimType = ClaimTypes.Role
+    };
+})
+.AddPolicyScheme("SmartScheme", "JWT or Cookie", options =>
+{
+    // Detecta automáticamente si la request trae JWT o Cookie
+    options.ForwardDefaultSelector = context =>
+    {
+        string authHeader = context.Request.Headers["Authorization"];
+        if (!string.IsNullOrEmpty(authHeader) && authHeader.StartsWith("Bearer "))
+        {
+            return JwtBearerDefaults.AuthenticationScheme;
+        }
+        return CookieAuthenticationDefaults.AuthenticationScheme;
     };
 });
 
 builder.Services.AddAuthorization();
 
-// MediatR - Registrar todos los assemblies con handlers y event handlers
+// -------------------- MediatR --------------------
 builder.Services.AddMediatR(cfg =>
 {
     cfg.RegisterServicesFromAssemblies(
-        typeof(ListUsersQueryHandler).Assembly,  // Application assembly
+        typeof(ListUsersQueryHandler).Assembly,
         typeof(CreateUserCommandHandler).Assembly
     );
-    // Registrar behaviors
     cfg.AddOpenBehavior(typeof(GestionIncidentes.Application.Behaviors.AuditBehavior<,>));
 });
 
@@ -154,16 +165,12 @@ var connectionString = builder.Configuration.GetConnectionString("DefaultConnect
 builder.Services.AddDbContext<GestionIncidentesDbContext>(options =>
     options.UseNpgsql(connectionString));
 
-// -------------------- Repositorios EF Core --------------------
+// -------------------- Repositorios --------------------
 builder.Services.AddScoped<IUserRepository, EfUserRepository>();
 builder.Services.AddScoped<IRoleRepository, EfRoleRepository>();
 builder.Services.AddScoped<IDepartmentRepository, EfDepartmentRepository>();
 builder.Services.AddScoped<ITicketRepository, EfTicketRepository>();
-
-// ✅ Repositorio Integrante A
 builder.Services.AddScoped<IIncidentRepository, IncidentRepository>();
-
-// ✅ Nuevos repositorios para Integración C
 builder.Services.AddScoped<IKnowledgeRepository, KnowledgeRepository>();
 builder.Services.AddScoped<ISolutionStepRepository, SolutionStepRepository>();
 builder.Services.AddScoped<INotificationRepository, NotificationRepository>();
@@ -176,10 +183,8 @@ builder.Services.AddScoped<NotificationService>();
 builder.Services.AddScoped<ReportFormatter>();
 builder.Services.AddScoped<GestionIncidentes.Web.Services.AuthService>();
 
-// ✅ HttpClient para llamadas internas (login, etc.)
 builder.Services.AddHttpClient();
 
-// ✅ Servicios HTTP para comunicación Frontend-Backend
 builder.Services.AddHttpClient<GestionIncidentes.Web.Services.AdminTicketService>(client =>
 {
     client.BaseAddress = new Uri("http://localhost:5238");
@@ -195,22 +200,16 @@ builder.Services.AddHttpClient<GestionIncidentes.Web.Services.StudentReportServi
 
 // Usuario actual
 builder.Services.AddHttpContextAccessor();
-
-// Registrar BlazorCurrentUser directamente
 builder.Services.AddScoped<GestionIncidentes.Web.Services.BlazorCurrentUser>();
-
-// Usar HttpContextCurrentUser para APIs y BlazorCurrentUser para componentes Blazor
 builder.Services.AddScoped<ICurrentUser>(sp =>
 {
     var httpContextAccessor = sp.GetRequiredService<IHttpContextAccessor>();
     if (httpContextAccessor.HttpContext != null)
     {
-        // Si hay HttpContext disponible (API/Razor Pages), usar HttpContextCurrentUser
         return new HttpContextCurrentUser(httpContextAccessor);
     }
     else
     {
-        // Si no hay HttpContext (componentes Blazor), usar BlazorCurrentUser
         var authStateProvider = sp.GetRequiredService<Microsoft.AspNetCore.Components.Authorization.AuthenticationStateProvider>();
         return new GestionIncidentes.Web.Services.BlazorCurrentUser(authStateProvider, httpContextAccessor);
     }
@@ -225,7 +224,7 @@ builder.Services.AddAuthorization(options =>
     options.AddPolicy("AdminLevel", policy => policy.Requirements.Add(new RoleLevelRequirement(50)));
 });
 
-// -------------------- HttpClient para Razor Pages --------------------
+// HttpClient para Razor Pages
 builder.Services.AddHttpClient("ApiClient", client =>
 {
     client.BaseAddress = new Uri(builder.Configuration["ApiBaseUrl"] ?? "https://localhost:7287/");
@@ -237,14 +236,10 @@ builder.Services.AddHttpClient();
 var app = builder.Build();
 
 // Aplicar migraciones y seed de datos automáticamente al iniciar
-// COMENTADO: Usa el script SQL en lugar de migraciones automáticas
-
 using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<GestionIncidentesDbContext>();
     await db.Database.MigrateAsync();
-    
-    // Seed de datos de prueba
     await GestionIncidentes.Infrastructure.Data.DbSeeder.SeedAsync(db);
 }
 
@@ -262,52 +257,20 @@ else
 }
 
 app.UseHttpsRedirection();
-
-// Middleware personalizado para redirigir a archivos HTML estáticos
-app.Use(async (context, next) =>
-{
-    var path = context.Request.Path.Value;
-    
-    // Si la ruta termina sin extensión y existe un archivo .html correspondiente
-    if (!string.IsNullOrEmpty(path) && !path.Contains('.'))
-    {
-        var htmlPath = $"{path}.html";
-        var filePath = Path.Combine(app.Environment.WebRootPath, htmlPath.TrimStart('/'));
-        
-        if (File.Exists(filePath))
-        {
-            context.Request.Path = htmlPath;
-        }
-    }
-    
-    await next();
-});
-
 app.UseStaticFiles();
-app.UseDefaultFiles(new DefaultFilesOptions
-{
-    DefaultFileNames = new List<string> { "index.html", "default.html" }
-});
-
 app.UseRouting();
 app.UseCors();
-
-// Habilitar sesión antes de auth
 app.UseSession();
 
 app.UseAuthentication();
 app.UseAuthorization();
-
-// ✅ Anti-forgery para Blazor
 app.UseAntiforgery();
 
-// Map controllers
+// Map controllers y Razor Pages
 app.MapControllers();
-
-// Map Razor Pages
 app.MapRazorPages();
 
-// ✅ Map Blazor Components
+// Map Blazor Components
 app.MapRazorComponents<GestionIncidentes.Web.Components.App>()
     .AddInteractiveServerRenderMode();
 
