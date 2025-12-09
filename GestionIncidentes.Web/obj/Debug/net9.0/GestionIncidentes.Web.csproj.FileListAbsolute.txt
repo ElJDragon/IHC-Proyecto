@@ -231,3 +231,4 @@ C:\Users\User\Documents\Joshua Universidad\Quinto\IHC\ProyectoIHC\IHC-Proyecto\G
 C:\Users\User\Documents\Joshua Universidad\Quinto\IHC\ProyectoIHC\IHC-Proyecto\GestionIncidentes.Web\obj\Debug\net9.0\GestionIncidentes.Web.pdb
 C:\Users\User\Documents\Joshua Universidad\Quinto\IHC\ProyectoIHC\IHC-Proyecto\GestionIncidentes.Web\obj\Debug\net9.0\GestionIncidentes.Web.genruntimeconfig.cache
 C:\Users\User\Documents\Joshua Universidad\Quinto\IHC\ProyectoIHC\IHC-Proyecto\GestionIncidentes.Web\obj\Debug\net9.0\ref\GestionIncidentes.Web.dll
+C:\Users\User\Documents\Joshua Universidad\Quinto\IHC\ProyectoIHC\IHC-Proyecto\GestionIncidentes.Web\obj\Debug\net9.0\compressed\uomm8d0a2q-rh2mkp8uc3.gz
