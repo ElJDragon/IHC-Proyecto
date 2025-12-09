@@ -162,7 +162,6 @@ C:\Users\User\Documents\Joshua Universidad\Quinto\IHC\ProyectoIHC\IHC-Proyecto\G
 C:\Users\User\Documents\Joshua Universidad\Quinto\IHC\ProyectoIHC\IHC-Proyecto\GestionIncidentes.Web\obj\Debug\net9.0\scopedcss\Components\Layout\NavMenu.razor.rz.scp.css
 C:\Users\User\Documents\Joshua Universidad\Quinto\IHC\ProyectoIHC\IHC-Proyecto\GestionIncidentes.Web\obj\Debug\net9.0\scopedcss\bundle\GestionIncidentes.Web.styles.css
 C:\Users\User\Documents\Joshua Universidad\Quinto\IHC\ProyectoIHC\IHC-Proyecto\GestionIncidentes.Web\obj\Debug\net9.0\scopedcss\projectbundle\GestionIncidentes.Web.bundle.scp.css
-C:\Users\User\Documents\Joshua Universidad\Quinto\IHC\ProyectoIHC\IHC-Proyecto\GestionIncidentes.Web\obj\Debug\net9.0\compressed\hipt28c79b-x4v9t6vssy.gz
 C:\Users\User\Documents\Joshua Universidad\Quinto\IHC\ProyectoIHC\IHC-Proyecto\GestionIncidentes.Web\obj\Debug\net9.0\compressed\9uqx7yhk8r-gsnicxdsaj.gz
 C:\Users\User\Documents\Joshua Universidad\Quinto\IHC\ProyectoIHC\IHC-Proyecto\GestionIncidentes.Web\obj\Debug\net9.0\compressed\r89kps0p7z-gwlvr8nbdc.gz
 C:\Users\User\Documents\Joshua Universidad\Quinto\IHC\ProyectoIHC\IHC-Proyecto\GestionIncidentes.Web\obj\Debug\net9.0\compressed\u4m6xdq29d-bblitkq32h.gz
@@ -175,9 +174,6 @@ C:\Users\User\Documents\Joshua Universidad\Quinto\IHC\ProyectoIHC\IHC-Proyecto\G
 C:\Users\User\Documents\Joshua Universidad\Quinto\IHC\ProyectoIHC\IHC-Proyecto\GestionIncidentes.Web\obj\Debug\net9.0\compressed\pdh8hr1sws-shhxdz5lpi.gz
 C:\Users\User\Documents\Joshua Universidad\Quinto\IHC\ProyectoIHC\IHC-Proyecto\GestionIncidentes.Web\obj\Debug\net9.0\compressed\3sgmg4nmch-jpd0xwbo4u.gz
 C:\Users\User\Documents\Joshua Universidad\Quinto\IHC\ProyectoIHC\IHC-Proyecto\GestionIncidentes.Web\obj\Debug\net9.0\compressed\w35lvbd57n-hc7ynjw99z.gz
-C:\Users\User\Documents\Joshua Universidad\Quinto\IHC\ProyectoIHC\IHC-Proyecto\GestionIncidentes.Web\obj\Debug\net9.0\compressed\j5dd5ipnj3-fnbpwqskk7.gz
-C:\Users\User\Documents\Joshua Universidad\Quinto\IHC\ProyectoIHC\IHC-Proyecto\GestionIncidentes.Web\obj\Debug\net9.0\compressed\erwb3cdu28-08xuo7obvq.gz
-C:\Users\User\Documents\Joshua Universidad\Quinto\IHC\ProyectoIHC\IHC-Proyecto\GestionIncidentes.Web\obj\Debug\net9.0\compressed\277sc8in4x-8qp0xscdvl.gz
 C:\Users\User\Documents\Joshua Universidad\Quinto\IHC\ProyectoIHC\IHC-Proyecto\GestionIncidentes.Web\obj\Debug\net9.0\compressed\32gfuo6k4p-t1cqhe9u97.gz
 C:\Users\User\Documents\Joshua Universidad\Quinto\IHC\ProyectoIHC\IHC-Proyecto\GestionIncidentes.Web\obj\Debug\net9.0\compressed\a4y68n25fh-c2jlpeoesf.gz
 C:\Users\User\Documents\Joshua Universidad\Quinto\IHC\ProyectoIHC\IHC-Proyecto\GestionIncidentes.Web\obj\Debug\net9.0\compressed\58l9majmnm-sejl45xvog.gz
@@ -222,10 +218,7 @@ C:\Users\User\Documents\Joshua Universidad\Quinto\IHC\ProyectoIHC\IHC-Proyecto\G
 C:\Users\User\Documents\Joshua Universidad\Quinto\IHC\ProyectoIHC\IHC-Proyecto\GestionIncidentes.Web\obj\Debug\net9.0\compressed\e40ix3ipa8-h1s4sie4z3.gz
 C:\Users\User\Documents\Joshua Universidad\Quinto\IHC\ProyectoIHC\IHC-Proyecto\GestionIncidentes.Web\obj\Debug\net9.0\compressed\x4zsg8qqro-4d85u1mtcx.gz
 C:\Users\User\Documents\Joshua Universidad\Quinto\IHC\ProyectoIHC\IHC-Proyecto\GestionIncidentes.Web\obj\Debug\net9.0\compressed\6ophgeg6u5-0j3bgjxly4.gz
-C:\Users\User\Documents\Joshua Universidad\Quinto\IHC\ProyectoIHC\IHC-Proyecto\GestionIncidentes.Web\obj\Debug\net9.0\compressed\k44g8ik53k-xpgx5prmft.gz
-C:\Users\User\Documents\Joshua Universidad\Quinto\IHC\ProyectoIHC\IHC-Proyecto\GestionIncidentes.Web\obj\Debug\net9.0\compressed\459nm3jkec-cytrsbyzw2.gz
 C:\Users\User\Documents\Joshua Universidad\Quinto\IHC\ProyectoIHC\IHC-Proyecto\GestionIncidentes.Web\obj\Debug\net9.0\compressed\3g88k2aztx-06eyiqybrm.gz
-C:\Users\User\Documents\Joshua Universidad\Quinto\IHC\ProyectoIHC\IHC-Proyecto\GestionIncidentes.Web\obj\Debug\net9.0\compressed\69htto4yn7-dw7emenlp6.gz
 C:\Users\User\Documents\Joshua Universidad\Quinto\IHC\ProyectoIHC\IHC-Proyecto\GestionIncidentes.Web\obj\Debug\net9.0\compressed\dueby6eh7r-r9219xji5t.gz
 C:\Users\User\Documents\Joshua Universidad\Quinto\IHC\ProyectoIHC\IHC-Proyecto\GestionIncidentes.Web\obj\Debug\net9.0\compressed\983eehw8xf-r9219xji5t.gz
 C:\Users\User\Documents\Joshua Universidad\Quinto\IHC\ProyectoIHC\IHC-Proyecto\GestionIncidentes.Web\obj\Debug\net9.0\staticwebassets.build.json
