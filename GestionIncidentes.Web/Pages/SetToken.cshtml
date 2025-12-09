@@ -1,0 +1,25 @@
+﻿@page
+@model GestionIncidentes.Web.Pages.SetTokenModel
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8" />
+    <title>Iniciando sesión...</title>
+</head>
+<body>
+    <script>
+        const urlParams = new URLSearchParams(window.location.search);
+        const token = urlParams.get('jwt');
+        const userId = urlParams.get('userId');
+        const redirect = urlParams.get('redirect') || '/';
+
+        if (token && userId) {
+            sessionStorage.setItem('jwt', token);
+            sessionStorage.setItem('userId', userId);
+            window.location.href = redirect;
+        } else {
+            document.body.innerHTML = '<p>Error: no se recibió token o userId.</p>';
+        }
+    </script>
+</body>
+</html>

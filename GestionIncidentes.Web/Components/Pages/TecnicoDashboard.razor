@@ -1,6 +1,10 @@
 @page "/tecnico/dashboard"
 @layout TecnicoLayout
 @rendermode InteractiveServer
+@inject IJSRuntime JS
+@inject NavigationManager Navigation
+@inject HttpClient Http
+
 @inject GestionIncidentes.Web.Services.TechnicianTicketService TicketService
 @using GestionIncidentes.Application.Models
 
@@ -21,7 +25,7 @@
         </div>
         <div class="card">
             <div style="font-size: 14px; color: var(--color-text-secondary); margin-bottom: 0.25rem;">En Proceso</div>
-            <div style="font-size: 32px; font-weight: 600; color: #1976d2;">@myTickets.Count(t => t.Status == "En Progreso")</div>
+            <div style="font-size: 32px; font-weight: 600; color: #1976d2;">@myTickets.Count(t => t.Status == "Pendiente")</div>
             <div style="font-size: 12px; color: var(--color-text-tertiary); margin-top: 0.5rem;">Trabajando en ellos</div>
         </div>
         <div class="card">
@@ -83,17 +87,75 @@
     private List<TicketResponseDto> myTickets = new();
     private bool loading = true;
 
-    protected override async Task OnInitializedAsync()
+    // Ya no usamos OnInitializedAsync para llamadas que usan JSInterop
+    // protected override async Task OnInitializedAsync()
+    // {
+    //     await LoadTicketsAsync();
+    // }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        await LoadTicketsAsync();
+        if (firstRender)
+        {
+            // En este punto el navegador ya está conectado y JS interop funciona
+            await LoadTicketsAsync();
+            // asegurar que el UI se refresque si LoadTicketsAsync cambió el estado
+            await InvokeAsync(StateHasChanged);
+        }
     }
 
     private async Task LoadTicketsAsync()
     {
         loading = true;
+        string token = null;
+        string userId = null;
         try
         {
-            myTickets = await TicketService.GetMyTicketsAsync() ?? new List<TicketResponseDto>();
+            token = await JS.InvokeAsync<string>("sessionStorage.getItem", "jwt");
+            userId = await JS.InvokeAsync<string>("sessionStorage.getItem", "userId");
+        }
+        catch (JSException jsEx)
+        {
+            Console.WriteLine($"JS interop failed: {jsEx.Message}");
+        }
+
+        if (string.IsNullOrEmpty(token))
+        {
+            Navigation.NavigateTo("/login");
+            return;
+        }
+
+        try
+        {
+            Http.DefaultRequestHeaders.Authorization =
+                new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+
+            // Hacer la petición manualmente para poder inspeccionar la respuesta
+            var response = await Http.GetAsync($"http://localhost:5238/api/technician/tickets/my-tickets/{userId}");
+            var text = await response.Content.ReadAsStringAsync();
+
+            if (!response.IsSuccessStatusCode)
+            {
+                Console.WriteLine($"API error. Status: {(int)response.StatusCode} - {response.ReasonPhrase}");
+                Console.WriteLine($"Response body:\n{text}");
+                myTickets = new List<TicketResponseDto>();
+                return;
+            }
+
+            try
+            {
+                myTickets = System.Text.Json.JsonSerializer.Deserialize<List<TicketResponseDto>>(text,
+                    new System.Text.Json.JsonSerializerOptions { PropertyNameCaseInsensitive = true }) ?? new List<TicketResponseDto>();
+            }
+            catch (System.Text.Json.JsonException jex)
+            {
+                Console.WriteLine($"JSON parse error: {jex.Message}");
+                Console.WriteLine($"Response body:\n{text}");
+                myTickets = new List<TicketResponseDto>();
+            }
+
+            // Si prefieres usar el servicio, asegúrate de que el servicio también maneje errores como aquí:
+            // var serviceTickets = await TicketService.GetMyTicketsAsync();
         }
         catch (Exception ex)
         {
@@ -108,8 +170,6 @@
 
     private void SelectTicket(Guid ticketId)
     {
-        // Navigate to detail page or show modal
-        // For now, just log it
         Console.WriteLine($"Selected ticket: {ticketId}");
     }
 

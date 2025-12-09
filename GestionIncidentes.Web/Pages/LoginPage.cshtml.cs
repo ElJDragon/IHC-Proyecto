@@ -1,10 +1,11 @@
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.RazorPages;
+using System.Security.Claims;
+using System.Text;
+using GestionIncidentes.Application.Features.Auth.Commands;
+using MediatR;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
-using System.Security.Claims;
-using MediatR;
-using GestionIncidentes.Application.Features.Auth.Commands;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace GestionIncidentes.Web.Pages;
 
@@ -22,10 +23,10 @@ public class LoginPageModel : PageModel
 
     [BindProperty]
     public string Email { get; set; } = "";
-    
+
     [BindProperty]
     public string Password { get; set; } = "";
-    
+
     public string? ErrorMessage { get; set; }
 
     public void OnGet()
@@ -49,33 +50,30 @@ public class LoginPageModel : PageModel
 
         _logger.LogInformation($"[LoginPage] Login exitoso - UserId: {result.UserId}, Role: {result.Role}");
 
-        // Crear claims
+        // Generar JWT
         var claims = new List<Claim>
+    {
+        new Claim(ClaimTypes.NameIdentifier, result.UserId.ToString()!),
+        new Claim(ClaimTypes.Name, result.UserName!),
+        new Claim(ClaimTypes.Role, result.Role!),
+        new Claim(ClaimTypes.Email, Email)
+    };
+
+        var key = Encoding.ASCII.GetBytes("EstaClaveTieneExactamente32Bytes!!");
+        var tokenHandler = new System.IdentityModel.Tokens.Jwt.JwtSecurityTokenHandler();
+        var tokenDescriptor = new Microsoft.IdentityModel.Tokens.SecurityTokenDescriptor
         {
-            new Claim(ClaimTypes.NameIdentifier, result.UserId.ToString()!),
-            new Claim(ClaimTypes.Name, result.UserName!),
-            new Claim(ClaimTypes.Role, result.Role!),
-            new Claim(ClaimTypes.Email, Email)
+            Subject = new ClaimsIdentity(claims),
+            Expires = DateTime.UtcNow.AddHours(8),
+            SigningCredentials = new Microsoft.IdentityModel.Tokens.SigningCredentials(
+                new Microsoft.IdentityModel.Tokens.SymmetricSecurityKey(key),
+                Microsoft.IdentityModel.Tokens.SecurityAlgorithms.HmacSha256Signature
+            )
         };
+        var token = tokenHandler.CreateToken(tokenDescriptor);
+        var tokenString = tokenHandler.WriteToken(token);
 
-        _logger.LogInformation($"[LoginPage] Claims creados: {claims.Count}");
-
-        var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
-        var claimsPrincipal = new ClaimsPrincipal(claimsIdentity);
-
-        _logger.LogInformation("[LoginPage] Creando cookie de autenticacion");
-        
-        await HttpContext.SignInAsync(
-            CookieAuthenticationDefaults.AuthenticationScheme,
-            claimsPrincipal,
-            new AuthenticationProperties
-            {
-                IsPersistent = true,
-                ExpiresUtc = DateTimeOffset.UtcNow.AddHours(8)
-            });
-
-        _logger.LogInformation("[LoginPage] Cookie creada exitosamente");
-
+        // Redirigir a la página intermedia SetToken
         var redirectUrl = result.Role!.ToLower() switch
         {
             "admin" => "/admin/dashboard",
@@ -83,8 +81,10 @@ public class LoginPageModel : PageModel
             _ => "/usuario/dashboard"
         };
 
-        _logger.LogInformation($"[LoginPage] Redirigiendo a: {redirectUrl}");
-        
-        return Redirect(redirectUrl);
+        var intermediatePageUrl = $"/SetToken?jwt={tokenString}&userId={result.UserId}&redirect={redirectUrl}";
+        _logger.LogInformation($"[LoginPage] Redirigiendo a la página intermedia: {intermediatePageUrl}");
+
+        return Redirect(intermediatePageUrl);
     }
+
 }

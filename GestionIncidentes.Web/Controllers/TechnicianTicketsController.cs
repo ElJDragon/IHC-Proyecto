@@ -21,14 +21,14 @@ public class TechnicianTicketsController : ControllerBase
     }
 
     // ==================== Listar Mis Tickets Asignados ====================
-    [HttpGet("my-tickets")]
-    public async Task<IActionResult> GetMyTickets()
+    [HttpGet("my-tickets/{id}")]
+    public async Task<IActionResult> GetMyTickets(Guid id)
     {
-        var technicianId = GetCurrentUserId();
-        if (technicianId == Guid.Empty)
+       
+        if (id == Guid.Empty)
             return Unauthorized();
 
-        var tickets = await _ticketRepo.ListByTechnicianAsync(technicianId);
+        var tickets = await _ticketRepo.ListByTechnicianAsync(id);
         
         var response = new List<TicketResponseDto>();
         foreach (var ticket in tickets)
