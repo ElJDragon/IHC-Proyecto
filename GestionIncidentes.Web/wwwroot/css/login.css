@@ -1,46 +1,54 @@
 /* ============================================
-   LOGIN PAGE STYLES
+   LOGIN PAGE - SISTEMA UTA
+   Parámetros IHC: Variables Globales, Contraste, Affordance
    ============================================ */
 @import url('https://fonts.googleapis.com/icon?family=Material+Icons');
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
 
-:root {
-    --primary-blue: #2563EB;
-    --primary-blue-light: #3B82F6;
-    --success-green: #10B981;
-    --danger-red: #EF4444;
-    --text-dark: #111827;
-    --text-gray: #6B7280;
-    --background-light: #F9FAFB;
-    --background-white: #FFFFFF;
-    --border-color: #E5E7EB;
-}
+/* 
+  PARÁMETRO IHC: No redefinir variables, usar las del sistema
+  Justificación: "La consistencia implica que todos los mecanismos deben funcionar de la misma manera"
+*/
 
 body {
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    font-family: var(--font-family);
     margin: 0;
     padding: 0;
 }
 
+/* 
+  PARÁMETRO IHC: Contraste de Color
+  Justificación: Fondo con imagen de la UTA, overlay oscuro para contraste WCAG AA
+*/
 .login-container {
     min-height: 100vh;
     width: 100vw;
     display: flex;
     align-items: center;
     justify-content: center;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    padding: 20px;
+    /* Gradiente institucional UTA: Rojo a gris */
+    background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-secondary) 100%);
+    padding: var(--spacing-xl);
     box-sizing: border-box;
+    position: relative;
 }
 
+/* 
+  PARÁMETRO IHC: Agrupación Visual (Card)
+  Justificación: "Los objetos dentro de una región cerrada se percibirán agrupados" (Ley de Región Común)
+*/
 .login-card {
-    background: var(--background-white);
-    border-radius: 16px;
-    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    background: var(--color-surface);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-2xl);
     max-width: 520px;
     width: 100%;
-    padding: 48px;
+    padding: var(--spacing-3xl);
     box-sizing: border-box;
+    position: relative;
+    z-index: 10;
+    /* Borde sutil para definir región */
+    border: 1px solid var(--color-border);
 }
 
 /* ============================================
@@ -48,131 +56,154 @@ body {
    ============================================ */
 .login-header {
     text-align: center;
-    margin-bottom: 32px;
+    margin-bottom: var(--spacing-xl);
 }
 
 .brand-logo {
-    margin-bottom: 16px;
+    margin-bottom: var(--spacing-lg);
 }
 
+/* 
+  PARÁMETRO IHC: Identidad Visual UTA
+  Justificación: Color primario institucional para reconocimiento inmediato
+*/
 .brand-icon {
-    width: 64px;
-    height: 64px;
-    background: linear-gradient(135deg, var(--primary-blue) 0%, var(--primary-blue-light) 100%);
-    border-radius: 16px;
+    width: 72px;
+    height: 72px;
+    background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-hover) 100%);
+    border-radius: var(--radius-lg);
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    color: white;
-    font-weight: 700;
-    font-size: 28px;
+    color: var(--color-text-inverse);
+    font-weight: var(--font-weight-bold);
+    font-size: 32px;
+    box-shadow: var(--shadow-lg);
 }
 
+/* 
+  PARÁMETRO IHC: Tipografía - Jerarquía Visual
+  Justificación: "Limita los tamaños a 3 niveles (H1, H2, Body)"
+*/
 .login-title {
-    font-size: 24px;
-    font-weight: 700;
-    color: var(--text-dark);
-    margin: 0 0 4px 0;
+    font-size: var(--font-size-h1);
+    font-weight: var(--font-weight-semibold);
+    color: var(--color-text-primary);
+    margin: 0 0 var(--spacing-xs) 0;
 }
 
 .login-subtitle {
-    font-size: 16px;
-    color: var(--text-gray);
+    font-size: var(--font-size-body);
+    color: var(--color-text-secondary);
     margin: 0;
+    line-height: var(--line-height-normal);
 }
 
 .login-section-title {
-    font-size: 18px;
-    font-weight: 600;
-    color: var(--text-dark);
-    margin-bottom: 24px;
-    padding-bottom: 12px;
-    border-bottom: 1px solid var(--border-color);
+    font-size: var(--font-size-h2);
+    font-weight: var(--font-weight-semibold);
+    color: var(--color-text-primary);
+    margin-bottom: var(--spacing-lg);
+    padding-bottom: var(--spacing-sm);
+    border-bottom: 2px solid var(--color-primary-light);
 }
 
 /* ============================================
    FORM
    ============================================ */
 .login-form {
-    margin-bottom: 24px;
+    margin-bottom: var(--spacing-xl);
 }
 
 .form-group {
-    margin-bottom: 20px;
+    margin-bottom: var(--spacing-lg);
 }
 
-.form-group label {
+/* 
+  PARÁMETRO IHC: Etiquetas Visibles
+  Justificación: "Usa <label> visible siempre. No uses el placeholder como única etiqueta"
+*/
+.form-group label,
+.form-label {
     display: block;
-    font-size: 14px;
-    font-weight: 500;
-    color: var(--text-dark);
-    margin-bottom: 8px;
+    font-size: var(--font-size-body);
+    font-weight: var(--font-weight-medium);
+    color: var(--color-text-primary);
+    margin-bottom: var(--spacing-xs);
 }
 
-.form-group input {
+/* 
+  PARÁMETRO IHC: Affordance + Contraste
+  Justificación: "Elementos clicables deben cambiar de estado al hover" + "Alto contraste entre letra y fondo"
+*/
+.form-group input,
+.form-input {
     width: 100%;
-    padding: 12px 16px;
-    font-size: 15px;
-    border: 1px solid var(--border-color);
-    border-radius: 8px;
-    transition: all 0.2s ease;
-    font-family: 'Inter', sans-serif;
+    padding: var(--spacing-sm) var(--spacing-md);
+    font-size: var(--font-size-body);
+    color: var(--color-text-primary);
+    background-color: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    transition: all var(--transition-fast);
+    font-family: var(--font-family);
     box-sizing: border-box;
 }
 
-.form-group input:focus {
-    outline: none;
-    border-color: var(--primary-blue);
-    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
-}
-
-.form-group input:disabled {
-    background-color: #F3F4F6;
-    cursor: not-allowed;
-}
-
-.form-label {
-    display: block;
-    font-size: 14px;
-    font-weight: 500;
-    color: var(--text-dark);
-    margin-bottom: 8px;
-}
-
-.form-input {
-    width: 100%;
-    padding: 12px 16px;
-    font-size: 15px;
-    border: 1px solid var(--border-color);
-    border-radius: 8px;
-    transition: all 0.2s ease;
-    font-family: 'Inter', sans-serif;
-}
-
+/* 
+  PARÁMETRO IHC: Feedback Inmediato
+  Justificación: "Es necesario notificar al usuario que se ha recibido su petición"
+*/
+.form-group input:focus,
 .form-input:focus {
     outline: none;
-    border-color: var(--primary-blue);
-    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+    border-color: var(--color-primary);
+    /* Sombra de enfoque visible - WCAG 2.1 Focus Visible */
+    box-shadow: 0 0 0 3px var(--color-primary-light);
+}
+
+.form-group input:disabled,
+.form-input:disabled {
+    background-color: var(--color-surface-hover);
+    color: var(--color-text-tertiary);
+    cursor: not-allowed;
+    opacity: 0.6;
 }
 
 .password-input-wrapper {
     position: relative;
 }
 
+/* 
+  PARÁMETRO IHC: Iconos Semánticos
+  Justificación: "Todo icono debe tener aria-label si es funcional"
+*/
 .password-toggle {
     position: absolute;
-    right: 12px;
+    right: var(--spacing-sm);
     top: 50%;
     transform: translateY(-50%);
     background: none;
     border: none;
     cursor: pointer;
-    padding: 4px;
-    color: var(--text-gray);
+    padding: var(--spacing-xs);
+    color: var(--color-text-secondary);
+    transition: color var(--transition-fast);
+    /* Área de clic accesible (mínimo 44x44px) */
+    min-width: 44px;
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .password-toggle:hover {
-    color: var(--text-dark);
+    color: var(--color-primary);
+}
+
+.password-toggle:focus {
+    outline: 2px solid var(--color-primary);
+    outline-offset: 2px;
 }
 
 /* ============================================
@@ -182,42 +213,57 @@ body {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 24px;
+    margin-bottom: var(--spacing-lg);
+    /* Espaciado para separar elementos no relacionados (Ley de Proximidad) */
+    gap: var(--spacing-md);
 }
 
 .checkbox-label {
     display: flex;
     align-items: center;
-    gap: 8px;
-    font-size: 14px;
-    color: var(--text-gray);
+    gap: var(--spacing-sm);
+    font-size: var(--font-size-small);
+    color: var(--color-text-secondary);
     cursor: pointer;
+    user-select: none;
 }
 
+/* Enlaces clicables con color UTA */
 .forgot-link {
-    font-size: 14px;
-    color: var(--primary-blue);
+    font-size: var(--font-size-small);
+    color: var(--color-primary);
     text-decoration: none;
+    font-weight: var(--font-weight-medium);
+    transition: color var(--transition-fast);
 }
 
 .forgot-link:hover {
+    color: var(--color-primary-hover);
     text-decoration: underline;
 }
 
+.forgot-link:focus {
+    outline: 2px solid var(--color-primary);
+    outline-offset: 2px;
+}
+
 /* ============================================
-   ALERTS
+   ALERTS - Estados visuales claros
+   PARÁMETRO IHC: Feedback Inmediato
    ============================================ */
 .alert-error {
-    padding: 12px 16px;
-    border-radius: 8px;
-    margin-bottom: 20px;
+    padding: var(--spacing-md);
+    border-radius: var(--radius-md);
+    margin-bottom: var(--spacing-lg);
     display: flex;
     align-items: center;
-    gap: 12px;
-    font-size: 14px;
-    background-color: #FEE2E2;
-    color: #991B1B;
-    border: 1px solid #FECACA;
+    gap: var(--spacing-sm);
+    font-size: var(--font-size-small);
+    background-color: var(--color-critical-bg);
+    color: var(--color-critical);
+    border: 1px solid var(--color-critical-border);
+    /* Sombra para elevar y llamar atención */
+    box-shadow: var(--shadow-sm);
 }
 
 .alert-error svg {
@@ -231,42 +277,66 @@ body {
 }
 
 /* ============================================
-   BUTTONS
+   BUTTONS - Color UTA + Affordance
+   PARÁMETRO IHC: Affordance + Feedback Inmediato
+   Justificación: "Elementos clicables deben cambiar de estado al hover" + "Notificar que el sistema está trabajando"
    ============================================ */
 .btn-login {
     width: 100%;
-    padding: 14px;
-    background: linear-gradient(135deg, var(--primary-blue) 0%, var(--primary-blue-light) 100%);
-    color: white;
+    padding: var(--spacing-md) var(--spacing-lg);
+    /* Gradiente del rojo UTA para dar profundidad */
+    background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-hover) 100%);
+    color: var(--color-text-inverse);
     border: none;
-    border-radius: 8px;
-    font-size: 16px;
-    font-weight: 600;
+    border-radius: var(--radius-md);
+    font-size: var(--font-size-body);
+    font-weight: var(--font-weight-semibold);
     cursor: pointer;
-    transition: all 0.2s ease;
+    transition: all var(--transition-fast);
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 8px;
+    gap: var(--spacing-sm);
+    font-family: var(--font-family);
+    /* Sombra para elevar (affordance) */
+    box-shadow: var(--shadow-sm);
 }
 
+/* Hover State - Elevación visual */
 .btn-login:hover:not(:disabled) {
-    transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.4);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-lg);
+    /* Oscurecer ligeramente */
+    filter: brightness(1.05);
 }
 
+/* Active/Click State - Feedback táctil */
+.btn-login:active:not(:disabled) {
+    transform: translateY(0);
+    box-shadow: var(--shadow-sm);
+}
+
+/* Focus State - Accesibilidad teclado */
+.btn-login:focus {
+    outline: 2px solid var(--color-primary);
+    outline-offset: 2px;
+}
+
+/* Estado Deshabilitado - Prevención de errores */
 .btn-login:disabled {
-    opacity: 0.6;
+    opacity: 0.5;
     cursor: not-allowed;
+    transform: none;
 }
 
+/* Spinner de carga - Feedback Inmediato */
 .spinner {
     width: 20px;
     height: 20px;
-    border: 3px solid rgba(255, 255, 255, 0.3);
-    border-top-color: white;
+    border: 2px solid var(--color-border);
+    border-top-color: var(--color-text-inverse);
     border-radius: 50%;
-    animation: spin 0.8s linear infinite;
+    animation: spin 0.6s linear infinite;
 }
 
 @keyframes spin {
@@ -274,143 +344,162 @@ body {
 }
 
 /* ============================================
-   DEMO SECTION
+   DEMO SECTION - Ayuda Contextual
+   PARÁMETRO IHC: Ayuda Contextual
+   Justificación: "Explica los requisitos antes de que ocurran errores"
    ============================================ */
 .demo-section {
-    margin-top: 24px;
-    padding-top: 24px;
-    border-top: 1px solid var(--border-color);
+    margin-top: var(--spacing-xl);
+    padding-top: var(--spacing-xl);
+    /* Separación visual clara (Ley de Proximidad) */
+    border-top: 1px solid var(--color-divider);
 }
 
 .demo-title {
-    font-size: 14px;
-    font-weight: 600;
-    color: var(--text-dark);
-    margin-bottom: 12px;
+    font-size: var(--font-size-small);
+    font-weight: var(--font-weight-semibold);
+    color: var(--color-text-primary);
+    margin-bottom: var(--spacing-md);
     text-align: center;
 }
 
 .demo-grid {
     display: grid;
-    gap: 8px;
+    gap: var(--spacing-sm);
 }
 
+/* Agrupación Visual - Card para cada usuario demo */
 .demo-user {
-    padding: 10px 12px;
-    background-color: var(--background-light);
-    border-radius: 6px;
-    font-size: 13px;
-    color: var(--text-gray);
+    padding: var(--spacing-sm) var(--spacing-md);
+    background-color: var(--color-surface-hover);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    font-size: var(--font-size-small);
+    color: var(--color-text-secondary);
+    line-height: var(--line-height-normal);
 }
 
 .demo-user strong {
-    color: var(--text-dark);
-    font-weight: 600;
+    color: var(--color-text-primary);
+    font-weight: var(--font-weight-semibold);
 }
 
-.demo-title {
-    font-size: 14px;
-    font-weight: 600;
-    color: var(--text-gray);
-    margin-bottom: 16px;
-    text-align: center;
-}
-
+/* Botones demo con affordance claro */
 .demo-buttons {
     display: flex;
     flex-direction: column;
-    gap: 12px;
+    gap: var(--spacing-sm);
 }
 
 .demo-btn {
-    padding: 12px 16px;
-    border: 1px solid var(--border-color);
-    border-radius: 8px;
-    background-color: var(--background-white);
+    padding: var(--spacing-sm) var(--spacing-md);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    background-color: var(--color-surface);
     cursor: pointer;
-    transition: all 0.2s ease;
+    transition: all var(--transition-fast);
     display: flex;
     justify-content: space-between;
     align-items: center;
 }
 
 .demo-btn:hover {
-    border-color: var(--primary-blue);
-    box-shadow: 0 2px 8px rgba(37, 99, 235, 0.1);
+    border-color: var(--color-primary);
+    box-shadow: var(--shadow-md);
+    transform: translateY(-1px);
+}
+
+.demo-btn:focus {
+    outline: 2px solid var(--color-primary);
+    outline-offset: 2px;
 }
 
 .demo-role {
-    font-size: 14px;
-    font-weight: 500;
-    color: var(--text-dark);
+    font-size: var(--font-size-small);
+    font-weight: var(--font-weight-medium);
+    color: var(--color-text-primary);
 }
 
+/* Badges con colores UTA */
 .demo-badge {
-    font-size: 12px;
-    padding: 4px 12px;
-    border-radius: 12px;
-    font-weight: 600;
+    font-size: var(--font-size-xs);
+    padding: var(--spacing-xs) var(--spacing-sm);
+    border-radius: var(--radius-full);
+    font-weight: var(--font-weight-semibold);
 }
 
 .admin-btn .demo-badge {
-    background-color: #FEE2E2;
-    color: #991B1B;
+    background-color: var(--color-critical-bg);
+    color: var(--color-critical);
+    border: 1px solid var(--color-critical-border);
 }
 
 .tech-btn .demo-badge {
-    background-color: #DBEAFE;
-    color: #1E40AF;
+    background-color: var(--color-info-bg);
+    color: #055160;
+    border: 1px solid var(--color-info-border);
 }
 
 .user-btn .demo-badge {
-    background-color: #E5E7EB;
-    color: #374151;
+    background-color: var(--color-pending-bg);
+    color: var(--color-pending);
+    border: 1px solid var(--color-pending-border);
 }
 
 .demo-credentials {
-    margin-top: 16px;
-    padding: 16px;
-    background-color: var(--background-light);
-    border-radius: 8px;
-    font-size: 13px;
+    margin-top: var(--spacing-md);
+    padding: var(--spacing-md);
+    background-color: var(--color-surface-hover);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    font-size: var(--font-size-small);
 }
 
 .credentials-title {
-    font-weight: 600;
-    color: var(--text-dark);
-    margin-bottom: 8px;
+    font-weight: var(--font-weight-semibold);
+    color: var(--color-text-primary);
+    margin-bottom: var(--spacing-sm);
 }
 
 .credential-item {
-    color: var(--text-gray);
-    margin-bottom: 4px;
+    color: var(--color-text-secondary);
+    margin-bottom: var(--spacing-xs);
+    line-height: var(--line-height-normal);
 }
 
 /* ============================================
    FOOTER
    ============================================ */
 .login-footer {
-    margin-top: 24px;
+    margin-top: var(--spacing-xl);
     text-align: center;
-    font-size: 13px;
-    color: var(--text-gray);
+    font-size: var(--font-size-small);
+    color: var(--color-text-secondary);
 }
 
 .login-footer a {
-    color: var(--primary-blue);
+    color: var(--color-primary);
     text-decoration: none;
+    font-weight: var(--font-weight-medium);
+    transition: color var(--transition-fast);
 }
 
 .login-footer a:hover {
+    color: var(--color-primary-hover);
     text-decoration: underline;
 }
 
+.login-footer a:focus {
+    outline: 2px solid var(--color-primary);
+    outline-offset: 2px;
+}
+
 /* ============================================
-   RESPONSIVE
+   RESPONSIVE - Espaciado adaptativo
    ============================================ */
 @media (max-width: 480px) {
     .login-card {
-        padding: 24px;
+        padding: var(--spacing-xl);
     }
 
     .login-title {
@@ -418,8 +507,25 @@ body {
     }
 
     .brand-icon {
-        width: 56px;
-        height: 56px;
-        font-size: 24px;
+        width: 60px;
+        height: 60px;
+        font-size: 28px;
+    }
+    
+    .form-options {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: var(--spacing-sm);
+    }
+}
+
+/* Mejoras de accesibilidad adicionales */
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
     }
 }

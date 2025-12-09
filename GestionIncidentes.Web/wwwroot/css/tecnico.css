@@ -1,9 +1,10 @@
 /* Mis Tickets - Técnico */
+/* IHC: Variables Globales - Colores de Prioridad con Paleta UTA */
 :root {
-  --critical: #ef4444;
-  --high: #f59e0b;
-  --medium: #3b82f6;
-  --low: #22c55e;
+  --critical: var(--color-critical, #DC2626); /* UTA Red para crítico */
+  --high: var(--color-warning, #F59E0B); /* Naranja para alta */
+  --medium: var(--color-info, #2563EB); /* Azul para media */
+  --low: var(--color-success, #10B981); /* Verde para baja */
 }
 
 .tickets-shell { display:grid; grid-template-columns: 360px 1fr; gap: 24px; }
@@ -12,13 +13,15 @@
 .ticket-item .header { display:flex; align-items:center; justify-content:space-between; padding:10px 12px; border-bottom:1px solid #e9eef6; }
 .ticket-item .title { font-weight:600; color:var(--text-dark); }
 .ticket-item .badge { border-radius:999px; padding:4px 8px; font-size:12px; font-weight:600; }
-.badge.critica { background:#fee2e2; color:#b91c1c; }
-.badge.alta { background:#fff1d6; color:#b45309; }
-.badge.media { background:#e6f0ff; color:#1d4ed8; }
-.badge.baja { background:#dcfce7; color:#166534; }
+/* IHC: Contraste de Color - Badges con colores semánticos UTA */
+.badge.critica { background:var(--color-critical-bg, #FEE2E2); color:var(--color-critical, #DC2626); }
+.badge.alta { background:var(--color-warning-bg, #FFF1D6); color:var(--color-warning, #F59E0B); }
+.badge.media { background:var(--color-info-bg, #DBEAFE); color:var(--color-info, #2563EB); }
+.badge.baja { background:var(--color-success-bg, #DCFCE7); color:var(--color-success, #10B981); }
 .ticket-item .meta { display:flex; gap:12px; color:var(--text-gray); font-size:13px; padding:8px 12px; }
-.progress { height:8px; background:#eef2f7; border-radius:999px; margin:8px 12px 12px; overflow:hidden; }
-.progress .bar { height:100%; border-radius:999px; background: linear-gradient(90deg, #60a5fa, #2563eb); width:40%; }
+/* IHC: Feedback Visual - Barra de progreso con gradiente UTA */
+.progress { height:8px; background:var(--color-bg-tertiary, #F3F4F6); border-radius:999px; margin:8px 12px 12px; overflow:hidden; }
+.progress .bar { height:100%; border-radius:999px; background: linear-gradient(90deg, var(--color-primary-light, #B91C3C), var(--color-primary, #8B1538)); width:40%; }
 
 .ticket-detail { background:#fff; border:1px solid var(--border-color); border-radius:16px; padding:16px; }
 .ticket-detail .title { display:flex; align-items:center; gap:8px; font-size:20px; font-weight:700; }

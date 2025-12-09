@@ -4,15 +4,15 @@
    ========================================== */
 
 :root {
-  /* Colores modo claro (por defecto) */
-  --color-primary: #3b82f6;
-  --color-primary-light: rgba(59, 130, 246, 0.1);
+  /* Colores modo claro (por defecto) - Paleta UTA */
+  --color-primary: var(--uta-primary, #8B1538);
+  --color-primary-light: rgba(139, 21, 56, 0.1);
   --color-success: #10b981;
   --color-success-bg: rgba(16, 185, 129, 0.1);
   --color-warning: #f59e0b;
   --color-error: #ef4444;
-  --color-info: #06b6d4;
-  --color-info-light: rgba(6, 182, 212, 0.1);
+  --color-info: #2563EB;
+  --color-info-light: rgba(37, 99, 235, 0.1);
   
   --text-dark: #1f2937;
   --text-gray: #6b7280;
@@ -37,15 +37,15 @@
    ========================================== */
 
 .dark-theme {
-  /* Colores primarios con mayor contraste */
-  --color-primary: #60a5fa;
-  --color-primary-light: rgba(96, 165, 250, 0.15);
+  /* Colores primarios con mayor contraste - UTA oscuro */
+  --color-primary: #C72C5B; /* Versión más clara del rojo UTA para contraste */
+  --color-primary-light: rgba(199, 44, 91, 0.15);
   --color-success: #34d399;
   --color-success-bg: rgba(52, 211, 153, 0.15);
   --color-warning: #fbbf24;
   --color-error: #f87171;
-  --color-info: #22d3ee;
-  --color-info-light: rgba(34, 211, 238, 0.15);
+  --color-info: #60a5fa; /* Azul claro para info en tema oscuro */
+  --color-info-light: rgba(96, 165, 250, 0.15);
   
   /* Textos con contraste óptimo (WCAG AA) */
   --text-dark: #f9fafb;
@@ -153,10 +153,10 @@
 }
 
 /* Deuteranopia - Dificultad con Verde (más común: 6% hombres)
-   Evita verde-rojo, usa azul-amarillo-púrpura */
+   Evita verde-rojo, usa azul-amarillo-púrpura con primario UTA */
 .colorblind-deuteranopia {
-  --color-primary: #3b82f6; /* Azul */
-  --color-primary-light: rgba(59, 130, 246, 0.15);
+  --color-primary: #8B1538; /* Rojo UTA es distinguible en deuteranopia */
+  --color-primary-light: rgba(139, 21, 56, 0.15);
   --color-success: #0ea5e9; /* Azul cielo (reemplaza verde) */
   --color-success-bg: rgba(14, 165, 233, 0.15);
   --color-error: #f59e0b; /* Ámbar (reemplaza rojo) */

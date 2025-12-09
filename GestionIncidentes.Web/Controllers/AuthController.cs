@@ -131,7 +131,7 @@ public class AuthController : ControllerBase
             "admin" => "/admin/dashboard",
             "tecnico" => "/tecnico/dashboard",
             "usuario" => "/usuario/dashboard",
-            _ => "/login"
+            _ => "/LoginPage"
         };
     }
 }
