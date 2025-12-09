@@ -262,7 +262,33 @@ else
 }
 
 app.UseHttpsRedirection();
+
+// Middleware personalizado para redirigir a archivos HTML estáticos
+app.Use(async (context, next) =>
+{
+    var path = context.Request.Path.Value;
+    
+    // Si la ruta termina sin extensión y existe un archivo .html correspondiente
+    if (!string.IsNullOrEmpty(path) && !path.Contains('.'))
+    {
+        var htmlPath = $"{path}.html";
+        var filePath = Path.Combine(app.Environment.WebRootPath, htmlPath.TrimStart('/'));
+        
+        if (File.Exists(filePath))
+        {
+            context.Request.Path = htmlPath;
+        }
+    }
+    
+    await next();
+});
+
 app.UseStaticFiles();
+app.UseDefaultFiles(new DefaultFilesOptions
+{
+    DefaultFileNames = new List<string> { "index.html", "default.html" }
+});
+
 app.UseRouting();
 app.UseCors();
 

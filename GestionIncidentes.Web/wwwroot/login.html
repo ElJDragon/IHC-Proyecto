@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NetManager - Inicio de Sesión</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* Estilos específicos para Login */
+        .login-container {
+            min-height: 100vh;
+            background: linear-gradient(135deg, var(--color-primary) 0%, #003d9a 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1.5rem;
+        }
+
+        .login-card {
+            background: var(--color-surface);
+            border-radius: 16px;
+            box-shadow: var(--shadow-xl);
+            padding: 2rem;
+            width: 100%;
+            max-width: 500px;
+        }
+
+        .logo-container {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .logo-icon {
+            width: 80px;
+            height: 80px;
+            background: var(--color-primary);
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1rem;
+            box-shadow: var(--shadow-lg);
+        }
+
+        .logo-icon svg {
+            width: 48px;
+            height: 48px;
+            stroke: white;
+        }
+
+        .university-badge {
+            display: inline-block;
+            background: var(--color-primary-light);
+            color: var(--color-primary);
+            padding: 0.375rem 1rem;
+            border-radius: var(--radius-full);
+            font-size: 14px;
+            font-weight: 500;
+            margin-top: 0.5rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+            position: relative;
+        }
+
+        .input-with-icon {
+            position: relative;
+        }
+
+        .input-icon {
+            position: absolute;
+            left: 0.75rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--color-text-tertiary);
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .input-with-icon input {
+            padding-left: 2.75rem;
+            padding-top: 1.5rem;
+            padding-bottom: 0.5rem;
+        }
+
+        .floating-label {
+            position: absolute;
+            left: 2.75rem;
+            top: 0.5rem;
+            font-size: 12px;
+            color: var(--color-text-tertiary);
+            transition: all 0.2s;
+            pointer-events: none;
+        }
+
+        .input-with-icon input:placeholder-shown + .floating-label {
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 16px;
+        }
+
+        .input-with-icon input:focus + .floating-label {
+            top: 0.5rem;
+            transform: translateY(0);
+            font-size: 12px;
+            color: var(--color-primary);
+        }
+
+        .error-container {
+            min-height: 24px;
+            margin-bottom: 1rem;
+        }
+
+        .error-message {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: var(--color-critical-bg);
+            border: 1px solid var(--color-critical);
+            color: var(--color-critical);
+            padding: 0.75rem;
+            border-radius: var(--radius-md);
+            font-size: 14px;
+        }
+
+        .submit-btn {
+            width: 100%;
+            padding: 1rem 1.5rem;
+            background: var(--color-primary);
+            color: white;
+            border: none;
+            border-radius: var(--radius-md);
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            box-shadow: var(--shadow-md);
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        .submit-btn:hover {
+            background: var(--color-primary-hover);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .submit-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .submit-btn svg {
+            transition: transform 0.2s;
+        }
+
+        .submit-btn:hover svg.arrow-icon {
+            transform: translateX(4px);
+        }
+
+        .spinner {
+            width: 20px;
+            height: 20px;
+            border: 2px solid white;
+            border-top-color: transparent;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        .helper-links {
+            margin-top: 1.5rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid var(--color-border);
+        }
+
+        .helper-link {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            color: var(--color-primary);
+            font-size: 14px;
+            text-decoration: none;
+            padding: 0.5rem;
+            transition: color 0.2s;
+        }
+
+        .helper-link:hover {
+            color: var(--color-primary-hover);
+        }
+
+        .helper-link.secondary {
+            color: var(--color-text-secondary);
+        }
+
+        .helper-link.secondary:hover {
+            color: var(--color-primary);
+        }
+
+        .demo-credentials {
+            margin-top: 1.5rem;
+            background: #f8f9fa;
+            padding: 1rem;
+            border-radius: var(--radius-md);
+        }
+
+        .demo-credentials p {
+            font-size: 12px;
+            color: var(--color-text-secondary);
+            margin-bottom: 0.5rem;
+        }
+
+        .demo-credentials .credential-item {
+            font-size: 12px;
+            color: var(--color-text-secondary);
+            margin: 0.25rem 0;
+        }
+
+        .demo-credentials strong {
+            color: var(--color-text-primary);
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 1.5rem;
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <div style="width: 100%; max-width: 500px;">
+            <!-- Login Card -->
+            <div class="login-card">
+                <!-- Logo y Header -->
+                <div class="logo-container">
+                    <div class="logo-icon">
+                        <svg class="icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="2" y="2" width="20" height="8" rx="2" ry="2"></rect>
+                            <rect x="2" y="14" width="20" height="8" rx="2" ry="2"></rect>
+                            <line x1="6" y1="6" x2="6.01" y2="6"></line>
+                            <line x1="6" y1="18" x2="6.01" y2="18"></line>
+                        </svg>
+                    </div>
+                    <h1 style="font-size: 28px; margin-bottom: 0.5rem;">NetManager</h1>
+                    <p style="color: var(--color-text-secondary);">Sistema de Gestión de Red</p>
+                    <div class="university-badge">
+                        Universidad Institucional
+                    </div>
+                </div>
+
+                <!-- Formulario -->
+                <form id="loginForm">
+                    <!-- Email Field -->
+                    <div class="form-group">
+                        <div class="input-with-icon">
+                            <svg class="icon icon-sm input-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <rect x="2" y="4" width="20" height="16" rx="2"></rect>
+                                <path d="m2 7 10 7 10-7"></path>
+                            </svg>
+                            <input type="email" id="email" name="email" placeholder=" " required>
+                            <label for="email" class="floating-label">Correo Institucional</label>
+                        </div>
+                    </div>
+
+                    <!-- Password Field -->
+                    <div class="form-group">
+                        <div class="input-with-icon">
+                            <svg class="icon icon-sm input-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                                <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                            </svg>
+                            <input type="password" id="password" name="password" placeholder=" " required>
+                            <label for="password" class="floating-label">Contraseña</label>
+                        </div>
+                    </div>
+
+                    <!-- Error Container -->
+                    <div class="error-container">
+                        <div id="errorMessage" class="error-message hidden">
+                            <svg class="icon icon-sm" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <circle cx="12" cy="12" r="10"></circle>
+                                <line x1="12" y1="8" x2="12" y2="12"></line>
+                                <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                            </svg>
+                            <span id="errorText">Por favor complete todos los campos</span>
+                        </div>
+                    </div>
+
+                    <!-- Submit Button -->
+                    <button type="submit" class="submit-btn" id="submitBtn">
+                        <span id="btnText">Iniciar Sesión Institucional</span>
+                        <svg class="icon icon-sm arrow-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="5" y1="12" x2="19" y2="12"></line>
+                            <polyline points="12 5 19 12 12 19"></polyline>
+                        </svg>
+                    </button>
+                </form>
+
+                <!-- Helper Links -->
+                <div class="helper-links">
+                    <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+                        <a href="#" class="helper-link">
+                            <svg class="icon icon-sm" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <circle cx="12" cy="12" r="10"></circle>
+                                <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path>
+                                <line x1="12" y1="17" x2="12.01" y2="17"></line>
+                            </svg>
+                            ¿Olvidaste tu contraseña?
+                        </a>
+                        <a href="#" class="helper-link secondary">
+                            <svg class="icon icon-sm" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M3 11h3a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                                <path d="M21 11h-3a2 2 0 0 0-2 2v3a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2z"></path>
+                                <path d="M5 16v2a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-2"></path>
+                                <path d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                            </svg>
+                            Soporte Técnico
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Demo Credentials -->
+                <div class="demo-credentials">
+                    <p style="text-align: center; font-weight: 500; margin-bottom: 0.75rem; color: var(--color-text-tertiary);">
+                        Credenciales de prueba:
+                    </p>
+                    <div class="credential-item">• <strong>Admin:</strong> admin@universidad.edu</div>
+                    <div class="credential-item">• <strong>Técnico:</strong> tecnico@universidad.edu</div>
+                    <div class="credential-item">• <strong>Estudiante:</strong> estudiante@universidad.edu</div>
+                    <p style="color: var(--color-text-tertiary); margin-top: 0.75rem;">Contraseña: cualquier texto</p>
+                </div>
+            </div>
+
+            <!-- Footer -->
+            <div class="footer">
+                <p>© 2025 Universidad Institucional</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Manejo del formulario de login
+        const form = document.getElementById('loginForm');
+        const emailInput = document.getElementById('email');
+        const passwordInput = document.getElementById('password');
+        const errorMessage = document.getElementById('errorMessage');
+        const errorText = document.getElementById('errorText');
+        const submitBtn = document.getElementById('submitBtn');
+        const btnText = document.getElementById('btnText');
+
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const email = emailInput.value;
+            const password = passwordInput.value;
+            
+            // Validar campos
+            if (!email || !password) {
+                showError('Por favor complete todos los campos');
+                return;
+            }
+            
+            // Mostrar estado de carga
+            submitBtn.disabled = true;
+            btnText.textContent = 'Verificando...';
+            submitBtn.innerHTML = `
+                <div class="spinner"></div>
+                <span>Verificando...</span>
+            `;
+            
+            // Simular autenticación
+            setTimeout(() => {
+                // Determinar rol basado en el email
+                let role = 'student';
+                let redirectPage = 'student.html';
+                
+                if (email.includes('admin')) {
+                    role = 'admin';
+                    redirectPage = 'dashboard.html';
+                } else if (email.includes('tecnico')) {
+                    role = 'technician';
+                    redirectPage = 'technician.html';
+                }
+                
+                // Guardar sesión
+                localStorage.setItem('userRole', role);
+                localStorage.setItem('userEmail', email);
+                localStorage.setItem('isLoggedIn', 'true');
+                
+                // Redireccionar
+                window.location.href = redirectPage;
+            }, 1000);
+        });
+
+        function showError(message) {
+            errorText.textContent = message;
+            errorMessage.classList.remove('hidden');
+            errorMessage.classList.add('animate-fadeIn');
+            
+            setTimeout(() => {
+                errorMessage.classList.add('hidden');
+            }, 5000);
+        }
+
+        // Verificar si ya está logueado
+        if (localStorage.getItem('isLoggedIn') === 'true') {
+            const role = localStorage.getItem('userRole');
+            if (role === 'admin') {
+                window.location.href = 'dashboard.html';
+            } else if (role === 'technician') {
+                window.location.href = 'technician.html';
+            } else {
+                window.location.href = 'student.html';
+            }
+        }
+    </script>
+</body>
+</html>
